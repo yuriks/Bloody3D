@@ -48,4 +48,20 @@ mat<M, P> operator*(const mat<M, N>& m1, const mat<N, P>& m2)
 	return mr;
 }
 
+template <unsigned int M, unsigned int N>
+inline mat<M, N> operator+(const mat<M, N>& m1, const mat<M, N>& m2)
+{
+	mat<M, N> mr = m1;
+	mr += m2;
+	return mr;
+}
+
+template <unsigned int M, unsigned int N>
+inline mat<M, N> operator*(const mat<M, N>& m, float s)
+{
+	mat<M, N> mr = m;
+	mr *= s;
+	return mr;
+}
+
 #endif // BLOODY3D_MATRIX
