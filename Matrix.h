@@ -28,8 +28,24 @@ struct mat
 		return data[N*r + c];
 	}
 
+	inline float& operator[](unsigned int r)
+	{
+		static_assert (N == 1, "operator[] for vectors only!");
+		return data[r];
+	}
+
+	inline const float& operator[](unsigned int r) const
+	{
+		static_assert (N == 1, "operator[] for vectors only!");
+		return data[r];
+	}
+
 	float data[M*N];
 };
+
+typedef mat<4> mat4;
+typedef mat<3> mat3;
+typedef mat<2> mat2;
 
 template <unsigned int M, unsigned int N, unsigned int P>
 mat<M, P> operator*(const mat<M, N>& m1, const mat<N, P>& m2)
