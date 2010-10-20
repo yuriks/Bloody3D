@@ -28,6 +28,18 @@ inline vec3 cross(const vec3& a, const vec3& b)
 	return r;
 }
 
+template <unsigned int N>
+inline mat<N-1, 1> euclidean(const mat<N, 1>& v)
+{
+	mat<N-1, 1> r;
+
+	for (unsigned int i = 0; i < N-1; ++i) {
+		r[i] = v[i] / v[N-1];
+	}
+
+	return r;
+}
+
 };
 
 #endif // BLOODY3D_VECTOR
