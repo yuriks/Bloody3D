@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < 4; ++i) {
 		std::cout << r[i] << " ";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl << vec::length(vec::euclidean(r));
 
 	std::cout << std::endl;
 

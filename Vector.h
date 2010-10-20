@@ -40,6 +40,18 @@ inline mat<N-1, 1> euclidean(const mat<N, 1>& v)
 	return r;
 }
 
+template <unsigned int N>
+float length(const mat<N, 1>& v)
+{
+	float l = 0;
+
+	for (unsigned int i = 0; i < N; ++i) {
+		l += v[i] * v[i];
+	}
+
+	return sqrt(l);
+}
+
 };
 
 #endif // BLOODY3D_VECTOR
