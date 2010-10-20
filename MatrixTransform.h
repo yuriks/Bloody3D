@@ -36,6 +36,20 @@ const mat<N+1> translate(const mat<N,1>& v)
 	return m;
 }
 
+template <unsigned int N>
+const mat<N+1> scale(const mat<N,1>& v)
+{
+	mat<N+1> m;
+	m.clear(0.f);
+
+	for (int i = 0; i < N; ++i) {
+		m(i, i) = v[i];
+	}
+	m(N, N) = 1.f;
+
+	return m;
+}
+
 }
 
 #endif // BLOODY3D_MATRIXTRANSFORM

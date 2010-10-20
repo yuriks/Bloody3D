@@ -5,13 +5,13 @@
 
 int main(int argc, char *argv[])
 {
-	vec4 a = {4, 3, 2, 1};
+	vec4 a = {0, 0, 0, 1};
 
 	mat4 b = mat_transform::identity<4>();
 
-	vec3 t = {2, 2, 0};
-	mat4 c = mat_transform::translate(t);
-	b = b * c * c;
+	vec3 t = {1, 2, 3};
+	mat4 c = mat_transform::scale(t) * mat_transform::translate(t);
+	b = b * c;
 
 	vec4 r = b * a;
 
