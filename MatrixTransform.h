@@ -2,6 +2,7 @@
 #define BLOODY3D_MATRIXTRANSFORM
 
 #include "Matrix.h"
+#include "Vector.h"
 
 namespace mat_transform
 {
@@ -47,6 +48,8 @@ const mat<N+1> scale(const mat<N,1>& v)
 
 	return m;
 }
+
+mat4 rotate(const vec3& axis, float angle);
 
 }
 
