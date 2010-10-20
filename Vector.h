@@ -52,6 +52,12 @@ float length(const mat<N, 1>& v)
 	return sqrt(l);
 }
 
+template <unsigned int N>
+mat<N, 1> unit(const mat<N, 1>& v)
+{
+	return v * (1.f / length(v));
+}
+
 };
 
 #endif // BLOODY3D_VECTOR

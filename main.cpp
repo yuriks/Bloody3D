@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
 	mat4 c = mat_transform::scale(t) * mat_transform::translate(t);
 	b = b * c;
 
-	vec4 r = b * a;
+	vec3 r = vec::unit(vec::euclidean(b * a));
 
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		std::cout << r[i] << " ";
 	}
-	std::cout << std::endl << vec::length(vec::euclidean(r));
+	std::cout << std::endl << vec::length(r);
 
 	std::cout << std::endl;
 
