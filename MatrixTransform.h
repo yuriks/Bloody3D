@@ -24,6 +24,18 @@ const mat<N>& identity()
 	return ident_mat;
 }
 
+template <unsigned int N>
+const mat<N+1> translate(const mat<N,1>& v)
+{
+	mat<N+1> m = identity<N+1>();
+
+	for (int i = 0; i < N; ++i) {
+		m(i, N) = v[i];
+	}
+
+	return m;
+}
+
 }
 
 #endif // BLOODY3D_MATRIXTRANSFORM
