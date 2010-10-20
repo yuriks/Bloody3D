@@ -18,6 +18,13 @@ struct mat
 		}
 	}
 
+	inline void clear(float f)
+	{
+		for (unsigned int i = 0; i < M*N; ++i) {
+			data[i] = f;
+		}
+	}
+
 	inline float& operator()(unsigned int r, unsigned int c)
 	{
 		return data[N*r + c];
