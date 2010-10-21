@@ -41,6 +41,19 @@ inline mat<N-1, 1> euclidean(const mat<N, 1>& v)
 }
 
 template <unsigned int N>
+inline mat<N+1, 1> homogeneous(const mat<N, 1>& v)
+{
+	mat<N+1, 1> r;
+
+	for (unsigned int i = 0; i < N; ++i) {
+		r[i] = v[i];
+	}
+	r[N] = 1.f;
+
+	return r;
+}
+
+template <unsigned int N>
 float length(const mat<N, 1>& v)
 {
 	float l = 0;
