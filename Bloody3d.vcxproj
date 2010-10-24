@@ -13,6 +13,8 @@
   <ItemGroup>
     <ClInclude Include="src\gl3w.h" />
     <ClInclude Include="src\gl\BufferObject.h" />
+    <ClInclude Include="src\gl\Shader.h" />
+    <ClInclude Include="src\gl\ShaderProgram.h" />
     <ClInclude Include="src\gl\VertexArrayObject.h" />
     <ClInclude Include="src\Matrix.h" />
     <ClInclude Include="src\MatrixTransform.h" />
@@ -20,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gl3w.cpp" />
+    <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MatrixTransform.cpp" />
   </ItemGroup>

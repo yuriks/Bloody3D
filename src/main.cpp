@@ -3,10 +3,10 @@
 #include "MatrixTransform.h"
 #include "gl/VertexArrayObject.h"
 #include "gl/BufferObject.h"
+#include "gl/Shader.h"
+#include "gl/ShaderProgram.h"
 
 #include <iostream>
-#include <vector>
-#include <cmath>
 
 #include "gl3w.h"
 
@@ -90,42 +90,32 @@ int main(int argc, char *argv[])
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,  8*sizeof(float), (float*)0 + 4);
 		glEnableVertexAttribArray(1);
 
-		GLuint vert_shader_id, frag_shader_id;
-		vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
-		frag_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+		gl::ShaderProgram shader_prog;
 
-		glShaderSource(vert_shader_id, 1, &vert_shader_src, 0);
-		glShaderSource(frag_shader_id, 1, &frag_shader_src, 0);
+		{
+			gl::Shader vert_shader(GL_VERTEX_SHADER);
+			gl::Shader frag_shader(GL_FRAGMENT_SHADER);
 
-		glCompileShader(vert_shader_id);
-		glCompileShader(frag_shader_id);
+			vert_shader.setSource(vert_shader_src);
+			frag_shader.setSource(frag_shader_src);
 
-		GLint vert_log_size, frag_log_size;
-		glGetShaderiv(vert_shader_id, GL_INFO_LOG_LENGTH, &vert_log_size);
-		glGetShaderiv(frag_shader_id, GL_INFO_LOG_LENGTH, &frag_log_size);
-		std::vector<char> log_buf(std::max(vert_log_size, frag_log_size));
+			vert_shader.compile();
+			frag_shader.compile();
 
-		glGetShaderInfoLog(vert_shader_id, log_buf.size(), 0, &log_buf[0]);
-		std::cout << &log_buf[0];
-		glGetShaderInfoLog(frag_shader_id, log_buf.size(), 0, &log_buf[0]);
-		std::cout << &log_buf[0];
+			vert_shader.printInfoLog(std::cout);
+			frag_shader.printInfoLog(std::cout);
 
+			shader_prog.attachShader(vert_shader);
+			shader_prog.attachShader(frag_shader);
 
-		GLuint shader_prog_id;
-		shader_prog_id = glCreateProgram();
+			shader_prog.bindAttribute(0, "in_Position");
+			shader_prog.bindAttribute(1, "in_Color");
 
-		glAttachShader(shader_prog_id, vert_shader_id);
-		glAttachShader(shader_prog_id, frag_shader_id);
+			shader_prog.link();
+			shader_prog.printInfoLog(std::cout);
+		}
 
-		glBindAttribLocation(shader_prog_id, 0, "in_Position");
-		glBindAttribLocation(shader_prog_id, 1, "in_Color");
-
-		glLinkProgram(shader_prog_id);
-
-		glDeleteShader(vert_shader_id);
-		glDeleteShader(frag_shader_id);
-
-		glUseProgram(shader_prog_id);
+		shader_prog.use();
 
 		bool running = true;
 
@@ -136,15 +126,13 @@ int main(int argc, char *argv[])
 			glClearColor(0.f, 0.f, 0.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glUniformMatrix4fv(glGetUniformLocation(shader_prog_id, "in_Proj"), 1, false, &m.data[0]);
+			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
 			glfwSwapBuffers();
 
 			running = glfwGetWindowParam(GLFW_OPENED) != 0;
 		}
-
-		glDeleteProgram(shader_prog_id);
 	}
 
 	glfwTerminate();
