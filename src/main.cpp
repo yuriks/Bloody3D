@@ -1,8 +1,8 @@
 #include "Matrix.h"
 #include "Vector.h"
 #include "MatrixTransform.h"
-#include "VertexArrayObject.h"
-#include "BufferObject.h"
+#include "gl/VertexArrayObject.h"
+#include "gl/BufferObject.h"
 
 #include <iostream>
 #include <vector>

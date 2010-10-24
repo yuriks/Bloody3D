@@ -10,6 +10,19 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gl3w.h" />
+    <ClInclude Include="src\gl\BufferObject.h" />
+    <ClInclude Include="src\gl\VertexArrayObject.h" />
+    <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\MatrixTransform.h" />
+    <ClInclude Include="src\Vector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gl3w.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MatrixTransform.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>
     <RootNamespace>Bloody3d</RootNamespace>
@@ -48,6 +61,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,6 +81,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -76,19 +91,6 @@
       <AdditionalDependencies>GLFW.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="gl3w.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MatrixTransform.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="gl3w.h" />
-    <ClInclude Include="BufferObject.h" />
-    <ClInclude Include="Matrix.h" />
-    <ClInclude Include="MatrixTransform.h" />
-    <ClInclude Include="Vector.h" />
-    <ClInclude Include="VertexArrayObject.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
