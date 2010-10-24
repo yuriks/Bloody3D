@@ -2,6 +2,7 @@
 #include "Vector.h"
 #include "MatrixTransform.h"
 #include "VertexArrayObject.h"
+#include "BufferObject.h"
 
 #include <iostream>
 #include <vector>
@@ -80,10 +81,8 @@ int main(int argc, char *argv[])
 		gl::VertexArrayObject vao;
 		vao.bind();
 
-		GLuint vbo_id;
-		glGenBuffers(1, &vbo_id);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+		gl::BufferObject vbo;
+		vbo.bind(GL_ARRAY_BUFFER);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*3, static_cast<const void*>(&data), GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 8*sizeof(float), (float*)0 + 0);
@@ -146,8 +145,6 @@ int main(int argc, char *argv[])
 		}
 
 		glDeleteProgram(shader_prog_id);
-
-		glDeleteBuffers(1, &vbo_id);
 	}
 
 	glfwTerminate();

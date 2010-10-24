@@ -38,6 +38,9 @@
     <ClInclude Include="gl3w.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BufferObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="VertexArrayObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>

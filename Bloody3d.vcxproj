@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gl3w.h" />
+    <ClInclude Include="BufferObject.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixTransform.h" />
     <ClInclude Include="Vector.h" />
