@@ -11,7 +11,7 @@
 #include <GL/glfw.h>
 
 static const char* vert_shader_src =
-"#version 150\n"
+"#version 330\n"
 "// in_Position was bound to attribute index 0 and in_Color was bound to attribute index 1\n"
 "in  vec4 in_Position;\n"
 "in  vec4 in_Color;\n"
@@ -26,14 +26,14 @@ static const char* vert_shader_src =
 "}\n";
 
 static const char* frag_shader_src =
-"#version 150\n"
+"#version 330\n"
 "\n"
 "in  vec4 ex_Color;\n"
-"out vec4 gl_FragColor;\n"
+"out vec4 out_Color;\n"
 "\n"
 "void main(void) {\n"
 "    // Pass through our original color with full opacity.\n"
-"    gl_FragColor = ex_Color;\n"
+"    out_Color = ex_Color;\n"
 "}\n";
 
 struct vertex_data {
@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 
 	glBindAttribLocation(shader_prog_id, 0, "in_Position");
 	glBindAttribLocation(shader_prog_id, 1, "in_Color");
+	glBindFragDataLocation(shader_prog_id, 0, "out_Color");
 
 	glLinkProgram(shader_prog_id);
 
