@@ -68,8 +68,11 @@ int main(int argc, char *argv[])
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 8, GLFW_WINDOW);
 
-	std::cout << gl3wInit() << std::endl;
-	std::cout << gl3wIsSupported(3, 3) << std::endl;
+	if (gl3wInit() != 0) {
+		std::cerr << "Failed to initialize gl3w." << std::endl;
+	} else if (!gl3wIsSupported(3, 3)) {
+		std::cerr << "OpenGL 3.3 not supported." << std::endl;
+	}
 
 	if (glDebugMessageCallbackARB) {
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
