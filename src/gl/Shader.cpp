@@ -1,5 +1,5 @@
-#include "gl/Shader.h"
-#include "gl/ShaderProgram.h"
+#include "gl/Shader.hpp"
+#include "gl/ShaderProgram.hpp"
 
 namespace gl
 {

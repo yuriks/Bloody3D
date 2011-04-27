@@ -1,14 +1,14 @@
-#include "Matrix.h"
-#include "Vector.h"
-#include "MatrixTransform.h"
-#include "gl/VertexArrayObject.h"
-#include "gl/BufferObject.h"
-#include "gl/Shader.h"
-#include "gl/ShaderProgram.h"
+#include "Matrix.hpp"
+#include "Vector.hpp"
+#include "MatrixTransform.hpp"
+#include "gl/VertexArrayObject.hpp"
+#include "gl/BufferObject.hpp"
+#include "gl/Shader.hpp"
+#include "gl/ShaderProgram.hpp"
 
 #include <iostream>
 
-#include "gl3w.h"
+#include "gl3w.hpp"
 
 //#define GLFW_GL3_H
 #include <GL/glfw.h>

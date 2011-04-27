@@ -1,7 +1,7 @@
 #ifndef BLOODY3D_VECTOR
 #define BLOODY3D_VECTOR
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 
 typedef mat<4, 1> vec4;
 typedef mat<3, 1> vec3;

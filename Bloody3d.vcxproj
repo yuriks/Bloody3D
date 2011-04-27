@@ -11,20 +11,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gl3w.h" />
-    <ClInclude Include="src\gl\BufferObject.h" />
-    <ClInclude Include="src\gl\Shader.h" />
-    <ClInclude Include="src\gl\ShaderProgram.h" />
-    <ClInclude Include="src\gl\VertexArrayObject.h" />
-    <ClInclude Include="src\Matrix.h" />
-    <ClInclude Include="src\MatrixTransform.h" />
-    <ClInclude Include="src\Vector.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\gl3w.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MatrixTransform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gl3w.hpp" />
+    <ClInclude Include="src\gl\BufferObject.hpp" />
+    <ClInclude Include="src\gl\Shader.hpp" />
+    <ClInclude Include="src\gl\ShaderProgram.hpp" />
+    <ClInclude Include="src\gl\VertexArrayObject.hpp" />
+    <ClInclude Include="src\Matrix.hpp" />
+    <ClInclude Include="src\MatrixTransform.hpp" />
+    <ClInclude Include="src\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>

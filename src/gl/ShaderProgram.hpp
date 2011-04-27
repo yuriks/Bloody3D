@@ -1,9 +1,9 @@
 #ifndef BLOODY3D_GL_SHADERPROGRAM
 #define BLOODY3D_GL_SHADERPROGRAM
 
-#include "Shader.h"
+#include "Shader.hpp"
 
-#include "gl3w.h"
+#include "gl3w.hpp"
 
 #include <iostream>
 #include <vector>

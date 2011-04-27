@@ -1,8 +1,8 @@
 #ifndef BLOODY3D_MATRIXTRANSFORM
 #define BLOODY3D_MATRIXTRANSFORM
 
-#include "Matrix.h"
-#include "Vector.h"
+#include "Matrix.hpp"
+#include "Vector.hpp"
 
 namespace mat_transform
 {
