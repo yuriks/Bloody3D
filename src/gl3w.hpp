@@ -7,9 +7,11 @@
 #define __gl_h_
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+
+namespace gl3w {
 
 /* gl3w api */
 int gl3wInit(void);
@@ -563,8 +565,11 @@ extern PFNGLGETNUNIFORMIVARBPROC glGetnUniformivARB;
 extern PFNGLGETNUNIFORMUIVARBPROC glGetnUniformuivARB;
 extern PFNGLGETNUNIFORMDVARBPROC glGetnUniformdvARB;
 
-#ifdef __cplusplus
+//#ifdef __cplusplus
+//}
+//#endif
+
 }
-#endif
+using namespace gl3w;
 
 #endif

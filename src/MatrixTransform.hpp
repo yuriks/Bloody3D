@@ -4,8 +4,9 @@
 #include "Matrix.hpp"
 #include "Vector.hpp"
 
-namespace mat_transform
-{
+namespace math {
+
+namespace mat_transform {
 
 template <unsigned int N>
 const mat<N>& identity()
@@ -30,7 +31,7 @@ const mat<N+1> translate(const mat<N,1>& v)
 {
 	mat<N+1> m = identity<N+1>();
 
-	for (int i = 0; i < N; ++i) {
+	for (unsigned int i = 0; i < N; ++i) {
 		m(i, N) = v[i];
 	}
 
@@ -42,7 +43,7 @@ const mat<N+1> scale(const mat<N,1>& v)
 {
 	mat<N+1> m = identity<N+1>();
 
-	for (int i = 0; i < N; ++i) {
+	for (unsigned int i = 0; i < N; ++i) {
 		m(i, i) = v[i];
 	}
 
@@ -51,6 +52,8 @@ const mat<N+1> scale(const mat<N,1>& v)
 
 mat4 rotate(const vec3& axis, float angle);
 
-}
+} // namespace mat_transform
+
+} // namespace math
 
 #endif // BLOODY3D_MATRIXTRANSFORM

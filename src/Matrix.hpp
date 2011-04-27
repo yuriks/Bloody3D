@@ -1,6 +1,9 @@
 #ifndef BLOODY3D_MATRIX
 #define BLOODY3D_MATRIX
 
+namespace math {
+
+// M = lines, N = columns
 template <unsigned int M, unsigned int N = M>
 struct mat
 {
@@ -11,10 +14,24 @@ struct mat
 		}
 	}
 
+	inline void operator-=(const mat& m)
+	{
+		for (unsigned int i = 0; i < M*N; ++i) {
+			data[i] -= m.data[i];
+		}
+	}
+
 	inline void operator*=(float f)
 	{
 		for (unsigned int i = 0; i < M*N; ++i) {
 			data[i] *= f;
+		}
+	}
+
+	inline void operator/=(float f)
+	{
+		for (unsigned int i = 0; i < M*N; ++i) {
+			data[i] /= f;
 		}
 	}
 
@@ -80,11 +97,29 @@ inline mat<M, N> operator+(const mat<M, N>& m1, const mat<M, N>& m2)
 }
 
 template <unsigned int M, unsigned int N>
+inline mat<M, N> operator-(const mat<M, N>& m1, const mat<M, N>& m2)
+{
+	mat<M, N> mr = m1;
+	mr -= m2;
+	return mr;
+}
+
+template <unsigned int M, unsigned int N>
 inline mat<M, N> operator*(const mat<M, N>& m, float s)
 {
 	mat<M, N> mr = m;
 	mr *= s;
 	return mr;
 }
+
+template <unsigned int M, unsigned int N>
+inline mat<M, N> operator/(const mat<M, N>& m, float s)
+{
+	mat<M, N> mr = m;
+	mr /= s;
+	return mr;
+}
+
+} // namespace math
 
 #endif // BLOODY3D_MATRIX

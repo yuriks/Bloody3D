@@ -1,8 +1,25 @@
-#include "gl/Shader.hpp"
-#include "gl/ShaderProgram.hpp"
+#include "Shader.hpp"
+#include "ShaderProgram.hpp"
+
+#include <iostream>
+#include <fstream>
 
 namespace gl
 {
+
+void Shader::setSource(std::ifstream& f) const
+{
+	std::vector<char> str;
+
+	f.seekg(0, std::ios::end);
+	str.reserve((unsigned int)f.tellg() + 1);
+	f.seekg(0);
+
+	str.assign(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
+	str.push_back('\0');
+
+	setSource(&str[0]);
+}
 
 void Shader::printInfoLog(std::ostream& s) const
 {

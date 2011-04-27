@@ -1,9 +1,9 @@
 #ifndef BLOODY3D_GL_SHADER
 #define BLOODY3D_GL_SHADER
 
-#include "gl3w.hpp"
+#include "../gl3w.hpp"
 
-#include <iostream>
+#include <iosfwd>
 #include <vector>
 #include <boost/noncopyable.hpp>
 
@@ -16,6 +16,7 @@ public:
 	~Shader();
 
 	void setSource(const char* src) const;
+	void setSource(std::ifstream& f) const;
 	void compile() const;
 
 	void printInfoLog(std::ostream& s) const;

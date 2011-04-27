@@ -13,6 +13,8 @@
 //#define GLFW_GL3_H
 #include <GL/glfw.h>
 
+using namespace math;
+
 static const char* vert_shader_src =
 "#version 330\n"
 "// in_Position was bound to attribute index 0 and in_Color was bound to attribute index 1\n"
@@ -123,14 +125,14 @@ int main(int argc, char *argv[])
 
 		bool running = true;
 
-		vec3 s = {600./800., 1.f, 1.f};
+		vec3 s = {{600./800., 1.f, 1.f}};
 		mat4 m = mat_transform::scale(s);
 
 		while (running) {
 			glClearColor(0.f, 0.f, 0.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
+			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, true, &m.data[0]);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
 			glfwSwapBuffers();

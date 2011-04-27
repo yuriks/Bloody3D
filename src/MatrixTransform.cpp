@@ -2,8 +2,9 @@
 
 #include <cmath>
 
-namespace mat_transform
-{
+namespace math {
+
+namespace mat_transform {
 
 mat4 rotate(const vec3& axis, float angle)
 {
@@ -14,9 +15,9 @@ mat4 rotate(const vec3& axis, float angle)
 	const float s = std::sin(angle);
 	const float c = std::cos(angle);
 	const float t = 1 - c;
-	const float& x = axis[0];
-	const float& y = axis[1];
-	const float& z = axis[2];
+	const float x = axis[0];
+	const float y = axis[1];
+	const float z = axis[2];
 
 	// A lot of common sub-expression optimization can be
 	// done here, but I'll leave that to the compiler.
@@ -35,4 +36,6 @@ mat4 rotate(const vec3& axis, float angle)
 	return m;
 }
 
-}
+} // namespace mat_transform
+
+} // namespace math

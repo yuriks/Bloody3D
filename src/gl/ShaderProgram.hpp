@@ -3,7 +3,7 @@
 
 #include "Shader.hpp"
 
-#include "gl3w.hpp"
+#include "../gl3w.hpp"
 
 #include <iostream>
 #include <vector>

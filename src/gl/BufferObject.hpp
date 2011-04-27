@@ -1,7 +1,7 @@
 #ifndef BLOODY3D_GL_BUFFEROBJECT
 #define BLOODY3D_GL_BUFFEROBJECT
 
-#include "gl3w.hpp"
+#include "../gl3w.hpp"
 
 #include <boost/noncopyable.hpp>
 
