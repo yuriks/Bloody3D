@@ -65,6 +65,8 @@ struct mat
 	}
 
 	float data[M*N];
+
+	static const bool ROW_MAJOR = true;
 };
 
 typedef mat<4> mat4;
@@ -121,5 +123,9 @@ inline mat<M, N> operator/(const mat<M, N>& m, float s)
 }
 
 } // namespace math
+
+#ifdef USE_SSE2
+#include "sse2/Matrix.hpp"
+#endif
 
 #endif // BLOODY3D_MATRIX

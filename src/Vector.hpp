@@ -96,4 +96,8 @@ mat<N, 1> unit(const mat<N, 1>& v)
 
 } // namespace math
 
+#ifdef USE_SSE2
+#include "sse2/Vector.hpp"
+#endif
+
 #endif // BLOODY3D_VECTOR

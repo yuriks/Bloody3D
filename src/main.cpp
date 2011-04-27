@@ -124,18 +124,24 @@ int main(int argc, char *argv[])
 		shader_prog.use();
 
 		bool running = true;
+		float ang = 0.f;
 
-		vec3 s = {{600./800., 1.f, 1.f}};
-		mat4 m = mat_transform::scale(s);
+		using mat_transform::scale;
+		using mat_transform::rotate;
+		using mat_transform::translate;
 
 		while (running) {
+			mat4 m = scale(make_vec(600./800., 1.f, 1.f)) * rotate(make_vec(0.f, 1.f, 0.f), ang/2.f) * translate(make_vec(-.5f, 0.f, 0.f)) * rotate(make_vec(0.f, 0.f, -1.f), ang);
+
 			glClearColor(0.f, 0.f, 0.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, true, &m.data[0]);
+			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, m.ROW_MAJOR, &m.data[0]);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
 			glfwSwapBuffers();
+
+			ang += 0.01f;
 
 			running = glfwGetWindowParam(GLFW_OPENED) != 0;
 		}

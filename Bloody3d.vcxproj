@@ -24,6 +24,8 @@
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Matrix.hpp" />
     <ClInclude Include="src\MatrixTransform.hpp" />
+    <ClInclude Include="src\sse2\Matrix.hpp" />
+    <ClInclude Include="src\sse2\Vector.hpp" />
     <ClInclude Include="src\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -65,6 +67,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>USE_SSE2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -85,6 +88,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>USE_SSE2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
