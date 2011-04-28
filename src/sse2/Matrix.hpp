@@ -193,23 +193,41 @@ struct mat<3, 1>
 	static const bool ROW_MAJOR = false;
 };
 
-/*
-mat4 operator*(const mat4& m1, const mat4& m2)
+inline mat4 operator*(const mat4& m1, const mat4& m2)
 {
 	mat4 mr;
 
-	for (unsigned int i = 0; i < M; ++i) {
-		for (unsigned int j = 0; j < P; ++j) {
-			mr(i, j) = 0;
-			for (unsigned int k = 0; k < N; ++k) {
-				mr(i, j) += m1(i, k) * m2(k, j);
-			}
-		}
-	}
+	__m128 a0, a1, a2, a3;
+	__m128 b, r;
+
+	a0 = _mm_load_ps(m1.data);
+	a1 = _mm_load_ps(m1.data+4);
+	a2 = _mm_load_ps(m1.data+8);
+	a3 = _mm_load_ps(m1.data+12);
+
+#define do_column(i) \
+	b = _mm_set1_ps(m2(0, i)); \
+	r = _mm_mul_ps(a0, b); \
+	\
+	b = _mm_set1_ps(m2(1, i)); \
+	r = _mm_add_ps(r, _mm_mul_ps(a1, b)); \
+	\
+	b = _mm_set1_ps(m2(2, i)); \
+	r = _mm_add_ps(r, _mm_mul_ps(a2, b)); \
+	\
+	b = _mm_set1_ps(m2(3, i)); \
+	r = _mm_add_ps(r, _mm_mul_ps(a3, b)); \
+	\
+	_mm_store_ps(mr.data+4*i, r)
+
+	do_column(0);
+	do_column(1);
+	do_column(2);
+	do_column(3);
+#undef do_column
 
 	return mr;
 }
-*/
 
 } // namespace math
 
