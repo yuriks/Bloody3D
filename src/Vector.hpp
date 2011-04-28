@@ -89,7 +89,7 @@ float length(const mat<N, 1>& v)
 template <unsigned int N>
 mat<N, 1> unit(const mat<N, 1>& v)
 {
-	return v * (1.f / length(v));
+	return v / length(v);
 }
 
 } // namespace vec
