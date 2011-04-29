@@ -70,6 +70,7 @@
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_SSE2;USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -91,6 +92,7 @@
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USE_SSE2;USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
