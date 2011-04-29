@@ -26,6 +26,7 @@
     <ClInclude Include="src\MatrixTransform.hpp" />
     <ClInclude Include="src\sse2\Matrix.hpp" />
     <ClInclude Include="src\sse2\Vector.hpp" />
+    <ClInclude Include="src\sse2\vec_def.hpp" />
     <ClInclude Include="src\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
