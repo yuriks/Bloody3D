@@ -27,6 +27,7 @@
     <ClInclude Include="src\sse2\Matrix.hpp" />
     <ClInclude Include="src\sse2\Vector.hpp" />
     <ClInclude Include="src\sse2\vec_def.hpp" />
+    <ClInclude Include="src\sse2\vec_ops.hpp" />
     <ClInclude Include="src\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -68,7 +69,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_SSE2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_SSE2;USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -89,7 +90,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_SSE2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_SSE2;USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
