@@ -21,6 +21,7 @@
     <ClInclude Include="src\gl\BufferObject.hpp" />
     <ClInclude Include="src\gl\Shader.hpp" />
     <ClInclude Include="src\gl\ShaderProgram.hpp" />
+    <ClInclude Include="src\gl\Texture.hpp" />
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Matrix.hpp" />
     <ClInclude Include="src\MatrixTransform.hpp" />
