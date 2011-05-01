@@ -5,7 +5,6 @@
 #ifdef USE_SSE3
 #include <pmmintrin.h>
 #endif
-#include <iostream>
 
 namespace math {
 
