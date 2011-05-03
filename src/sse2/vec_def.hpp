@@ -54,6 +54,4 @@ struct mat<N, 1>
 		float data[4];
 		__m128 xmm_data;
 	};
-
-	static const bool ROW_MAJOR = false;
 };

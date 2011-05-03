@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 			glClearColor(0.f, 0.f, 0.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, m.ROW_MAJOR, &m.data[0]);
+			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 
 			glfwSwapBuffers();
