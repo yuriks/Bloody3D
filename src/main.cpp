@@ -5,8 +5,11 @@
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
+#include "mesh/Mesh.hpp"
+#include "mesh/ObjLoader.hpp"
 
 #include <iostream>
+#include <fstream>
 
 #include "gl3w.hpp"
 
@@ -18,16 +21,16 @@ using namespace math;
 static const char* vert_shader_src =
 "#version 330\n"
 "// in_Position was bound to attribute index 0 and in_Color was bound to attribute index 1\n"
-"in  vec4 in_Position;\n"
-"in  vec4 in_Color;\n"
+"in  vec3 in_Position;\n"
+"in  vec3 in_Normal;\n"
 "uniform mat4 in_Proj;\n"
 "\n"
 "// We output the ex_Color variable to the next shader in the chain\n"
 "out vec4 ex_Color;\n"
 "\n"
 "void main(void) {\n"
-"    gl_Position = in_Proj * in_Position;\n"
-"    ex_Color = in_Color;\n"
+"    gl_Position = in_Proj * vec4(in_Position.xyz, 1.0);\n"
+"    ex_Color = vec4(0.5 + in_Normal / 2, 1.0);\n"
 "}\n";
 
 static const char* frag_shader_src =
@@ -40,19 +43,6 @@ static const char* frag_shader_src =
 "    // Pass through our original color with full opacity.\n"
 "    out_Color = ex_Color;\n"
 "}\n";
-
-struct vertex_data {
-	float x, y, z, w;
-	float r, g, b, a;
-};
-static_assert (sizeof(vertex_data) == sizeof(float)*8, "Oops. Padding.");
-
-static const vertex_data data[3] = {
-	{-.5f,  .5f, 0.f, 1.f, 1.f, 0.f, 0.f, 1.f},
-	{ .5f, -.5f, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f},
-	{-.5f, -.5f, 0.f, 1.f, 0.f, 0.f, 1.f, 1.f}
-};
-static_assert (sizeof(data) == sizeof(vertex_data)*3, "Oops. Padding.");
 
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
@@ -82,18 +72,32 @@ int main(int argc, char *argv[])
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
+	std::ifstream f("assets/panel-beams.obj");
+	Mesh panel_beams = load_obj(f);
+	f.close();
+
 	{
-		gl::VertexArrayObject vao;
-		vao.bind();
+		gl::VertexArrayObject vao[3];
+		gl::BufferObject vbo[3];
+		gl::BufferObject ibo[3];
 
-		gl::BufferObject vbo;
-		vbo.bind(GL_ARRAY_BUFFER);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data)*3, static_cast<const void*>(&data), GL_STATIC_DRAW);
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			vao[i].bind();
 
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 8*sizeof(float), (float*)0 + 0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,  8*sizeof(float), (float*)0 + 4);
-		glEnableVertexAttribArray(1);
+			vbo[i].bind(GL_ARRAY_BUFFER);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * panel_beams.sub_meshes[i].vertices.size(),
+				static_cast<const void*>(&panel_beams.sub_meshes[i].vertices[0]), GL_STATIC_DRAW);
+
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)0 + offsetof(Vertex, position));
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,  sizeof(Vertex), (char*)0 + offsetof(Vertex, normal));
+			glEnableVertexAttribArray(1);
+
+			ibo[i].bind(GL_ELEMENT_ARRAY_BUFFER);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(short) * panel_beams.sub_meshes[i].indices.size(),
+				static_cast<const void*>(&panel_beams.sub_meshes[i].indices[0]), GL_STATIC_DRAW);
+		}
 
 		gl::ShaderProgram shader_prog;
 
@@ -114,7 +118,7 @@ int main(int argc, char *argv[])
 			shader_prog.attachShader(frag_shader);
 
 			shader_prog.bindAttribute(0, "in_Position");
-			shader_prog.bindAttribute(1, "in_Color");
+			shader_prog.bindAttribute(1, "in_Normal");
 			glBindFragDataLocation(shader_prog, 0, "out_Color");
 
 			shader_prog.link();
@@ -130,14 +134,22 @@ int main(int argc, char *argv[])
 		using mat_transform::rotate;
 		using mat_transform::translate;
 
-		while (running) {
-			mat4 m = scale(make_vec(600./800., 1.f, 1.f)) * rotate(make_vec(0.f, 1.f, 0.f), ang/2.f) * translate(make_vec(-.5f, 0.f, 0.f)) * rotate(make_vec(0.f, 0.f, -1.f), ang);
+		glClearColor(0.2f, 0.2f, 0.2f, 1.f);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
 
-			glClearColor(0.f, 0.f, 0.f, 1.f);
-			glClear(GL_COLOR_BUFFER_BIT);
+		while (running) {
+			mat4 m = scale(make_vec(600./800. /4.f, 1.f/4.f, 1.f/4.f)) * translate(make_vec(-.5f, 0.f, 0.f)) * rotate(vec::unit(make_vec(0.f, 1.f, 0.2f)), ang);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			for (int i = 2; i >= 0; --i)
+			{
+				vao[i].bind();
+				glDrawElements(GL_TRIANGLES, panel_beams.sub_meshes[i].indices.size(), GL_UNSIGNED_SHORT, (char*)0);
+			}
 
 			glfwSwapBuffers();
 

@@ -15,6 +15,7 @@
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MatrixTransform.cpp" />
+    <ClCompile Include="src\mesh\ObjLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl3w.hpp" />
@@ -25,6 +26,8 @@
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Matrix.hpp" />
     <ClInclude Include="src\MatrixTransform.hpp" />
+    <ClInclude Include="src\mesh\Mesh.hpp" />
+    <ClInclude Include="src\mesh\ObjLoader.hpp" />
     <ClInclude Include="src\sse2\Matrix.hpp" />
     <ClInclude Include="src\sse2\Vector.hpp" />
     <ClInclude Include="src\sse2\vec_def.hpp" />
