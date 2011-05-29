@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 
 			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
 
-			for (int i = 2; i >= 0; --i)
+			for (int i = 0; i < 3; ++i)
 			{
 				vao[i].bind();
 				glDrawElements(GL_TRIANGLES, panel_beams.sub_meshes[i].indices.size(), GL_UNSIGNED_SHORT, (char*)0);
