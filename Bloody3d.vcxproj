@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="src\gl3w.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
+    <ClCompile Include="src\image\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MatrixTransform.cpp" />
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
@@ -24,6 +25,7 @@
     <ClInclude Include="src\gl\ShaderProgram.hpp" />
     <ClInclude Include="src\gl\Texture.hpp" />
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
+    <ClInclude Include="src\image\ImageLoader.hpp" />
     <ClInclude Include="src\Matrix.hpp" />
     <ClInclude Include="src\MatrixTransform.hpp" />
     <ClInclude Include="src\mesh\Mesh.hpp" />
@@ -79,7 +81,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>GLFWd.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GLFWd.lib;opengl32.lib;libpng15.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,7 +105,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>GLFW.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GLFW.lib;opengl32.lib;libpng15.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
