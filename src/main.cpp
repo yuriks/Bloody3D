@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
-	std::ifstream f("assets/panel-beams.obj");
+	std::ifstream f("data/panel-beams.obj");
 	Mesh panel_beams = load_obj(f);
 	f.close();
 
