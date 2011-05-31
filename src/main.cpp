@@ -18,32 +18,6 @@
 
 using namespace math;
 
-static const char* vert_shader_src =
-"#version 330\n"
-"// in_Position was bound to attribute index 0 and in_Color was bound to attribute index 1\n"
-"in  vec3 in_Position;\n"
-"in  vec3 in_Normal;\n"
-"uniform mat4 in_Proj;\n"
-"\n"
-"// We output the ex_Color variable to the next shader in the chain\n"
-"out vec4 ex_Color;\n"
-"\n"
-"void main(void) {\n"
-"    gl_Position = in_Proj * vec4(in_Position.xyz, 1.0);\n"
-"    ex_Color = vec4(0.5 + in_Normal / 2, 1.0);\n"
-"}\n";
-
-static const char* frag_shader_src =
-"#version 330\n"
-"\n"
-"in  vec4 ex_Color;\n"
-"out vec4 out_Color;\n"
-"\n"
-"void main(void) {\n"
-"    // Pass through our original color with full opacity.\n"
-"    out_Color = ex_Color;\n"
-"}\n";
-
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
 	std::cout << message << std::endl;
@@ -105,8 +79,14 @@ int main(int argc, char *argv[])
 			gl::Shader vert_shader(GL_VERTEX_SHADER);
 			gl::Shader frag_shader(GL_FRAGMENT_SHADER);
 
-			vert_shader.setSource(vert_shader_src);
-			frag_shader.setSource(frag_shader_src);
+			{
+				std::ifstream f("data/test.vert");
+				vert_shader.setSource(f);
+			}
+			{
+				std::ifstream f("data/test.frag");
+				frag_shader.setSource(f);
+			}
 
 			vert_shader.compile();
 			frag_shader.compile();
