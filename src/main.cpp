@@ -120,12 +120,15 @@ int main(int argc, char *argv[])
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
+		mat4 view = scale(make_vec(600./800., 1.f, 1.f));
+
 		while (running) {
-			mat4 m = scale(make_vec(600./800. /4.f, 1.f/4.f, 1.f/4.f)) * translate(make_vec(-.5f, 0.f, 0.f)) * rotate(vec::unit(make_vec(0.f, 1.f, 0.2f)), ang);
+			mat4 model = rotate(vec::unit(make_vec(0.f, 1.f, -0.2f)), ang) * scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f));
+			mat4 modelview = view * model;
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
+			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &modelview.data[0]);
 
 			for (int i = 0; i < NUM_MESHES; ++i)
 			{
