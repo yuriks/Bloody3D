@@ -46,16 +46,18 @@ int main(int argc, char *argv[])
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
+	static const int NUM_MESHES = 3;
+
 	std::ifstream f("data/panel-beams.obj");
 	Mesh panel_beams = load_obj(f);
 	f.close();
 
 	{
-		gl::VertexArrayObject vao[3];
-		gl::BufferObject vbo[3];
-		gl::BufferObject ibo[3];
+		gl::VertexArrayObject vao[NUM_MESHES];
+		gl::BufferObject vbo[NUM_MESHES];
+		gl::BufferObject ibo[NUM_MESHES];
 
-		for (unsigned int i = 0; i < 3; ++i)
+		for (unsigned int i = 0; i < NUM_MESHES; ++i)
 		{
 			vao[i].bind();
 
@@ -125,7 +127,7 @@ int main(int argc, char *argv[])
 
 			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &m.data[0]);
 
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < NUM_MESHES; ++i)
 			{
 				vao[i].bind();
 				glDrawElements(GL_TRIANGLES, panel_beams.sub_meshes[i].indices.size(), GL_UNSIGNED_SHORT, (char*)0);
