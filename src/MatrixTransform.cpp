@@ -96,6 +96,35 @@ mat4 rotate(const vec3& axis, float angle)
 
 #endif
 
+mat4 orthographic_proj(float left, float right, float bottom, float top, float z_near, float z_far)
+{
+	vec3 t = make_vec(left + right, bottom + top, z_near + z_far) / -2.f;
+	vec3 s = vec::inverse(make_vec(right - left, top - bottom, z_far - z_near)) * 2.f;
+	return scale(s) * translate(t);
+}
+
+mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_far)
+{
+	mat4 m;
+	m.clear(0.f);
+
+	// x' * z = (F / W)*x;
+	// y' * z = (F / H)*y;
+	// z' * z = A*z + B*1;
+	// A = (F + N)/(F - N);
+	// B = (2 * F * N)/(N - F);
+
+	m(0, 0) = z_far / half_width;
+	m(1, 1) = z_far / half_height;
+
+	m(2, 2) = (z_far + z_near) / (z_far - z_near);
+	m(3, 2) = 1.f;
+
+	m(2, 3) = (2.f * z_far * z_near)/(z_near - z_far);
+
+	return m;
+}
+
 } // namespace mat_transform
 
 } // namespace math

@@ -169,7 +169,6 @@ int main(int argc, char *argv[])
 		}
 
 		bool running = true;
-		float ang = 0.f;
 
 		using mat_transform::scale;
 		using mat_transform::rotate;
@@ -203,27 +202,50 @@ int main(int argc, char *argv[])
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_lights);
 		glUniformBlockBinding(shader_prog, uniform_block_index, 0);
 
-		//mat4 projection = mat_transform::perspective(45.f, 600.f/800.f, 1.f, 10000.f);
-		mat4 projview = scale(make_vec(600./800., 1.f, 1.f));
+		mat4 proj = mat_transform::frustrum_proj(2.f * (800.f/600.f), 2.f, 1.f, 4.f);
+		mat4 view = translate(make_vec(0.f, 0.f, 1.f));
 
-		GLuint in_ModelMat = shader_prog.getUniformLocation("in_ModelMat");
-		GLuint in_ProjViewMat = shader_prog.getUniformLocation("in_ProjViewMat");
+		GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
+		GLuint in_ProjMat = shader_prog.getUniformLocation("in_ProjMat");
+
+		vec3 pos = {{ 0.f, 0.f, 1.f }};
+		vec3 rot = {{ 0.f, 0.f, 0.f }};
 
 		while (running) {
-			mat4 model = rotate(vec::unit(make_vec(0.f, 1.f, -0.2f)), ang) * scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f));
+			if (glfwGetKey('A')) pos[0] -= 0.05f;
+			if (glfwGetKey('S')) pos[0] += 0.05f;
+			if (glfwGetKey('T')) pos[1] -= 0.05f;
+			if (glfwGetKey('P')) pos[1] += 0.05f;
+			if (glfwGetKey('W')) pos[2] += 0.05f;
+			if (glfwGetKey('R')) pos[2] -= 0.05f;
+
+			if (glfwGetKey('Y')) rot[0] -= 0.05f;
+			if (glfwGetKey('I')) rot[0] += 0.05f;
+			if (glfwGetKey('E')) rot[1] -= 0.05f;
+			if (glfwGetKey('O')) rot[1] += 0.05f;
+			if (glfwGetKey('U')) rot[2] -= 0.05f;
+			if (glfwGetKey(';')) rot[2] += 0.05f;
+
+			mat4 model = translate(pos) *
+				rotate(vec::unit(make_vec(0.f, 1.f, 0.f)), rot[1]) *
+				rotate(vec::unit(make_vec(1.f, 0.f, 0.f)), rot[0]) *
+				rotate(vec::unit(make_vec(0.f, 0.f, 1.f)), rot[2]) *
+				scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f));
+
+			mat4 viewmodel = view * model;
 
 			Light lights[4];
 
 			for	(int i = 0; i < 4; ++i)
 			{
-				lights[i].position = vec::euclidean(projview * vec::homogeneous(lights_base[i].position));
+				lights[i].position = vec::euclidean(view * vec::homogeneous(lights_base[i].position));
 				lights[i].color = lights_base[i].color;
 			}
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUniformMatrix4fv(in_ModelMat, 1, false, &model.data[0]);
-			glUniformMatrix4fv(in_ProjViewMat, 1, false, &projview.data[0]);
+			glUniformMatrix4fv(in_ViewModelMat, 1, false, &viewmodel.data[0]);
+			glUniformMatrix4fv(in_ProjMat, 1, false, &proj.data[0]);
 			ubo_lights.bind(GL_UNIFORM_BUFFER);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), lights, GL_STREAM_DRAW);
 
@@ -234,8 +256,6 @@ int main(int argc, char *argv[])
 			}
 
 			glfwSwapBuffers();
-
-			ang += 0.01f;
 
 			running = glfwGetWindowParam(GLFW_OPENED) != 0;
 		}

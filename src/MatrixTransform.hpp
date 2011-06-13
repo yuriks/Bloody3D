@@ -52,6 +52,9 @@ const mat<N+1> scale(const mat<N,1>& v)
 
 mat4 rotate(const vec3& axis, float angle);
 
+mat4 orthographic_proj(float left, float right, float bottom, float top, float z_near, float z_far);
+mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_far);
+
 } // namespace mat_transform
 
 } // namespace math
