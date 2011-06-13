@@ -94,6 +94,18 @@ mat<N, 1> unit(const mat<N, 1>& v)
 	return v / length(v);
 }
 
+template <unsigned int N>
+mat<N, 1> inverse(const mat<N, 1>& v)
+{
+	mat<N, 1> r;
+
+	for (unsigned int i = 0; i < N; ++i) {
+		r[i] = 1.f / v[i];
+	}
+
+	return r;
+}
+
 } // namespace vec
 
 } // namespace math
