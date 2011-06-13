@@ -203,23 +203,27 @@ int main(int argc, char *argv[])
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_lights);
 		glUniformBlockBinding(shader_prog, uniform_block_index, 0);
 
-		mat4 view = scale(make_vec(600./800., 1.f, 1.f));
+		//mat4 projection = mat_transform::perspective(45.f, 600.f/800.f, 1.f, 10000.f);
+		mat4 projview = scale(make_vec(600./800., 1.f, 1.f));
+
+		GLuint in_ModelMat = shader_prog.getUniformLocation("in_ModelMat");
+		GLuint in_ProjViewMat = shader_prog.getUniformLocation("in_ProjViewMat");
 
 		while (running) {
 			mat4 model = rotate(vec::unit(make_vec(0.f, 1.f, -0.2f)), ang) * scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f));
-			mat4 modelview = view * model;
 
 			Light lights[4];
 
 			for	(int i = 0; i < 4; ++i)
 			{
-				lights[i].position = vec::euclidean(view * vec::homogeneous(lights_base[i].position));
+				lights[i].position = vec::euclidean(projview * vec::homogeneous(lights_base[i].position));
 				lights[i].color = lights_base[i].color;
 			}
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUniformMatrix4fv(shader_prog.getUniformLocation("in_Proj"), 1, false, &modelview.data[0]);
+			glUniformMatrix4fv(in_ModelMat, 1, false, &model.data[0]);
+			glUniformMatrix4fv(in_ProjViewMat, 1, false, &projview.data[0]);
 			ubo_lights.bind(GL_UNIFORM_BUFFER);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), lights, GL_STREAM_DRAW);
 

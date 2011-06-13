@@ -1,6 +1,7 @@
 #version 330
 
-uniform mat4 in_Proj;
+uniform mat4 in_ModelMat;
+uniform mat4 in_ProjViewMat;
 
 in vec3 in_Position;
 in vec3 in_Normal;
@@ -13,10 +14,10 @@ out vec2 ex_TexCoord;
 
 void main(void)
 {
-	vec4 pos = in_Proj * vec4(in_Position.xyz, 1.0);
+	vec4 pos = in_ProjViewMat * (in_ModelMat * vec4(in_Position.xyz, 1.0));
 	gl_Position = pos;
 	ex_Color = vec4(1.0, 1.0, 1.0, 1.0);
-	ex_Normal = (in_Proj * vec4(in_Normal, 1.0)).xyz;
+	ex_Normal = (in_ProjViewMat * (in_ModelMat * vec4(in_Normal, 1.0))).xyz;
 	ex_TexCoord = in_TexCoord;
 	ex_Position = pos.xyz / pos.w;
 };
