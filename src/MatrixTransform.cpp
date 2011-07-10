@@ -132,7 +132,7 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 	return frustrum_proj(height * aspect, height, z_near, z_far);
 }
 
-mat4 look_at(vec3 up, vec3 camera, vec3 target)
+mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 {
 	using vec::cross;
 	using vec::unit;

@@ -58,7 +58,7 @@ mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_fa
 mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far);
 
 // Cameras
-mat4 look_at(vec3 up, vec3 camera, vec3 target);
+mat4 look_at(const vec3& up, const vec3& camera, const vec3& target);
 
 } // namespace mat_transform
 
