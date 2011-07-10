@@ -40,21 +40,43 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum sever
 	std::cout << message << std::endl;
 }
 
+
+// Eh isso o que acontece quando se procrastina demais
 int main(int argc, char *argv[])
 {
-	glfwInit();
+	if (glfwInit() != GL_TRUE)
+	{
+		char tmp;
+		std::cerr << "Failed to initialize GLFW." << std::endl;
+		std::cin >> tmp;
+		return 1;
+	}
 
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
 	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 8, GLFW_WINDOW);
+	if (glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 8, GLFW_WINDOW) != GL_TRUE)
+	{
+		char tmp;
+		std::cerr << "Failed to open window." << std::endl;
+		std::cin >> tmp;
+		return 1;
+	}
+
+	glfwSwapInterval(1);
 
 	if (gl3wInit() != 0) {
+		char tmp;
 		std::cerr << "Failed to initialize gl3w." << std::endl;
+		std::cin >> tmp;
+		return 1;
 	} else if (!gl3wIsSupported(3, 3)) {
+		char tmp;
 		std::cerr << "OpenGL 3.3 not supported." << std::endl;
+		std::cin >> tmp;
+		return 1;
 	}
 
 	if (glDebugMessageCallbackARB) {
@@ -63,6 +85,7 @@ int main(int argc, char *argv[])
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
+	// Gambiarras sem tempo :P
 	static const int NUM_MESHES = 3;
 
 	std::ifstream f("data/panel-beams.obj");
@@ -177,6 +200,7 @@ int main(int argc, char *argv[])
 		glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_CLAMP);
 
 		glActiveTexture(GL_TEXTURE0);
 		diffuse_map.bind(GL_TEXTURE_2D);
@@ -202,62 +226,139 @@ int main(int argc, char *argv[])
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_lights);
 		glUniformBlockBinding(shader_prog, uniform_block_index, 0);
 
-		mat4 proj = mat_transform::frustrum_proj(2.f * (800.f/600.f), 2.f, 1.f, 4.f);
-		mat4 view = translate(make_vec(0.f, 0.f, 1.f));
+		mat4 proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 100.f);
+		//mat4 proj = mat_transform::orthographic_proj(-2.f * (800.f/600.f), 2.f * (800.f/600.f), -2.f, 2.f, 1.f, 4.f);
 
 		GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
 		GLuint in_ProjMat = shader_prog.getUniformLocation("in_ProjMat");
 
-		vec3 pos = {{ 0.f, 0.f, 1.f }};
-		vec3 rot = {{ 0.f, 0.f, 0.f }};
+		glUniformMatrix4fv(in_ProjMat, 1, false, &proj.data[0]);
 
-		while (running) {
-			if (glfwGetKey('A')) pos[0] -= 0.05f;
-			if (glfwGetKey('S')) pos[0] += 0.05f;
-			if (glfwGetKey('T')) pos[1] -= 0.05f;
-			if (glfwGetKey('P')) pos[1] += 0.05f;
-			if (glfwGetKey('W')) pos[2] += 0.05f;
-			if (glfwGetKey('R')) pos[2] -= 0.05f;
+		vec3 obj_pos = {{ 0.f, 0.f, 0.f }};
+		vec3 obj_rot = {{ 0.f, 0.f, 0.f }};
+		vec3 cam_pos = {{ 0.f, 0.f, -1.f }};
 
-			if (glfwGetKey('Y')) rot[0] -= 0.05f;
-			if (glfwGetKey('I')) rot[0] += 0.05f;
-			if (glfwGetKey('E')) rot[1] -= 0.05f;
-			if (glfwGetKey('O')) rot[1] += 0.05f;
-			if (glfwGetKey('U')) rot[2] -= 0.05f;
-			if (glfwGetKey(';')) rot[2] += 0.05f;
+		vec3 *pos = &cam_pos;
 
-			mat4 model = translate(pos) *
-				rotate(vec::unit(make_vec(0.f, 1.f, 0.f)), rot[1]) *
-				rotate(vec::unit(make_vec(1.f, 0.f, 0.f)), rot[0]) *
-				rotate(vec::unit(make_vec(0.f, 0.f, 1.f)), rot[2]) *
-				scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f));
+		std::cout <<
+			"Teclas:\n"
+			"  A/D - Movimentacao eixo -X/+X\n"
+			"  F/R - Movimentacao eixo -Y/+Y\n"
+			"  S/W - Movimentacao eixo -Z/+Z\n"
+			"  O/L - K/; - I/P - Rotaciona objeto nos eixos X/Y/Z\n"
+			"\n"
+			"  1/2 - Projecao ortografica/perspectiva.\n"
+			"  3/4/5 - Move Camera/Objeto/Luz.\n"
+			"  6 - Muda a cor da luz. (Confuso.)\n"
+			"  7/8 - Desliga/Liga wireframe.\n" << std::endl;
 
-			mat4 viewmodel = view * model;
+		double elapsed_game_time = 0.;
+		double elapsed_real_time = 0.;
+		double last_frame_time;
 
-			Light lights[4];
+		mat4 view;
+		Light lights[4];
+		bool wire;
 
-			for	(int i = 0; i < 4; ++i)
+		while (running)
+		{
+			double frame_start = glfwGetTime();
+
+			int i;
+			for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 			{
-				lights[i].position = vec::euclidean(view * vec::homogeneous(lights_base[i].position));
-				lights[i].color = lights_base[i].color;
+				//game_manager.update();
+
+				if (glfwGetKey('1')) proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 100.f);
+				if (glfwGetKey('2')) proj = mat_transform::orthographic_proj(-2.f * (800.f/600.f), 2.f * (800.f/600.f), -2.f, 2.f, 0.1f, 100.f);
+				glUniformMatrix4fv(in_ProjMat, 1, false, &proj.data[0]);
+
+				if (glfwGetKey('3')) pos = &cam_pos;
+				if (glfwGetKey('4')) pos = &obj_pos;
+				if (glfwGetKey('5')) pos = &lights_base[0].position;
+				if (glfwGetKey('6')) pos = &lights_base[0].color;
+				if (glfwGetKey('7')) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); wire = false; }
+				if (glfwGetKey('8')) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); wire = true; }
+
+				if (glfwGetKey('A')) (*pos)[0] -= 0.05f; // A - A
+				if (glfwGetKey('D')) (*pos)[0] += 0.05f; // S - D
+				if (glfwGetKey('F')) (*pos)[1] -= 0.05f; // T - F
+				if (glfwGetKey('R')) (*pos)[1] += 0.05f; // P - R
+				if (glfwGetKey('W')) (*pos)[2] += 0.05f; // W - W
+				if (glfwGetKey('S')) (*pos)[2] -= 0.05f; // R - S
+
+				if (glfwGetKey('O')) obj_rot[0] -= 0.05f; // Y - O
+				if (glfwGetKey('L')) obj_rot[0] += 0.05f; // I - L
+				if (glfwGetKey('K')) obj_rot[1] -= 0.05f; // E - K
+				if (glfwGetKey(';')) obj_rot[1] += 0.05f; // O - ;
+				if (glfwGetKey('I')) obj_rot[2] -= 0.05f; // U - I
+				if (glfwGetKey('P')) obj_rot[2] += 0.05f; // ; - P
+
+				view = mat_transform::look_at(make_vec(0.f, 1.f, 0.f), cam_pos, obj_pos);
+
+				for	(int i = 0; i < 4; ++i)
+				{
+					lights[i].position = vec::euclidean(view * vec::homogeneous(lights_base[i].position));
+					if (wire)
+						lights[i].color = make_vec(9999.f, 9999.f, 9999.f);
+					else
+						lights[i].color = lights_base[i].color;
+				}
+
+				ubo_lights.bind(GL_UNIFORM_BUFFER);
+				glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), lights, GL_STREAM_DRAW);
+
+				elapsed_game_time += 1./60.;
 			}
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUniformMatrix4fv(in_ViewModelMat, 1, false, &viewmodel.data[0]);
-			glUniformMatrix4fv(in_ProjMat, 1, false, &proj.data[0]);
-			ubo_lights.bind(GL_UNIFORM_BUFFER);
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), lights, GL_STREAM_DRAW);
+			static const vec3 positions[12] = {
+				{{ 2.f, 0.f, 0.f }}, {{ 0.f, 1.f, 0.f }},
+				{{ 0.f, 0.f, 2.f }}, {{ 0.f, 1.f, 0.f }},
+				{{-2.f, 0.f, 0.f }}, {{ 0.f, 1.f, 0.f }},
+				{{ 0.f, 0.f,-2.f }}, {{ 0.f, 1.f, 0.f }},
+				{{ 0.f, 2.f, 0.f }}, {{ 1.f, 0.f, 0.f }},
+				{{ 0.f,-2.f, 0.f }}, {{ 1.f, 0.f, 0.f }}
+			};
 
-			for (int i = 0; i < NUM_MESHES; ++i)
+			static const float angles[6] = {
+				1.f, 2.f, 3.f, 0.f, -1.f, 1.f
+			};
+
+			for (int j = 0; j < 6; ++j)
 			{
-				vao[i].bind();
-				glDrawElements(GL_TRIANGLES, panel_beams.sub_meshes[i].indices.size(), GL_UNSIGNED_SHORT, (char*)0);
+				for (int i = 0; i < NUM_MESHES; ++i)
+				{
+
+					mat4 model = translate(obj_pos) *
+						rotate(vec::unit(make_vec(0.f, 1.f, 0.f)), obj_rot[1]) *
+						rotate(vec::unit(make_vec(1.f, 0.f, 0.f)), obj_rot[0]) *
+						rotate(vec::unit(make_vec(0.f, 0.f, 1.f)), obj_rot[2]) *
+						scale(make_vec(1.f/3.f, 1.f/3.f, 1.f/3.f)) *
+						translate(positions[j*2]) * rotate(positions[j*2+1], angles[j] * 1.5707963267948966192313216916397514420f);
+
+					mat4 viewmodel = view * model;
+
+					glUniformMatrix4fv(in_ViewModelMat, 1, false, &viewmodel.data[0]);
+
+					vao[i].bind();
+					glDrawElements(GL_TRIANGLES, panel_beams.sub_meshes[i].indices.size(), GL_UNSIGNED_SHORT, (char*)0);
+				}
 			}
 
 			glfwSwapBuffers();
 
-			running = glfwGetWindowParam(GLFW_OPENED) != 0;
+			double tmp = elapsed_real_time + (glfwGetTime() - frame_start);
+			if (elapsed_game_time > tmp)
+				glfwSleep(elapsed_game_time - tmp - 0.01);
+
+			last_frame_time = glfwGetTime() - frame_start;
+			elapsed_real_time += last_frame_time;
+			if (i == 5)
+				elapsed_game_time = elapsed_real_time;
+
+			running = glfwGetWindowParam(GLFW_OPENED) != 0 && glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS;
 		}
 	}
 
