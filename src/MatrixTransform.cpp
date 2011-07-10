@@ -134,29 +134,36 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 
 mat4 look_at(vec3 up, vec3 camera, vec3 target)
 {
-	using vec::dot;
 	using vec::cross;
 	using vec::unit;
 
-	vec3 dir = unit(target - camera);
+	vec3 z_axis = unit(target - camera);
+	vec3 x_axis = cross(up, z_axis);
+	vec3 y_axis = cross(z_axis, x_axis);
 
-	static const vec3 x = {{ 1.f, 0.f, 0.f }};
-	static const vec3 y = {{ 0.f, 1.f, 0.f }};
-	static const vec3 z = {{ 0.f, 0.f, 1.f }};
+	mat4 m = mat_transform::identity<4>();
 
-	float up_angle = -std::acosf(dot(up, y));
-	vec3 up_axis = cross(up, y);
+	m(0, 0) = x_axis[0];
+	m(0, 1) = x_axis[1];
+	m(0, 2) = x_axis[2];
+	m(0, 3) = 0.f;
 
-	mat4 rot_roll = rotate(up_axis, up_angle);
-	dir = vec::euclidean(rot_roll * vec::homogeneous(dir));
+	m(1, 0) = y_axis[0];
+	m(1, 1) = y_axis[1];
+	m(1, 2) = y_axis[2];
+	m(1, 3) = 0.f;
 
-	float heading_angle = std::atan2f(1.f, 0.f) - std::atan2f(dir[2], dir[0]);
-	mat4 rot_heading = rotate(y, heading_angle);
-	dir = vec::euclidean(rot_heading * vec::homogeneous(dir));
+	m(2, 0) = z_axis[0];
+	m(2, 1) = z_axis[1];
+	m(2, 2) = z_axis[2];
+	m(2, 3) = 0.f;
 
-	mat4 rot_pitch = rotate(x, -std::asinf(dir[1]));
+	m(3, 0) = 0.f;
+	m(3, 1) = 0.f;
+	m(3, 2) = 0.f;
+	m(3, 3) = 1.f;
 
-	return rot_pitch * rot_heading * rot_roll * translate(target - camera);
+	return m * mat_transform::translate(camera * -1.f);
 }
 
 } // namespace mat_transform
