@@ -91,7 +91,18 @@ float length(const mat<N, 1>& v)
 template <unsigned int N>
 mat<N, 1> unit(const mat<N, 1>& v)
 {
-	return v / length(v);
+	mat<N, 1> r;
+
+	float len = length(v);
+
+	if (len == 0.f)
+		// r.clear makes msvc stupid
+		for (unsigned int i = 0; i < N; ++i)
+			r[i] = 0.f;
+	else
+		r = v / len;
+
+	return r;
 }
 
 template <unsigned int N>
