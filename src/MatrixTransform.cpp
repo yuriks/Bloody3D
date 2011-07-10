@@ -132,6 +132,33 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 	return frustrum_proj(height * aspect, height, z_near, z_far);
 }
 
+mat4 look_at(vec3 up, vec3 camera, vec3 target)
+{
+	using vec::dot;
+	using vec::cross;
+	using vec::unit;
+
+	vec3 dir = unit(target - camera);
+
+	static const vec3 x = {{ 1.f, 0.f, 0.f }};
+	static const vec3 y = {{ 0.f, 1.f, 0.f }};
+	static const vec3 z = {{ 0.f, 0.f, 1.f }};
+
+	float up_angle = -std::acosf(dot(up, y));
+	vec3 up_axis = cross(up, y);
+
+	mat4 rot_roll = rotate(up_axis, up_angle);
+	dir = vec::euclidean(rot_roll * vec::homogeneous(dir));
+
+	float heading_angle = std::atan2f(1.f, 0.f) - std::atan2f(dir[2], dir[0]);
+	mat4 rot_heading = rotate(y, heading_angle);
+	dir = vec::euclidean(rot_heading * vec::homogeneous(dir));
+
+	mat4 rot_pitch = rotate(x, -std::asinf(dir[1]));
+
+	return rot_pitch * rot_heading * rot_roll * translate(target - camera);
+}
+
 } // namespace mat_transform
 
 } // namespace math

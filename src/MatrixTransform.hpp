@@ -57,6 +57,9 @@ mat4 orthographic_proj(float left, float right, float bottom, float top, float z
 mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_far);
 mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far);
 
+// Cameras
+mat4 look_at(vec3 up, vec3 camera, vec3 target);
+
 } // namespace mat_transform
 
 } // namespace math
