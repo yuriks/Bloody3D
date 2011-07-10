@@ -125,6 +125,13 @@ mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_fa
 	return m;
 }
 
+mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
+{
+	float height = z_far * std::tanf(vfov);
+
+	return frustrum_proj(height * aspect, height, z_near, z_far);
+}
+
 } // namespace mat_transform
 
 } // namespace math
