@@ -141,7 +141,7 @@ mat4 look_at(vec3 up, vec3 camera, vec3 target)
 	vec3 x_axis = cross(up, z_axis);
 	vec3 y_axis = cross(z_axis, x_axis);
 
-	mat4 m = mat_transform::identity<4>();
+	mat4 m;
 
 	m(0, 0) = x_axis[0];
 	m(0, 1) = x_axis[1];
