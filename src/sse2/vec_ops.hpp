@@ -62,8 +62,9 @@ inline float length(const vecN& v)
 
 inline vecN inverse(const vecN& v)
 {
-	v.xmm_data = _mm_rcp_ps(v.xmm_data);
-	return v;
+	vecN r;
+	r.xmm_data = _mm_rcp_ps(v.xmm_data);
+	return r;
 }
 
 } // namespace vec
