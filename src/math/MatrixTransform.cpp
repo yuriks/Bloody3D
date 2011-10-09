@@ -17,9 +17,9 @@ mat4 rotate(const vec3& axis, float angle)
 	const float s = std::sin(angle);
 	const float c = std::cos(angle);
 	const float t = 1.f - c;
-	const float x = axis[0];
-	const float y = axis[1];
-	const float z = axis[2];
+	const float x = axis.getX();
+	const float y = axis.getY();
+	const float z = axis.getZ();
 
 	// A lot of common sub-expression optimization can be
 	// done here, but I'll leave that to the compiler.
@@ -98,8 +98,8 @@ mat4 rotate(const vec3& axis, float angle)
 
 mat4 orthographic_proj(float left, float right, float bottom, float top, float z_near, float z_far)
 {
-	vec3 t = make_vec(left + right, bottom + top, z_near + z_far) / -2.f;
-	vec3 s = vec::inverse(make_vec(right - left, top - bottom, z_far - z_near)) * 2.f;
+	vec3 t = vec3(left + right, bottom + top, z_near + z_far) / -2.f;
+	vec3 s = vec::inverse(vec3(right - left, top - bottom, z_far - z_near)) * 2.f;
 	return scale(s) * translate(t);
 }
 
@@ -135,27 +135,27 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 {
 	using vec::cross;
-	using vec::unit;
+	using vec::normalized;
 
-	vec3 z_axis = unit(target - camera);
+	vec3 z_axis = normalized(target - camera);
 	vec3 x_axis = cross(up, z_axis);
 	vec3 y_axis = cross(z_axis, x_axis);
 
 	mat4 m;
 
-	m(0, 0) = x_axis[0];
-	m(0, 1) = x_axis[1];
-	m(0, 2) = x_axis[2];
+	m(0, 0) = x_axis.getX();
+	m(0, 1) = x_axis.getY();
+	m(0, 2) = x_axis.getZ();
 	m(0, 3) = 0.f;
 
-	m(1, 0) = y_axis[0];
-	m(1, 1) = y_axis[1];
-	m(1, 2) = y_axis[2];
+	m(1, 0) = y_axis.getX();
+	m(1, 1) = y_axis.getY();
+	m(1, 2) = y_axis.getZ();
 	m(1, 3) = 0.f;
 
-	m(2, 0) = z_axis[0];
-	m(2, 1) = z_axis[1];
-	m(2, 2) = z_axis[2];
+	m(2, 0) = z_axis.getX();
+	m(2, 1) = z_axis.getY();
+	m(2, 2) = z_axis.getZ();
 	m(2, 3) = 0.f;
 
 	m(3, 0) = 0.f;

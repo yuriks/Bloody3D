@@ -1,7 +1,7 @@
 #ifndef BLOODY3D_MESH_MESH_HPP
 #define BLOODY3D_MESH_MESH_HPP
 
-#include "Vector.hpp"
+#include "math/Vector.hpp"
 #include <vector>
 #include <string>
 

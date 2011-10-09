@@ -15,7 +15,7 @@
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\image\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\MatrixTransform.cpp" />
+    <ClCompile Include="src\math\MatrixTransform.cpp" />
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -25,16 +25,18 @@
     <ClInclude Include="src\gl\ShaderProgram.hpp" />
     <ClInclude Include="src\gl\Texture.hpp" />
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
+    <ClInclude Include="src\Heatwave.hpp" />
     <ClInclude Include="src\image\ImageLoader.hpp" />
-    <ClInclude Include="src\Matrix.hpp" />
-    <ClInclude Include="src\MatrixTransform.hpp" />
+    <ClInclude Include="src\math\Matrix.hpp" />
+    <ClInclude Include="src\math\MatrixTransform.hpp" />
+    <ClInclude Include="src\math\vec_template.hpp" />
     <ClInclude Include="src\mesh\Mesh.hpp" />
     <ClInclude Include="src\mesh\ObjLoader.hpp" />
     <ClInclude Include="src\sse2\Matrix.hpp" />
     <ClInclude Include="src\sse2\Vector.hpp" />
     <ClInclude Include="src\sse2\vec_def.hpp" />
     <ClInclude Include="src\sse2\vec_ops.hpp" />
-    <ClInclude Include="src\Vector.hpp" />
+    <ClInclude Include="src\math\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>

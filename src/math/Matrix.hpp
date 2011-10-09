@@ -1,5 +1,4 @@
-#ifndef BLOODY3D_MATRIX
-#define BLOODY3D_MATRIX
+#pragma once
 
 namespace math {
 
@@ -64,7 +63,8 @@ struct mat
 		return data[r];
 	}
 
-	float data[M*N];
+	// Hack to pad vec3 to 4 floats until I replace this class
+	float data[(N == 1 && M == 3) ? 4 : M*N];
 };
 
 typedef mat<4> mat4;
@@ -125,5 +125,3 @@ inline mat<M, N> operator/(const mat<M, N>& m, float s)
 #ifdef USE_SSE2
 #include "sse2/Matrix.hpp"
 #endif
-
-#endif // BLOODY3D_MATRIX
