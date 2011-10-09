@@ -9,7 +9,7 @@ struct Vertex
 {
 	math::vec3 position;
 	math::vec3 normal;
-	math::vec2 tex_coord;
+	//math::vec2 tex_coord;
 };
 
 struct SubMesh

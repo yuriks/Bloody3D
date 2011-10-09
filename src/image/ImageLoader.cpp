@@ -1,6 +1,7 @@
 #include "ImageLoader.hpp"
 
 #include <cassert>
+#include <cstdint>
 #include <istream>
 
 #include <png.h>
@@ -102,6 +103,100 @@ void Image::loadPNGFileRGBA8(Image& image, std::istream& stream)
 	row_pointers = new png_bytep[img_height];
 	for (i = 0; i < img_height; ++i) {
 		row_pointers[i] = &image.getData()[i*img_width*4];
+	}
+
+	png_read_image(png_ptr, row_pointers);
+
+	png_read_end(png_ptr, info_ptr);
+
+	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+}
+
+void GrayscaleImage::initialize(unsigned int width_, unsigned int height_)
+{
+	assert(width_ != ~0u);
+	assert(height_ != ~0u);
+
+	clear();
+	data = new unsigned char[width_ * height_ * 2];
+	width = width_;
+	height = height_;
+}
+
+bool isBigEndian()
+{
+	union
+	{
+		char c[2];
+		uint16_t i;
+	} foo;
+	foo.i = 0x1020;
+	return foo.c[0] == 0x10;
+}
+
+void GrayscaleImage::loadPNGFileGray16(Image& image, std::istream& stream)
+{
+	png_structp png_ptr = 0;
+	png_infop info_ptr = 0;
+	bool clear_image = false;
+	png_uint_32 img_width = ~0u;
+	png_uint_32 img_height = ~0u;
+	int bit_depth, color_type, interlace_type;
+	png_bytep* row_pointers = 0;
+	unsigned int i;
+
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+	if (png_ptr == 0) {
+		if (clear_image)
+			image.clear();
+		delete[] row_pointers;
+		throw PngException("Error creating png read struct.");
+	}
+
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == 0) {
+		png_destroy_read_struct(&png_ptr, 0, 0);
+		throw PngException("Error creating png info struct.");
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr)) != 0) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+
+		throw PngException("Unknown error.");
+	}
+
+	png_set_read_fn(png_ptr, static_cast<void*>(&stream), read_data);
+
+	png_read_info(png_ptr, info_ptr);
+	png_get_IHDR(png_ptr, info_ptr, &img_width, &img_height, &bit_depth, &color_type, &interlace_type, 0, 0);
+
+	//if (interlace_type != PNG_INTERLACE_NONE)
+	//	png_error(png_ptr, "Interlaced images not supported.");
+	png_set_interlace_handling(png_ptr);
+
+	//png_set_strip_16(png_ptr);
+	png_set_expand_16(png_ptr);
+
+	png_set_rgb_to_gray_fixed(png_ptr, 2, -1, -1);
+
+	png_read_update_info(png_ptr, info_ptr);
+
+	png_get_IHDR(png_ptr, info_ptr, &img_width, &img_height, &bit_depth, &color_type, 0, 0, 0);
+	// In case I didn't do all needed transformations above. (Likely.)
+	if (bit_depth != 16)
+		png_error(png_ptr, "Unsupported format: Not 16-bit.");
+	if (color_type != PNG_COLOR_TYPE_GRAY)
+		png_error(png_ptr, "Unsupported format: Not Grayscale.");
+
+	if (!isBigEndian())
+		png_set_swap(png_ptr);
+
+	clear_image = true;
+	image.initialize(img_width, img_height);
+
+	row_pointers = new png_bytep[img_height];
+	for (i = 0; i < img_height; ++i) {
+		row_pointers[i] = &image.getData()[i*img_width*2];
 	}
 
 	png_read_image(png_ptr, row_pointers);

@@ -30,10 +30,18 @@ public:
 
 	static void loadPNGFileRGBA8(Image& image, std::istream& stream);
 
-private:
+protected:
 	unsigned int width;
 	unsigned int height;
 	unsigned char* data;
+};
+
+class GrayscaleImage : public Image
+{
+public:
+	void initialize(unsigned int width, unsigned int height);
+
+	static void loadPNGFileGray16(Image& image, std::istream& stream);
 };
 
 void preMultiplyAlpha(Image& image);

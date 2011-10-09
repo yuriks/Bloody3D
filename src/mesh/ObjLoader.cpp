@@ -13,7 +13,7 @@ using std::get;
 
 Mesh load_obj(std::istream& f)
 {
-	typedef std::tuple<unsigned int, unsigned int, unsigned int> Triangle;
+	typedef std::tuple<unsigned int, unsigned int> Triangle;
 
 	Mesh mesh;
 	SubMesh* current_submesh = nullptr;
@@ -47,7 +47,7 @@ Mesh load_obj(std::istream& f)
 		else if (command == "v")
 		{
 			vec3 v;
-			ss >> v[0] >> v[2] >> v[1];
+			ss >> v[0] >> v[1] >> v[2];
 			pos_db.push_back(v);
 		}
 		else if (command == "vt")
@@ -59,7 +59,7 @@ Mesh load_obj(std::istream& f)
 		else if (command == "vn")
 		{
 			vec3 norm;
-			ss >> norm[0] >> norm[2] >> norm[1];
+			ss >> norm[0] >> norm[1] >> norm[2];
 			norm_db.push_back(norm);
 		}
 		else if (command == "f")
@@ -79,7 +79,7 @@ Mesh load_obj(std::istream& f)
 
 					std::istringstream fss(tri_str);
 					Triangle tri;
-					fss >> get<0>(tri) >> get<1>(tri) >> get<2>(tri);
+					fss >> get<0>(tri) >> get<1>(tri);
 
 					// Try to find key in map
 					auto lb = vertex_cache.lower_bound(tri);
@@ -93,8 +93,8 @@ Mesh load_obj(std::istream& f)
 						// Doesn't exist yet
 						Vertex vert;
 						vert.position = pos_db.at(get<0>(tri)-1);
-						vert.tex_coord = uv_db.at(get<1>(tri)-1);
-						vert.normal = norm_db.at(get<2>(tri)-1);
+						//vert.tex_coord = uv_db.at(get<1>(tri)-1);
+						vert.normal = norm_db.at(get<1>(tri)-1);
 
 						int i = current_submesh->vertices.size();
 						current_submesh->vertices.push_back(vert);
