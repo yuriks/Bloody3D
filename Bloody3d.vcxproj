@@ -29,7 +29,6 @@
     <ClInclude Include="src\image\ImageLoader.hpp" />
     <ClInclude Include="src\math\Matrix.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
-    <ClInclude Include="src\math\vec_template.hpp" />
     <ClInclude Include="src\mesh\Mesh.hpp" />
     <ClInclude Include="src\mesh\ObjLoader.hpp" />
     <ClInclude Include="src\sse2\Matrix.hpp" />

@@ -99,7 +99,7 @@ mat4 rotate(const vec3& axis, float angle)
 mat4 orthographic_proj(float left, float right, float bottom, float top, float z_near, float z_far)
 {
 	vec3 t = vec3(left + right, bottom + top, z_near + z_far) / -2.f;
-	vec3 s = vec::inverse(vec3(right - left, top - bottom, z_far - z_near)) * 2.f;
+	vec3 s = inverse(vec3(right - left, top - bottom, z_far - z_near)) * 2.f;
 	return scale(s) * translate(t);
 }
 
@@ -134,9 +134,6 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 
 mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 {
-	using vec::cross;
-	using vec::normalized;
-
 	vec3 z_axis = normalized(target - camera);
 	vec3 x_axis = cross(up, z_axis);
 	vec3 y_axis = cross(z_axis, x_axis);
