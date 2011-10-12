@@ -9,24 +9,25 @@
 
 namespace math {
 
-template <int N>
-struct vec {
+template <unsigned int N>
+struct Vec {
 	static_assert(N >= 2 && N <= 4, "N must be between 2 and 4");
 
 	__m128 xmm;
 
-	HW_FORCE_INLINE explicit vec(__m128 data) : xmm(data) {}
+	HW_FORCE_INLINE Vec() {}
+	HW_FORCE_INLINE explicit Vec(__m128 data) : xmm(data) {}
 
-	HW_FORCE_INLINE explicit vec(float x);
+	HW_FORCE_INLINE explicit Vec(float x);
 
-	HW_FORCE_INLINE vec(float x, float y, float z, float w) : xmm(_mm_set_ps(x, y, z,   w  )) { static_assert(N == 4); }
-	HW_FORCE_INLINE vec(float x, float y, float z)          : xmm(_mm_set_ps(x, y, z,   0.f)) { static_assert(N == 3); }
-	HW_FORCE_INLINE vec(float x, float y)                   : xmm(_mm_set_ps(x, y, 0.f, 0.f)) { static_assert(N == 2); }
+	HW_FORCE_INLINE Vec(float x, float y, float z, float w) : xmm(_mm_set_ps(x, y, z,   w  )) { static_assert(N == 4); }
+	HW_FORCE_INLINE Vec(float x, float y, float z)          : xmm(_mm_set_ps(x, y, z,   0.f)) { static_assert(N == 3); }
+	HW_FORCE_INLINE Vec(float x, float y)                   : xmm(_mm_set_ps(x, y, 0.f, 0.f)) { static_assert(N == 2); }
 
-	HW_FORCE_INLINE vec spreadX() const { return vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
-	HW_FORCE_INLINE vec spreadY() const { return vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
-	HW_FORCE_INLINE vec spreadZ() const { static_assert(N >= 3); return vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
-	HW_FORCE_INLINE vec spreadW() const { static_assert(N >= 4); return vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
+	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
+	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
+	HW_FORCE_INLINE Vec spreadZ() const { static_assert(N >= 3); return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
+	HW_FORCE_INLINE Vec spreadW() const { static_assert(N >= 4); return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
 
 	HW_FORCE_INLINE float getX() const { float tmp; _mm_store_ss(&tmp, xmm); return tmp; }
 	HW_FORCE_INLINE float getY() const { return spreadY().getX(); }
@@ -52,41 +53,41 @@ public:
 };
 
 template <>
-HW_FORCE_INLINE vec<4>::vec(float x) : xmm(_mm_set_ps1(x)) {}
+HW_FORCE_INLINE Vec<4>::Vec(float x) : xmm(_mm_set_ps1(x)) {}
 template <>
-HW_FORCE_INLINE vec<3>::vec(float x) : xmm(_mm_set_ps(x, x, x, 0.f)) {}
+HW_FORCE_INLINE Vec<3>::Vec(float x) : xmm(_mm_set_ps(x, x, x, 0.f)) {}
 template <>
-HW_FORCE_INLINE vec<2>::vec(float x) : xmm(_mm_set_ps(x, x, 0.f, 0.f)) {}
+HW_FORCE_INLINE Vec<2>::Vec(float x) : xmm(_mm_set_ps(x, x, 0.f, 0.f)) {}
 
 #define OP_TEMPLATE(OP, OPX) \
-	template <int N> \
-	HW_FORCE_INLINE vec<N>& operator OP##= (vec<N>& a, const vec<N>& b) { \
+	template <unsigned int N> \
+	HW_FORCE_INLINE Vec<N>& operator OP##= (Vec<N>& a, const Vec<N>& b) { \
 		a.xmm = _mm_##OPX##_ps(a.xmm, b.xmm); \
 		return a; \
 	} \
 	\
-	template <int N> \
-	HW_FORCE_INLINE vec<N> operator OP (const vec<N>& a, const vec<N>& b) { \
-		return vec<N>(_mm_##OPX##_ps(a.xmm, b.xmm)); \
+	template <unsigned int N> \
+	HW_FORCE_INLINE Vec<N> operator OP (const Vec<N>& a, const Vec<N>& b) { \
+		return Vec<N>(_mm_##OPX##_ps(a.xmm, b.xmm)); \
 	} \
 	\
-	template <int N> \
-	HW_FORCE_INLINE vec<N> operator OP##= (vec<N>& a, float b) { \
+	template <unsigned int N> \
+	HW_FORCE_INLINE Vec<N> operator OP##= (Vec<N>& a, float b) { \
 		a.xmm = _mm_##OPX##_ps(a.xmm, EXPAND_VAL(b)); \
 		return a; \
 	} \
 	\
-	template <int N> \
-	HW_FORCE_INLINE vec<N> operator OP (const vec<N>& a, float b) { \
-		return vec<N>(_mm_##OPX##_ps(a.xmm, EXPAND_VAL(b))); \
+	template <unsigned int N> \
+	HW_FORCE_INLINE Vec<N> operator OP (const Vec<N>& a, float b) { \
+		return Vec<N>(_mm_##OPX##_ps(a.xmm, EXPAND_VAL(b))); \
 	} \
 	\
-	template <int N> \
-	HW_FORCE_INLINE vec<N> operator OP (float b, const vec<N>& a) { \
+	template <unsigned int N> \
+	HW_FORCE_INLINE Vec<N> operator OP (float b, const Vec<N>& a) { \
 		return a OP b; \
 	}
 
-#define EXPAND_VAL(x) vec<N>(x).xmm
+#define EXPAND_VAL(x) Vec<N>(x).xmm
 
 OP_TEMPLATE(+, add)
 OP_TEMPLATE(-, sub)
@@ -100,13 +101,13 @@ OP_TEMPLATE(/, div)
 #undef EXPAND_VAL
 #undef OP_TEMPLATE
 
-typedef vec<4> vec4;
-typedef vec<3> vec3;
-typedef vec<2> vec2;
+typedef Vec<4> vec4;
+typedef Vec<3> vec3;
+typedef Vec<2> vec2;
 
 // Depends on unused elements being set to 0.f
-template <int N>
-HW_FORCE_INLINE float dot(const vec<N>& a, const vec<N>& b) {
+template <unsigned int N>
+HW_FORCE_INLINE float dot(const Vec<N>& a, const Vec<N>& b) {
 	__m128 x = _mm_mul_ps(a.xmm, b.xmm);
 
 	x = _mm_hadd_ps(x, x);
@@ -118,8 +119,8 @@ HW_FORCE_INLINE float dot(const vec<N>& a, const vec<N>& b) {
 }
 
 // Depends on unused elements being set to 0.f
-template <int N>
-HW_FORCE_INLINE float length(const vec<N>& a) {
+template <unsigned int N>
+HW_FORCE_INLINE float length(const Vec<N>& a) {
 	__m128 x = _mm_mul_ps(a.xmm, a.xmm);
 
 	x = _mm_hadd_ps(x, x);
@@ -132,8 +133,8 @@ HW_FORCE_INLINE float length(const vec<N>& a) {
 	return tmp;
 }
 
-template <int N>
-HW_FORCE_INLINE float invLength(const vec<N>& a) {
+template <unsigned int N>
+HW_FORCE_INLINE float invLength(const Vec<N>& a) {
 	__m128 x = _mm_mul_ps(a.xmm, a.xmm);
 
 	x = _mm_hadd_ps(x, x);
@@ -146,8 +147,8 @@ HW_FORCE_INLINE float invLength(const vec<N>& a) {
 	return tmp;
 }
 
-template <int N>
-HW_FORCE_INLINE vec<N> normalized(const vec<N>& a) {
+template <unsigned int N>
+HW_FORCE_INLINE Vec<N> normalized(const Vec<N>& a) {
 	__m128 x = _mm_mul_ps(a.xmm, a.xmm);
 	x = _mm_hadd_ps(x, x);
 	x = _mm_hadd_ps(x, x);
@@ -159,14 +160,14 @@ HW_FORCE_INLINE vec<N> normalized(const vec<N>& a) {
 	_mm_store_ss(&tmp, x);
 }
 
-template <int N>
-HW_FORCE_INLINE vec<N> inverse(const vec<N>& a) {
+template <unsigned int N>
+HW_FORCE_INLINE Vec<N> inverse(const Vec<N>& a) {
 	__m128 x = _mm_rcp_ps(a.xmm);
 	if (N != 4) {
 		// Clear unused components to 0
 		x = _mm_castsi128_ps(_mm_slli_si128(_mm_srli_si128(_mm_castps_si128(x), (4-N)*4), (4-N)*4));
 	}
-	return vec<N>(x);
+	return Vec<N>(x);
 }
 
 HW_FORCE_INLINE vec3 cross(const vec3& a, const vec3& b) {
