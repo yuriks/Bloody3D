@@ -85,7 +85,7 @@ void Image::loadPNGFileRGBA8(Image& image, std::istream& stream)
 	png_set_strip_16(png_ptr);
 
 	png_set_gray_to_rgb(png_ptr);
-	
+
 	png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
 
 	png_read_update_info(png_ptr, info_ptr);

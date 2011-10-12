@@ -21,7 +21,7 @@ private:
 	GLuint id;
 };
 
-inline BufferObject::BufferObject() 
+inline BufferObject::BufferObject()
 {
 	glGenBuffers(1, &id);
 }

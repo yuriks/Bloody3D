@@ -21,7 +21,7 @@ private:
 	GLuint id;
 };
 
-inline VertexArrayObject::VertexArrayObject() 
+inline VertexArrayObject::VertexArrayObject()
 {
 	glGenVertexArrays(1, &id);
 }
