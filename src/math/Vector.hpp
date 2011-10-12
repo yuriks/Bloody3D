@@ -120,6 +120,17 @@ HW_FORCE_INLINE float dot(const Vec<N>& a, const Vec<N>& b) {
 
 // Depends on unused elements being set to 0.f
 template <unsigned int N>
+HW_FORCE_INLINE Vec<N> spreadDot(const Vec<N>& a, const Vec<N>& b) {
+	__m128 x = _mm_mul_ps(a.xmm, b.xmm);
+
+	x = _mm_hadd_ps(x, x);
+	x = _mm_hadd_ps(x, x);
+
+	return Vec<N>(x);
+}
+
+// Depends on unused elements being set to 0.f
+template <unsigned int N>
 HW_FORCE_INLINE float length(const Vec<N>& a) {
 	__m128 x = _mm_mul_ps(a.xmm, a.xmm);
 
