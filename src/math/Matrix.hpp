@@ -7,38 +7,17 @@ namespace math {
 // R = rows, C = columns
 // row-major storage
 template <unsigned int R, unsigned int C>
-struct Mat {
-	typedef Vec<C> vec;
-	vec rows[R];
+struct Mat;
 
-	HW_FORCE_INLINE Mat() {}
-
-	HW_FORCE_INLINE explicit Mat(float x) {
-		for (unsigned int i = 0; i < R; ++i)
-			rows[i] = vec(x);
-	}
-
-	HW_FORCE_INLINE explicit Mat(const vec& a, const vec& b, const vec& c, const vec& d) {
-		static_assert(C == 4);
-		rows[0] = a;
-		rows[1] = b;
-		rows[2] = c;
-		rows[3] = d;
-	}
-
-	HW_FORCE_INLINE explicit Mat(const vec& a, const vec& b, const vec& c) {
-		static_assert(C == 3);
-		rows[0] = a;
-		rows[1] = b;
-		rows[2] = c;
-	}
-
-	HW_FORCE_INLINE explicit Mat(const vec& a, const vec& b) {
-		static_assert(C == 2);
-		rows[0] = a;
-		rows[1] = b;
-	}
-};
+#define R 4
+#include "matrix_template.hpp"
+#undef R
+#define R 3
+#include "matrix_template.hpp"
+#undef R
+#define R 2
+#include "matrix_template.hpp"
+#undef R
 
 #define OP_TEMPLATE(OP) \
 	template <unsigned int R, unsigned int C> \
@@ -240,7 +219,7 @@ inline vec4 transform(const mat3x4& m, const vec4& v) {
 }
 
 inline vec3 transform(const mat3x4& m, const vec3& v) {
-	vec4 v1 = v1;
+	vec4 v1(v);
 	v1.setW(1.f);
 	const vec4 x = spreadDot(m.rows[0], v1);
 	const vec4 y = spreadDot(m.rows[1], v1);
@@ -252,6 +231,10 @@ inline vec3 transform(const mat3x4& m, const vec3& v) {
 	__m128 xyz0 = _mm_shuffle_ps(xxyy, zz00, _MM_SHUFFLE(2, 0, 2, 0));
 
 	return vec3(xyz0);
+}
+
+HW_FORCE_INLINE mat4 padMat3x4(const mat3x4& m) {
+	return mat4(m.rows[0], m.rows[1], m.rows[2], vec4(0.f, 0.f, 0.f, 1.f));
 }
 
 } // namespace math

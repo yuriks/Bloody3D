@@ -86,5 +86,11 @@
     <ClInclude Include="src\Heatwave.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\math\vector_template.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\matrix_template.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

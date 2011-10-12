@@ -10,54 +10,17 @@
 namespace math {
 
 template <unsigned int N>
-struct Vec {
-	static_assert(N >= 2 && N <= 4, "N must be between 2 and 4");
+struct Vec;
 
-	__m128 xmm;
-
-	HW_FORCE_INLINE Vec() {}
-	HW_FORCE_INLINE explicit Vec(__m128 data) : xmm(data) {}
-
-	HW_FORCE_INLINE explicit Vec(float x);
-
-	HW_FORCE_INLINE Vec(float x, float y, float z, float w) : xmm(_mm_set_ps(x, y, z,   w  )) { static_assert(N == 4); }
-	HW_FORCE_INLINE Vec(float x, float y, float z)          : xmm(_mm_set_ps(x, y, z,   0.f)) { static_assert(N == 3); }
-	HW_FORCE_INLINE Vec(float x, float y)                   : xmm(_mm_set_ps(x, y, 0.f, 0.f)) { static_assert(N == 2); }
-
-	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
-	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
-	HW_FORCE_INLINE Vec spreadZ() const { static_assert(N >= 3); return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
-	HW_FORCE_INLINE Vec spreadW() const { static_assert(N >= 4); return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
-
-	HW_FORCE_INLINE float getX() const { float tmp; _mm_store_ss(&tmp, xmm); return tmp; }
-	HW_FORCE_INLINE float getY() const { return spreadY().getX(); }
-	HW_FORCE_INLINE float getZ() const { static_assert(N >= 3); return spreadZ().getX(); }
-	HW_FORCE_INLINE float getW() const { static_assert(N >= 4); return spreadW().getX(); }
-
-private:
-	HW_FORCE_INLINE void setVal(int n, float val) {
-		union {
-			__m128 v;
-			float f[4];
-		} u;
-		u.v = xmm;
-		u.f[n] = val;
-		xmm = u.v;
-	}
-
-public:
-	HW_FORCE_INLINE float setX(float val) { setVal(0, val); }
-	HW_FORCE_INLINE float setY(float val) { setVal(1, val); }
-	HW_FORCE_INLINE float setZ(float val) { static_assert(N >= 3); setVal(2, val); }
-	HW_FORCE_INLINE float setW(float val) { static_assert(N >= 4); setVal(3, val); }
-};
-
-template <>
-HW_FORCE_INLINE Vec<4>::Vec(float x) : xmm(_mm_set_ps1(x)) {}
-template <>
-HW_FORCE_INLINE Vec<3>::Vec(float x) : xmm(_mm_set_ps(x, x, x, 0.f)) {}
-template <>
-HW_FORCE_INLINE Vec<2>::Vec(float x) : xmm(_mm_set_ps(x, x, 0.f, 0.f)) {}
+#define N 4
+#include "vector_template.hpp"
+#undef N
+#define N 3
+#include "vector_template.hpp"
+#undef N
+#define N 2
+#include "vector_template.hpp"
+#undef N
 
 #define OP_TEMPLATE(OP, OPX) \
 	template <unsigned int N> \
@@ -167,8 +130,7 @@ HW_FORCE_INLINE Vec<N> normalized(const Vec<N>& a) {
 
 	x = _mm_mul_ps(a.xmm, x);
 
-	float tmp;
-	_mm_store_ss(&tmp, x);
+	return Vec<N>(x);
 }
 
 template <unsigned int N>
