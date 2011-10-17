@@ -6,11 +6,16 @@ namespace math {
 
 namespace mat_transform {
 
-#ifndef USE_SSE2
+HW_ALIGN_VAR_SSE const float mat_identity[] = {
+	1.f, 0.f, 0.f, 0.f,
+	0.f, 1.f, 0.f, 0.f,
+	0.f, 0.f, 1.f, 0.f,
+	0.f, 0.f, 0.f, 1.f
+};
 
-mat4 rotate(const vec3& axis, float angle)
+mat3x4 rotate(const vec3& axis, float angle)
 {
-	mat4 m = identity<4>();
+	mat3x4 m;
 
 	// Taken from Graphics Gems I (Section IX.6)
 
@@ -23,22 +28,14 @@ mat4 rotate(const vec3& axis, float angle)
 
 	// A lot of common sub-expression optimization can be
 	// done here, but I'll leave that to the compiler.
-	m(0, 0) = t*x*x + c;
-	m(0, 1) = t*x*y + s*z;
-	m(0, 2) = t*x*z - s*y;
-
-	m(1, 0) = t*y*x - s*z;
-	m(1, 1) = t*y*y + c;
-	m(1, 2) = t*y*z + s*x;
-
-	m(2, 0) = t*z*x + s*y;
-	m(2, 1) = t*z*y - s*x;
-	m(2, 2) = t*z*z + c;
+	m.rows[0] = vec4(t*x*x + c,   t*x*y + s*z, t*x*z - s*y, 0.f);
+	m.rows[1] = vec4(t*y*x - s*z, t*y*y + c,   t*y*z + s*x, 0.f);
+	m.rows[2] = vec4(t*z*x + s*y, t*z*y - s*x, t*z*z + c,   0.f);
 
 	return m;
 }
 
-#else
+#if 0
 
 mat4 rotate(const vec3& axis, float angle)
 {
@@ -106,7 +103,6 @@ mat4 orthographic_proj(float left, float right, float bottom, float top, float z
 mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_far)
 {
 	mat4 m;
-	m.clear(0.f);
 
 	// x' * z = (F / W)*x;
 	// y' * z = (F / H)*y;
@@ -114,13 +110,15 @@ mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_fa
 	// A = (F + N)/(F - N);
 	// B = (2 * F * N)/(N - F);
 
-	m(0, 0) = z_far / half_width;
-	m(1, 1) = z_far / half_height;
+	const float z_over_w = z_far / half_width;
+	const float z_over_h = z_far / half_height;
+	const float a = (z_far + z_near) / (z_far - z_near);
+	const float b = (2.f * z_far * z_near)/(z_near - z_far);
 
-	m(2, 2) = (z_far + z_near) / (z_far - z_near);
-	m(3, 2) = 1.f;
-
-	m(2, 3) = (2.f * z_far * z_near)/(z_near - z_far);
+	m.rows[0] = vec4(z_over_w,   0.f,    0.f, 0.f);
+	m.rows[1] = vec4(  0.f,    z_over_h, 0.f, 0.f);
+	m.rows[2] = vec4(  0.f,      0.f,     a,   b );
+	m.rows[3] = vec4(  0.f,      0.f,    1.f, 0.f);
 
 	return m;
 }
@@ -132,35 +130,19 @@ mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 	return frustrum_proj(height * aspect, height, z_near, z_far);
 }
 
-mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
+mat3x4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 {
 	vec3 z_axis = normalized(target - camera);
 	vec3 x_axis = cross(up, z_axis);
 	vec3 y_axis = cross(z_axis, x_axis);
 
-	mat4 m;
+	mat3x4 m;
 
-	m(0, 0) = x_axis.getX();
-	m(0, 1) = x_axis.getY();
-	m(0, 2) = x_axis.getZ();
-	m(0, 3) = 0.f;
+	m.rows[0] = vec4(x_axis);
+	m.rows[1] = vec4(y_axis);
+	m.rows[2] = vec4(z_axis);
 
-	m(1, 0) = y_axis.getX();
-	m(1, 1) = y_axis.getY();
-	m(1, 2) = y_axis.getZ();
-	m(1, 3) = 0.f;
-
-	m(2, 0) = z_axis.getX();
-	m(2, 1) = z_axis.getY();
-	m(2, 2) = z_axis.getZ();
-	m(2, 3) = 0.f;
-
-	m(3, 0) = 0.f;
-	m(3, 1) = 0.f;
-	m(3, 2) = 0.f;
-	m(3, 3) = 1.f;
-
-	return m * mat_transform::translate(camera * -1.f);
+	return concatTransform(mat3x4(vec4(x_axis), vec4(y_axis), vec4(z_axis)), mat_transform::translate3x4(camera * -1.f));
 }
 
 } // namespace mat_transform
