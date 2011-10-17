@@ -8,6 +8,15 @@
 #	define HW_FORCE_INLINE inline
 #endif // _MSC_VER
 
+#ifdef _MSC_VER
+#	define HW_ALIGN_VAR(x) __declspec(align(x))
+#elif __GNUC__
+#	define HW_ALIGN_VAR(x) __attribute__ ((aligned (x)))
+#else
+#	error No support for HW_ALIGN
+#endif
+#define HW_ALIGN_VAR_SSE HW_ALIGN_VAR(16)
+
 namespace hw {
 	// Standard sized types
 	typedef int8_t s8;
