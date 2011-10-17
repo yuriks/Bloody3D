@@ -2,9 +2,9 @@
 #define min min
 #define max max
 
-#include "Matrix.hpp"
-#include "Vector.hpp"
-#include "MatrixTransform.hpp"
+#include "math/Matrix.hpp"
+#include "math/Vector.hpp"
+#include "math/MatrixTransform.hpp"
 #include "gl/VertexArrayObject.hpp"
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
@@ -34,14 +34,8 @@ using namespace math;
 
 struct Light
 {
-	union {
-		vec3 direction;
-		float pad1[4]; // Enforce alignment
-	};
-	union {
-		vec3 color;
-		float pad2[4];
-	};
+	vec3 direction;
+	vec3 color;
 };
 static_assert(sizeof(Light) == (4+4)*4, "OOPS!");
 static_assert(offsetof(Light, direction) == 0, "OOPS!");
@@ -137,13 +131,13 @@ vec3 lookup_value(const std::vector<unsigned char>& lut, float pos)
 	if (index_b >= lut_entries)
 		index_b = lut_entries - 1;
 
-	vec3 col;
+	float col[3];
 	for (int i = 0; i < 3; ++i)
 	{
 		col[i] = lerp(lut[index_a*4 + i] / 255.f, lut[index_b*4 + i] / 255.f, mix);
 	}
 
-	return col;
+	return vec3(col[0], col[1], col[2]);
 }
 
 int main(int argc, char *argv[])
@@ -218,8 +212,9 @@ int main(int argc, char *argv[])
 	}
 
 	static const float SPACING = .1f;
-	std::vector<Vertex> grid;
-	grid.resize(width*height);
+	//std::vector<Vertex> grid;
+	//grid.resize(width*height);
+	Vertex* grid = (Vertex*)_aligned_malloc(width*height*sizeof(Vertex), 16);
 	{
 		unsigned int i = 0;
 		for (unsigned int y = 0; y < height; ++y)
@@ -227,12 +222,12 @@ int main(int argc, char *argv[])
 			for (unsigned int x = 0; x < width; ++x)
 			{
 				Vertex v;
-				v.pos = make_vec(x * SPACING, y * SPACING);
-				v.texcoord = make_vec((float)x / width, (float)y / width);
+				v.pos = vec2(x * SPACING, y * SPACING);
+				v.texcoord = vec2((float)x / width, (float)y / width);
 				grid[i++] = v;
 			}
 		}
-		assert(i == grid.size());
+		//assert(i == grid.size());
 	}
 
 	std::vector<uint32_t> indices;
@@ -281,7 +276,7 @@ int main(int argc, char *argv[])
 		s.vao.bind();
 
 		s.vbo.bind(GL_ARRAY_BUFFER);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * grid.size(), static_cast<const void*>(grid.data()), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * width*height, static_cast<const void*>(grid), GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)0 + offsetof(Vertex, pos));
 		glEnableVertexAttribArray(0);
@@ -352,7 +347,7 @@ int main(int argc, char *argv[])
 			float light_rot = -15.f;
 			Light lights;
 			//lights.direction = make_vec(2.12f, 2.24f, 2.52f);
-			lights.direction = vec::unit(make_vec(-2.f, -3.f, -2.5f));
+			lights.direction = normalized(vec3(-2.f, -3.f, -2.5f));
 			//lights.color = make_vec(1.f, 1.f, 1.f);
 
 			gl::BufferObject ubo_lights;
@@ -372,13 +367,13 @@ int main(int argc, char *argv[])
 			GLuint u_ColorLookup = shader_prog.getUniformLocation("u_ColorLookup");
 			GLuint u_LodLevel = shader_prog.getUniformLocation("u_LodLevel");
 
-			glUniformMatrix4fv(in_ProjMat, 1, false, &proj.data[0]);
+			glUniformMatrix4fv(in_ProjMat, 1, true, proj.data());
 			glUniform1i(u_ColorLookup, 0);
 			glUniform1i(u_Heightmap, 1);
 			glUniform1i(u_LodLevel, 0);
 
-			vec3 cam_rot = {{ 0.f, 0.f, 0.f }};
-			vec3 cam_pos = {{ 0.f, 0.f, 0.f }};
+			vec3 cam_rot(0.f, 0.f, 0.f);
+			vec3 cam_pos(0.f, 0.f, 0.f);
 
 			vec3 *pos = &cam_pos;
 
@@ -398,7 +393,7 @@ int main(int argc, char *argv[])
 
 			int lod_level = 0;
 
-			mat4 view;
+			mat3x4 view;
 
 			while (running)
 			{
@@ -407,17 +402,17 @@ int main(int argc, char *argv[])
 				int i;
 				for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 				{
-					if (glfwGetKey('O')) cam_rot[0] -= 0.02f; // Y - O
-					if (glfwGetKey('L')) cam_rot[0] += 0.02f; // I - L
-					if (glfwGetKey('K')) cam_rot[1] -= 0.02f; // E - K
-					if (glfwGetKey(';')) cam_rot[1] += 0.02f; // O - ;
+					if (glfwGetKey('O')) cam_rot -= vec3(0.02f, 0.f, 0.f); // Y - O
+					if (glfwGetKey('L')) cam_rot += vec3(0.02f, 0.f, 0.f); // I - L
+					if (glfwGetKey('K')) cam_rot -= vec3(0.f, 0.02f, 0.f); // E - K
+					if (glfwGetKey(';')) cam_rot += vec3(0.f, 0.02f, 0.f); // O - ;
 
 					// Inverse of view_rot below
-					const mat4 view_rot_move = mat_transform::rotate(make_vec(0.f, 1.f, 0.f), -cam_rot[1]) * mat_transform::rotate(make_vec(1.f, 0.f, 0.f), -cam_rot[0]);
+					const mat3x4 view_rot_move = concatTransform(mat_transform::rotate(vec3(0.f, 1.f, 0.f), -cam_rot.getY()), mat_transform::rotate(vec3(1.f, 0.f, 0.f), -cam_rot.getX()));
 
-					vec3 x_axis = vec::euclidean(view_rot_move * make_vec(1.f, 0.f, 0.f, 1.f));
-					vec3 y_axis = vec::euclidean(view_rot_move * make_vec(0.f, 1.f, 0.f, 1.f));
-					vec3 z_axis = vec::euclidean(view_rot_move * make_vec(0.f, 0.f, 1.f, 1.f));
+					vec3 x_axis = transform(view_rot_move, vec3(1.f, 0.f, 0.f));
+					vec3 y_axis = transform(view_rot_move, vec3(0.f, 1.f, 0.f));
+					vec3 z_axis = transform(view_rot_move, vec3(0.f, 0.f, 1.f));
 
 					if (glfwGetKey('A')) (*pos) -= x_axis * 0.25f; // A - A
 					if (glfwGetKey('D')) (*pos) += x_axis * 0.25f; // S - D
@@ -445,21 +440,20 @@ int main(int argc, char *argv[])
 					light_rot += 0.05f;
 					if (light_rot >= 180.f + 15.f)
 						light_rot -= (180.f + 30.f);
-					lights.direction = vec::euclidean(mat_transform::rotate(make_vec(0.f, 1.f, 0.f), 0.4) * (mat_transform::rotate(make_vec(1.f, 0.f, 0.f), light_rot * M_PI/180.f) * make_vec(0.f, 0.f, -1.f, 1.f)));
+					lights.direction = transform(mat_transform::rotate(vec3(0.f, 1.f, 0.f), 0.4), transform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), light_rot * M_PI/180.f), vec3(0.f, 0.f, -1.f)));
 					lights.color = lookup_value(light_lookup, (light_rot + 15.f) / 210.f);
 
 					elapsed_game_time += 1./60.;
 				}
 
-				const mat4 view_rot = mat_transform::rotate(make_vec(1.f, 0.f, 0.f),  cam_rot[0]) * mat_transform::rotate(make_vec(0.f, 1.f, 0.f),  cam_rot[1]);
-				view = view_rot * mat_transform::translate(cam_pos * -1.f);
+				const mat3x4 view_rot = concatTransform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), cam_rot.getX()), mat_transform::rotate(vec3(0.f, 1.f, 0.f),  cam_rot.getY()));
+				view = concatTransform(view_rot, mat_transform::translate3x4(cam_pos * -1.f));
 				//view = mat_transform::look_at(make_vec(0.f, 1.f, 0.f), cam_pos, obj_pos);
 
 				Light light_transformed;
 				{
 					light_transformed.color = lights.color;
-					vec4 tmp = view * make_vec(lights.direction[0], lights.direction[1], lights.direction[2], 0.f);
-					light_transformed.direction = make_vec(tmp[0], tmp[1], tmp[2]);
+					light_transformed.direction = vec3(transform(view, vec4(lights.direction)));
 				}
 
 				ubo_lights.bind(GL_UNIFORM_BUFFER);
@@ -467,7 +461,7 @@ int main(int argc, char *argv[])
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				glUniformMatrix4fv(in_ViewModelMat, 1, false, &view.data[0]);
+				glUniformMatrix4fv(in_ViewModelMat, 1, true, padMat3x4(view).data());
 				mesh_state.vao.bind();
 				glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (char*)0);
 

@@ -1,6 +1,6 @@
 #include "ObjLoader.hpp"
 
-#include "Vector.hpp"
+#include "math/Vector.hpp"
 #include <sstream>
 #include <iostream>
 #include <tuple>
@@ -46,21 +46,21 @@ Mesh load_obj(std::istream& f)
 		}
 		else if (command == "v")
 		{
-			vec3 v;
-			ss >> v[0] >> v[1] >> v[2];
-			pos_db.push_back(v);
+			float x, y, z;
+			ss >> x >> y >> z;
+			pos_db.push_back(vec3(x, y, z));
 		}
 		else if (command == "vt")
 		{
-			vec2 uv;
-			ss >> uv[0] >> uv[1];
-			uv_db.push_back(uv);
+			float u, v;
+			ss >> u >> v;
+			uv_db.push_back(vec2(u, v));
 		}
 		else if (command == "vn")
 		{
-			vec3 norm;
-			ss >> norm[0] >> norm[1] >> norm[2];
-			norm_db.push_back(norm);
+			float x, y, z;
+			ss >> x >> y >> z;
+			norm_db.push_back(vec3(x, y, z));
 		}
 		else if (command == "f")
 		{
