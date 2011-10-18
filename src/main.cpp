@@ -1,57 +1,24 @@
-// Work-around stupid windows.h defines
-#define min min
-#define max max
-
-#include "math/Matrix.hpp"
-#include "math/Vector.hpp"
-#include "math/MatrixTransform.hpp"
+#include "Heatwave.hpp"
 #include "gl/VertexArrayObject.hpp"
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
-#include "gl/Texture.hpp"
-#include "image/ImageLoader.hpp"
+#include "math/Matrix.hpp"
+#include "math/MatrixTransform.hpp"
 
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <map>
-#include <string>
-#include <cstdint>
-#include <cassert>
 
 #include "gl3w.hpp"
 
 //#define GLFW_GL3_H
 #include <GL/glfw.h>
 
-#ifdef M_PI
-#undef M_PI
-#endif
-#define M_PI 3.14159265358979323846264338327950288419716939937510f
-
-using namespace math;
-
-struct Light
-{
-	vec3 direction;
-	vec3 color;
-};
-static_assert(sizeof(Light) == (4+4)*4, "OOPS!");
-static_assert(offsetof(Light, direction) == 0, "OOPS!");
-static_assert(offsetof(Light, color) == 4*4, "OOPS!");
-
-struct Vertex
-{
-	vec2 pos;
-	vec2 texcoord;
-};
-
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
-	if (severity != GL_DEBUG_SEVERITY_LOW_ARB)
+	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity != GL_DEBUG_SEVERITY_LOW_ARB)
 		std::cerr << message << std::endl;
-	if (severity == GL_DEBUG_SEVERITY_HIGH_ARB)
+	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 		__asm int 3; // Breakpoint
 
 }
@@ -72,7 +39,7 @@ bool init_window()
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
-	if (glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
+	if (glfwOpenWindow(600, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
 	{
 		char tmp;
 		std::cerr << "Failed to open window." << std::endl;
@@ -103,163 +70,16 @@ bool init_window()
 	return true;
 }
 
-float lerp(float a, float b, float x)
-{
-	return a * (1.f - x) + b * x;
-}
-
-float clamp(float min, float x, float max)
-{
-	return std::min(std::max(min, x), max);
-}
-
-vec3 lookup_value(const std::vector<unsigned char>& lut, float pos)
-{
-	int lut_entries = lut.size() / 4;
-	float table_pos = clamp(0.f, pos, 1.f) * float(lut_entries - 1);
-	int index_a = (int)std::floor(table_pos);
-	int index_b = (int)std::ceil(table_pos);
-	float mix = table_pos - std::floor(table_pos);
-
-	if (index_a < 0)
-		index_a = 0;
-	if (index_a >= lut_entries)
-		index_a = lut_entries - 1;
-
-	if (index_b < 0)
-		index_b = 0;
-	if (index_b >= lut_entries)
-		index_b = lut_entries - 1;
-
-	float col[3];
-	for (int i = 0; i < 3; ++i)
-	{
-		col[i] = lerp(lut[index_a*4 + i] / 255.f, lut[index_b*4 + i] / 255.f, mix);
-	}
-
-	return vec3(col[0], col[1], col[2]);
-}
+HW_ALIGN_VAR_SSE const float triangle_vertex_data[3*4] = {
+	-0.14f,  0.5f,  0.f, 0.f,
+	 0.56f, -0.3f,  0.f, 0.f,
+	-0.6f,  -0.54f, 0.f, 0.f
+};
 
 int main(int argc, char *argv[])
 {
 	if (!init_window())
 		return 1;
-
-	gl::Texture color_lookup_tex;
-	{
-		image::Image image;
-		{
-			std::ifstream image_file("data/color-lookup.png", std::ios::in | std::ios::binary);
-			image::GrayscaleImage::loadPNGFileRGBA8(image, image_file);
-		}
-
-		unsigned int width = image.getWidth();
-
-		glActiveTexture(GL_TEXTURE0);
-		color_lookup_tex.bind(GL_TEXTURE_1D);
-		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getData());
-	}
-
-	std::vector<unsigned char> light_lookup;
-	{
-		image::Image image;
-		{
-			std::ifstream image_file("data/light-lookup.png", std::ios::in | std::ios::binary);
-			image::GrayscaleImage::loadPNGFileRGBA8(image, image_file);
-		}
-
-		unsigned int width = image.getWidth();
-		light_lookup.resize(width * 4);
-		std::copy(image.getData(), image.getData() + width*4, light_lookup.begin());
-	}
-
-	unsigned int width, height;
-	gl::Texture terrain_tex;
-	{
-		image::GrayscaleImage image;
-		{
-			std::ifstream image_file("data/terrain16.png", std::ios::in | std::ios::binary);
-			image::GrayscaleImage::loadPNGFileGray16(image, image_file);
-		}
-
-		width = image.getWidth();
-		height = image.getHeight();
-		unsigned short* data = reinterpret_cast<unsigned short*>(image.getData());
-
-		for (unsigned int y = 3; y < height-3; ++y) {
-			for (unsigned int x = 3; x < width-3; ++x) {
-				long long v = 0;
-				for (int yy = -3; yy <= 3; ++yy) {
-					for (int xx = -3; xx <= 3; ++xx) {
-						v += int(data[(y+yy)*width + x+xx]);
-					}
-				}
-				data[y*width + x] = (unsigned short)(v / 49);
-			}
-		}
-
-		glActiveTexture(GL_TEXTURE1);
-		terrain_tex.bind(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_SHORT, image.getData());
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-
-	static const float SPACING = .1f;
-	//std::vector<Vertex> grid;
-	//grid.resize(width*height);
-	Vertex* grid = (Vertex*)_aligned_malloc(width*height*sizeof(Vertex), 16);
-	{
-		unsigned int i = 0;
-		for (unsigned int y = 0; y < height; ++y)
-		{
-			for (unsigned int x = 0; x < width; ++x)
-			{
-				Vertex v;
-				v.pos = vec2(x * SPACING, y * SPACING);
-				v.texcoord = vec2((float)x / width, (float)y / width);
-				grid[i++] = v;
-			}
-		}
-		//assert(i == grid.size());
-	}
-
-	std::vector<uint32_t> indices;
-	indices.resize((width-1)*(height-1)*3*2);
-	{
-		unsigned int i = 0;
-		for (unsigned int y = 0; y < height-1; ++y)
-		{
-			for (unsigned int x = 0; x < width-1; ++x)
-			{
-				// A--B
-				// | /|
-				// |/ |
-				// C--D
-				unsigned int a = y*width + x;
-				unsigned int b = a + 1;
-				unsigned int c = a + width;
-				unsigned int d = c + 1;
-
-				// First tri
-				indices[i++] = a;
-				indices[i++] = b;
-				indices[i++] = c;
-
-				// Second tri
-				indices[i++] = b;
-				indices[i++] = d;
-				indices[i++] = c;
-			}
-		}
-		assert(i == indices.size());
-	}
 
 	struct MeshGLState
 	{
@@ -276,15 +96,15 @@ int main(int argc, char *argv[])
 		s.vao.bind();
 
 		s.vbo.bind(GL_ARRAY_BUFFER);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * width*height, static_cast<const void*>(grid), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*4, triangle_vertex_data, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (char*)0 + offsetof(Vertex, pos));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, (char*)0);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), (char*)0 + offsetof(Vertex, texcoord));
-		glEnableVertexAttribArray(1);
+		//glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), (char*)0 + offsetof(Vertex, texcoord));
+		//glEnableVertexAttribArray(1);
 
-		s.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), static_cast<const void*>(indices.data()), GL_STATIC_DRAW);
+		//s.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), static_cast<const void*>(indices.data()), GL_STATIC_DRAW);
 
 		{
 			gl::ShaderProgram shader_prog;
@@ -320,7 +140,7 @@ int main(int argc, char *argv[])
 				shader_prog.attachShader(frag_shader);
 
 				shader_prog.bindAttribute(0, "in_Position");
-				shader_prog.bindAttribute(1, "in_TexCoord");
+				//shader_prog.bindAttribute(1, "in_TexCoord");
 				glBindFragDataLocation(shader_prog, 0, "out_Color");
 
 				shader_prog.link();
@@ -332,18 +152,21 @@ int main(int argc, char *argv[])
 
 			bool running = true;
 
+			/*
 			using mat_transform::scale;
 			using mat_transform::rotate;
 			using mat_transform::translate;
+			*/
 
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
+			//glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glEnable(GL_MULTISAMPLE);
-			glFrontFace(GL_CCW);
+			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+			/*
 			float light_rot = -15.f;
 			Light lights;
 			//lights.direction = make_vec(2.12f, 2.24f, 2.52f);
@@ -360,8 +183,10 @@ int main(int argc, char *argv[])
 			glUniformBlockBinding(shader_prog, uniform_block_index, 0);
 
 			mat4 proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
+			*/
 
 			GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
+			/*
 			GLuint in_ProjMat = shader_prog.getUniformLocation("in_ProjMat");
 			GLuint u_Heightmap = shader_prog.getUniformLocation("u_Heightmap");
 			GLuint u_ColorLookup = shader_prog.getUniformLocation("u_ColorLookup");
@@ -384,16 +209,18 @@ int main(int argc, char *argv[])
 				"  OKL; - Rotaciona camera\n"
 				"\n"
 				"  1/2 - Mudar nivel de detalhe fixo.\n" << std::endl;
+			*/
 
 			double elapsed_game_time = 0.;
 			double elapsed_real_time = 0.;
 			double last_frame_time;
 
-			bool prev_keys[2] = {false};
+			//bool prev_keys[2] = {false};
 
-			int lod_level = 0;
+			//int lod_level = 0;
 
-			mat3x4 view;
+			math::mat4 view;
+			float rot_amount = 0.f;
 
 			while (running)
 			{
@@ -402,6 +229,7 @@ int main(int argc, char *argv[])
 				int i;
 				for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 				{
+					/*
 					if (glfwGetKey('O')) cam_rot -= vec3(0.02f, 0.f, 0.f); // Y - O
 					if (glfwGetKey('L')) cam_rot += vec3(0.02f, 0.f, 0.f); // I - L
 					if (glfwGetKey('K')) cam_rot -= vec3(0.f, 0.02f, 0.f); // E - K
@@ -442,14 +270,23 @@ int main(int argc, char *argv[])
 						light_rot -= (180.f + 30.f);
 					lights.direction = transform(mat_transform::rotate(vec3(0.f, 1.f, 0.f), 0.4), transform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), light_rot * M_PI/180.f), vec3(0.f, 0.f, -1.f)));
 					lights.color = lookup_value(light_lookup, (light_rot + 15.f) / 210.f);
+					*/
+
+					rot_amount += 0.0105f;
+					//view = math::mat_transform::scale(math::vec3(rot_amount, rot_amount*2.f, 1.f));
+					view = math::padMat3x4(math::mat_transform::rotate(math::vec3(0.f, 0.f, -1.f), rot_amount));
+					//view = math::mat_transform::translate(math::vec3(0.f, 0.f, rot_amount));
+
+					//view = math::mat4(math::mat_transform::mat_identity);
 
 					elapsed_game_time += 1./60.;
 				}
 
-				const mat3x4 view_rot = concatTransform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), cam_rot.getX()), mat_transform::rotate(vec3(0.f, 1.f, 0.f),  cam_rot.getY()));
-				view = concatTransform(view_rot, mat_transform::translate3x4(cam_pos * -1.f));
+				//const mat3x4 view_rot = concatTransform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), cam_rot.getX()), mat_transform::rotate(vec3(0.f, 1.f, 0.f),  cam_rot.getY()));
+				//view = concatTransform(view_rot, mat_transform::translate3x4(cam_pos * -1.f));
 				//view = mat_transform::look_at(make_vec(0.f, 1.f, 0.f), cam_pos, obj_pos);
 
+				/*
 				Light light_transformed;
 				{
 					light_transformed.color = lights.color;
@@ -458,12 +295,14 @@ int main(int argc, char *argv[])
 
 				ubo_lights.bind(GL_UNIFORM_BUFFER);
 				glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), &light_transformed, GL_STREAM_DRAW);
+				*/
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				glUniformMatrix4fv(in_ViewModelMat, 1, true, padMat3x4(view).data());
+				glUniformMatrix4fv(in_ViewModelMat, 1, true, view.data());
 				mesh_state.vao.bind();
-				glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (char*)0);
+				glDrawArrays(GL_TRIANGLES, 0, 3);
+				//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (char*)0);
 
 				glfwSwapBuffers();
 
