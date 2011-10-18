@@ -30,10 +30,6 @@
     <ClInclude Include="src\math\MatrixTransform.hpp" />
     <ClInclude Include="src\math\matrix_template.hpp" />
     <ClInclude Include="src\math\vector_template.hpp" />
-    <ClInclude Include="src\sse2\Matrix.hpp" />
-    <ClInclude Include="src\sse2\Vector.hpp" />
-    <ClInclude Include="src\sse2\vec_def.hpp" />
-    <ClInclude Include="src\sse2\vec_ops.hpp" />
     <ClInclude Include="src\math\Vector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
