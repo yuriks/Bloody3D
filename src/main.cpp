@@ -14,6 +14,10 @@
 //#define GLFW_GL3_H
 #include <GL/glfw.h>
 
+struct UniformBlock {
+	math::mat3x4 view_model_mat;
+};
+
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity != GL_DEBUG_SEVERITY_LOW_ARB)
@@ -172,21 +176,23 @@ int main(int argc, char *argv[])
 			//lights.direction = make_vec(2.12f, 2.24f, 2.52f);
 			lights.direction = normalized(vec3(-2.f, -3.f, -2.5f));
 			//lights.color = make_vec(1.f, 1.f, 1.f);
-
-			gl::BufferObject ubo_lights;
-			ubo_lights.bind(GL_UNIFORM_BUFFER);
-
-			GLuint uniform_block_index = glGetUniformBlockIndex(shader_prog, "LightBlock");
-
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), &lights, GL_STREAM_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_lights);
-			glUniformBlockBinding(shader_prog, uniform_block_index, 0);
-
-			mat4 proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
 			*/
 
-			GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
+			UniformBlock uniforms;
+
+			gl::BufferObject ubo;
+			ubo.bind(GL_UNIFORM_BUFFER);
+
+			GLuint uniform_block_index = glGetUniformBlockIndex(shader_prog, "UniformBlock");
+
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+			glUniformBlockBinding(shader_prog, uniform_block_index, 0);
+
+			//mat4 proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
+
 			/*
+			GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
 			GLuint in_ProjMat = shader_prog.getUniformLocation("in_ProjMat");
 			GLuint u_Heightmap = shader_prog.getUniformLocation("u_Heightmap");
 			GLuint u_ColorLookup = shader_prog.getUniformLocation("u_ColorLookup");
@@ -219,7 +225,7 @@ int main(int argc, char *argv[])
 
 			//int lod_level = 0;
 
-			math::mat4 view;
+			math::mat3x4 view;
 			float rot_amount = 0.f;
 
 			while (running)
@@ -274,7 +280,7 @@ int main(int argc, char *argv[])
 
 					rot_amount += 0.0105f;
 					//view = math::mat_transform::scale(math::vec3(rot_amount, rot_amount*2.f, 1.f));
-					view = math::padMat3x4(math::mat_transform::rotate(math::vec3(0.f, 0.f, -1.f), rot_amount));
+					view = math::mat_transform::rotate(math::vec3(0.f, 0.f, -1.f), rot_amount);
 					//view = math::mat_transform::translate(math::vec3(0.f, 0.f, rot_amount));
 
 					//view = math::mat4(math::mat_transform::mat_identity);
@@ -292,14 +298,16 @@ int main(int argc, char *argv[])
 					light_transformed.color = lights.color;
 					light_transformed.direction = vec3(transform(view, vec4(lights.direction)));
 				}
-
-				ubo_lights.bind(GL_UNIFORM_BUFFER);
-				glBufferData(GL_UNIFORM_BUFFER, sizeof(lights), &light_transformed, GL_STREAM_DRAW);
 				*/
+
+				uniforms.view_model_mat = view;
+
+				ubo.bind(GL_UNIFORM_BUFFER);
+				glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				glUniformMatrix4fv(in_ViewModelMat, 1, true, view.data());
+				//glUniformMatrix4fv(in_ViewModelMat, 1, true, view.data());
 				mesh_state.vao.bind();
 				glDrawArrays(GL_TRIANGLES, 0, 3);
 				//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (char*)0);
