@@ -28,9 +28,9 @@ mat3x4 rotate(const vec3& axis, float angle)
 
 	// A lot of common sub-expression optimization can be
 	// done here, but I'll leave that to the compiler.
-	m.rows[0] = vec4(t*x*x + c,   t*x*y + s*z, t*x*z - s*y, 0.f);
-	m.rows[1] = vec4(t*y*x - s*z, t*y*y + c,   t*y*z + s*x, 0.f);
-	m.rows[2] = vec4(t*z*x + s*y, t*z*y - s*x, t*z*z + c,   0.f);
+	m.rows[0] = vec4(t*x*x + c,   t*x*y - s*z, t*x*z + s*y, 0.f);
+	m.rows[1] = vec4(t*y*x + s*z, t*y*y + c,   t*y*z - s*x, 0.f);
+	m.rows[2] = vec4(t*z*x - s*y, t*z*y + s*x, t*z*z + c,   0.f);
 
 	return m;
 }
