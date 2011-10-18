@@ -157,12 +157,6 @@ int main(int argc, char *argv[])
 
 			bool running = true;
 
-			/*
-			using mat_transform::scale;
-			using mat_transform::rotate;
-			using mat_transform::translate;
-			*/
-
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 			//glEnable(GL_DEPTH_TEST);
 			//glEnable(GL_CULL_FACE);
@@ -183,20 +177,7 @@ int main(int argc, char *argv[])
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
 			glUniformBlockBinding(shader_prog, uniform_block_index, 0);
 
-			//mat4 proj = mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
-
 			/*
-			GLuint in_ViewModelMat = shader_prog.getUniformLocation("in_ViewModelMat");
-			GLuint in_ProjMat = shader_prog.getUniformLocation("in_ProjMat");
-			GLuint u_Heightmap = shader_prog.getUniformLocation("u_Heightmap");
-			GLuint u_ColorLookup = shader_prog.getUniformLocation("u_ColorLookup");
-			GLuint u_LodLevel = shader_prog.getUniformLocation("u_LodLevel");
-
-			glUniformMatrix4fv(in_ProjMat, 1, true, proj.data());
-			glUniform1i(u_ColorLookup, 0);
-			glUniform1i(u_Heightmap, 1);
-			glUniform1i(u_LodLevel, 0);
-
 			vec3 cam_rot(0.f, 0.f, 0.f);
 			vec3 cam_pos(0.f, 0.f, 0.f);
 
@@ -265,12 +246,6 @@ int main(int argc, char *argv[])
 						glUniform1i(u_LodLevel, ++lod_level);
 					}
 					prev_keys[1] = key;
-
-					light_rot += 0.05f;
-					if (light_rot >= 180.f + 15.f)
-						light_rot -= (180.f + 30.f);
-					lights.direction = transform(mat_transform::rotate(vec3(0.f, 1.f, 0.f), 0.4), transform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), light_rot * M_PI/180.f), vec3(0.f, 0.f, -1.f)));
-					lights.color = lookup_value(light_lookup, (light_rot + 15.f) / 210.f);
 					*/
 
 					rot_amount += 0.0105f;
@@ -299,7 +274,6 @@ int main(int argc, char *argv[])
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				//glUniformMatrix4fv(in_ViewModelMat, 1, true, view.data());
 				mesh_state.vao.bind();
 				glDrawArrays(GL_TRIANGLES, 0, 3);
 				//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (char*)0);
