@@ -15,6 +15,7 @@
 #include <GL/glfw.h>
 
 struct UniformBlock {
+	math::mat4 projection_mat;
 	math::mat3x4 view_model_mat;
 };
 
@@ -170,15 +171,8 @@ int main(int argc, char *argv[])
 			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			/*
-			float light_rot = -15.f;
-			Light lights;
-			//lights.direction = make_vec(2.12f, 2.24f, 2.52f);
-			lights.direction = normalized(vec3(-2.f, -3.f, -2.5f));
-			//lights.color = make_vec(1.f, 1.f, 1.f);
-			*/
-
 			UniformBlock uniforms;
+			uniforms.projection_mat = math::mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
 
 			gl::BufferObject ubo;
 			ubo.bind(GL_UNIFORM_BUFFER);
@@ -227,6 +221,7 @@ int main(int argc, char *argv[])
 
 			math::mat3x4 view;
 			float rot_amount = 0.f;
+			float move_amount = 0.f;
 
 			while (running)
 			{
@@ -279,11 +274,8 @@ int main(int argc, char *argv[])
 					*/
 
 					rot_amount += 0.0105f;
-					//view = math::mat_transform::scale(math::vec3(rot_amount, rot_amount*2.f, 1.f));
-					view = math::mat_transform::rotate(math::vec3(0.f, 0.f, -1.f), rot_amount);
-					//view = math::mat_transform::translate(math::vec3(0.f, 0.f, rot_amount));
-
-					//view = math::mat4(math::mat_transform::mat_identity);
+					move_amount += 0.005;
+					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, move_amount)), math::mat_transform::rotate(math::vec3(0.f, 1.f, 0.f), rot_amount));
 
 					elapsed_game_time += 1./60.;
 				}

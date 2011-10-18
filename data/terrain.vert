@@ -6,6 +6,7 @@ struct mat3x4_rows {
 };
 
 uniform UniformBlock {
+	mat4 projection_mat;
 	mat3x4_rows view_model_mat;
 } u;
 
@@ -19,6 +20,6 @@ vec4 transform(mat3x4_rows m, vec4 v) {
 
 void main(void) {
 	vec4 pos = transform(u.view_model_mat, vec4(in_Position, 1.0));
-	gl_Position = pos;
-	vf_Color = vec4(vec3(in_Position.xyz * 0.5 + 0.5) * (-gl_Position.z * 0.5 + 0.5), 1.0);
+	gl_Position = u.projection_mat * pos;
+	vf_Color = vec4(vec3(in_Position.xyz * 0.5 + 0.5) * (1.0 - pos.z * 0.1), 1.0);
 };
