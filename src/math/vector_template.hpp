@@ -9,17 +9,17 @@ struct Vec<N> {
 #if N == 4
 	HW_FORCE_INLINE Vec(float x) : xmm(_mm_set_ps1(x)) {}
 #elif N == 3
-	HW_FORCE_INLINE Vec(float x) : xmm(_mm_set_ps(x, x, x, 0.f)) {}
+	HW_FORCE_INLINE Vec(float x) : xmm(_mm_setr_ps(x, x, x, 0.f)) {}
 #elif N == 2
-	HW_FORCE_INLINE Vec(float x) : xmm(_mm_set_ps(x, x, 0.f, 0.f)) {}
+	HW_FORCE_INLINE Vec(float x) : xmm(_mm_setr_ps(x, x, 0.f, 0.f)) {}
 #endif
 
 #if N == 4
-	HW_FORCE_INLINE Vec(float x, float y, float z, float w) : xmm(_mm_set_ps(x, y, z,   w  )) {}
+	HW_FORCE_INLINE Vec(float x, float y, float z, float w) : xmm(_mm_setr_ps(x, y, z,   w  )) {}
 #elif N == 3
-	HW_FORCE_INLINE Vec(float x, float y, float z)          : xmm(_mm_set_ps(x, y, z,   0.f)) {}
+	HW_FORCE_INLINE Vec(float x, float y, float z)          : xmm(_mm_setr_ps(x, y, z,   0.f)) {}
 #elif N == 2
-	HW_FORCE_INLINE Vec(float x, float y)                   : xmm(_mm_set_ps(x, y, 0.f, 0.f)) {}
+	HW_FORCE_INLINE Vec(float x, float y)                   : xmm(_mm_setr_ps(x, y, 0.f, 0.f)) {}
 #endif
 
 	// Pad with 0's
@@ -30,21 +30,32 @@ struct Vec<N> {
 	HW_FORCE_INLINE explicit Vec(const Vec<4>& v) : xmm(v.xmm) { setVal(3, 0.f); }
 #endif
 
-	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
-	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
+	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
+	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
 #if N >= 3
-	HW_FORCE_INLINE Vec spreadZ() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
+	HW_FORCE_INLINE Vec spreadZ() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
 #if N >= 4
-	HW_FORCE_INLINE Vec spreadW() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
+	HW_FORCE_INLINE Vec spreadW() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
 #endif
 #endif
 
-	HW_FORCE_INLINE float getX() const { float tmp; _mm_store_ss(&tmp, xmm); return tmp; }
-	HW_FORCE_INLINE float getY() const { return spreadY().getX(); }
+private:
+	HW_FORCE_INLINE float getVal(int n) const {
+		union {
+			__m128 v;
+			float f[4];
+		} u;
+		u.v = xmm;
+		return u.f[n];
+	}
+
+public:
+	HW_FORCE_INLINE float getX() const { return getVal(0); }
+	HW_FORCE_INLINE float getY() const { return getVal(1); }
 #if N >= 3
-	HW_FORCE_INLINE float getZ() const { return spreadZ().getX(); }
+	HW_FORCE_INLINE float getZ() const { return getVal(2); }
 #if N >= 4
-	HW_FORCE_INLINE float getW() const { return spreadW().getX(); }
+	HW_FORCE_INLINE float getW() const { return getVal(3); }
 #endif
 #endif
 
