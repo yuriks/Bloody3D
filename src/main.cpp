@@ -44,7 +44,7 @@ bool init_window()
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
-	if (glfwOpenWindow(600, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
+	if (glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
 	{
 		char tmp;
 		std::cerr << "Failed to open window." << std::endl;
