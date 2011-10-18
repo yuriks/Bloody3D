@@ -30,12 +30,12 @@ struct Vec<N> {
 	HW_FORCE_INLINE explicit Vec(const Vec<4>& v) : xmm(v.xmm) { setVal(3, 0.f); }
 #endif
 
-	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
-	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
+	HW_FORCE_INLINE Vec spreadX() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
+	HW_FORCE_INLINE Vec spreadY() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
 #if N >= 3
-	HW_FORCE_INLINE Vec spreadZ() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(1, 1, 1, 1))); }
+	HW_FORCE_INLINE Vec spreadZ() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(2, 2, 2, 2))); }
 #if N >= 4
-	HW_FORCE_INLINE Vec spreadW() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(0, 0, 0, 0))); }
+	HW_FORCE_INLINE Vec spreadW() const { return Vec(_mm_shuffle_ps(xmm, xmm, _MM_SHUFFLE(3, 3, 3, 3))); }
 #endif
 #endif
 
