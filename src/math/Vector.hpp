@@ -68,6 +68,10 @@ typedef Vec<4> vec4;
 typedef Vec<3> vec3;
 typedef Vec<2> vec2;
 
+static const vec3 right(1.f, 0.f, 0.f);
+static const vec3 up(0.f, 1.f, 0.f);
+static const vec3 forward(0.f, 0.f, 1.f);
+
 // Depends on unused elements being set to 0.f
 template <unsigned int N>
 HW_FORCE_INLINE float dot(const Vec<N>& a, const Vec<N>& b) {
