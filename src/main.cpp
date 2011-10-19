@@ -25,7 +25,6 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum sever
 		std::cerr << message << std::endl;
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 		__asm int 3; // Breakpoint
-
 }
 
 bool init_window()
@@ -43,7 +42,6 @@ bool init_window()
 	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
 	if (glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
 	{
 		char tmp;
@@ -76,9 +74,9 @@ bool init_window()
 }
 
 HW_ALIGN_VAR_SSE const float triangle_vertex_data[3*4] = {
-	-0.14f,  0.5f,  0.f, 0.f,
-	 0.56f, -0.3f,  0.f, 0.f,
-	-0.6f,  -0.54f, 0.f, 0.f
+	 0.f,   0.5f, 0.f, 0.f,
+	 0.5f, -0.5f, 0.f, 0.f,
+	-0.5f, -0.5f, 0.f, 0.f
 };
 
 int main(int argc, char *argv[])
@@ -158,10 +156,9 @@ int main(int argc, char *argv[])
 			bool running = true;
 
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
-			//glEnable(GL_DEPTH_TEST);
+			glEnable(GL_DEPTH_TEST);
 			//glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
-			glEnable(GL_MULTISAMPLE);
 			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
