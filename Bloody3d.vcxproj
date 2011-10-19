@@ -31,6 +31,7 @@
     <ClInclude Include="src\math\matrix_template.hpp" />
     <ClInclude Include="src\math\vector_template.hpp" />
     <ClInclude Include="src\math\Vector.hpp" />
+    <ClInclude Include="src\util\AlignedVector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>
