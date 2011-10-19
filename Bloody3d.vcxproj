@@ -16,6 +16,7 @@
     <ClCompile Include="src\image\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
+    <ClCompile Include="src\mesh\ObjLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl3w.hpp" />
@@ -31,6 +32,8 @@
     <ClInclude Include="src\math\matrix_template.hpp" />
     <ClInclude Include="src\math\vector_template.hpp" />
     <ClInclude Include="src\math\Vector.hpp" />
+    <ClInclude Include="src\mesh\Mesh.hpp" />
+    <ClInclude Include="src\mesh\ObjLoader.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -1,6 +1,7 @@
 #include "ObjLoader.hpp"
 
 #include "math/Vector.hpp"
+#include "util/AlignedVector.hpp"
 #include <sstream>
 #include <iostream>
 #include <tuple>
@@ -13,14 +14,15 @@ using std::get;
 
 Mesh load_obj(std::istream& f)
 {
-	typedef std::tuple<unsigned int, unsigned int> Triangle;
+	typedef std::tuple<unsigned int, unsigned int, unsigned int> Triangle;
+	typedef std::tuple<float, float> floatPair;
 
 	Mesh mesh;
 	SubMesh* current_submesh = nullptr;
 
-	std::deque<vec3> pos_db;
-	std::deque<vec2> uv_db;
-	std::deque<vec3> norm_db;
+	util::AlignedVector<vec3> pos_db;
+	util::AlignedVector<vec3> norm_db;
+	std::vector<floatPair> uv_db;
 	std::map<Triangle, unsigned short> vertex_cache;
 
 	std::string line;
@@ -54,7 +56,7 @@ Mesh load_obj(std::istream& f)
 		{
 			float u, v;
 			ss >> u >> v;
-			uv_db.push_back(vec2(u, v));
+			uv_db.push_back(floatPair(u, v));
 		}
 		else if (command == "vn")
 		{
@@ -79,7 +81,7 @@ Mesh load_obj(std::istream& f)
 
 					std::istringstream fss(tri_str);
 					Triangle tri;
-					fss >> get<0>(tri) >> get<1>(tri);
+					fss >> get<0>(tri) >> get<1>(tri) >> get<2>(tri);
 
 					// Try to find key in map
 					auto lb = vertex_cache.lower_bound(tri);
@@ -92,9 +94,19 @@ Mesh load_obj(std::istream& f)
 					{
 						// Doesn't exist yet
 						Vertex vert;
-						vert.position = pos_db.at(get<0>(tri)-1);
-						//vert.tex_coord = uv_db.at(get<1>(tri)-1);
-						vert.normal = norm_db.at(get<1>(tri)-1);
+						unsigned int pos_i = get<0>(tri)-1;
+						unsigned int norm_i = get<1>(tri)-1;
+						unsigned int uv_i = get<2>(tri)-1;
+
+						if (pos_i >= pos_db.size() || norm_i >= norm_db.size() || uv_i >= uv_db.size()) {
+							std::cerr << "Invalid vertex index: " << pos_i << ' ' << norm_i << ' ' << uv_i << std::endl;
+							goto abort_while;
+						}
+						vert.position = pos_db[pos_i];
+						vert.normal = norm_db[norm_i];
+						auto pair = uv_db[uv_i];
+						vert.tex_coord[0] = get<0>(pair);
+						vert.tex_coord[1] = get<1>(pair);
 
 						int i = current_submesh->vertices.size();
 						current_submesh->vertices.push_back(vert);
@@ -122,6 +134,7 @@ Mesh load_obj(std::istream& f)
 			}
 		}
 	}
+abort_while:
 
 	return mesh;
 }
