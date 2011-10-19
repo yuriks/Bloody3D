@@ -30,6 +30,7 @@
     <ClInclude Include="src\math\Matrix.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
     <ClInclude Include="src\math\matrix_template.hpp" />
+    <ClInclude Include="src\math\Quaternion.hpp" />
     <ClInclude Include="src\math\vector_template.hpp" />
     <ClInclude Include="src\math\Vector.hpp" />
     <ClInclude Include="src\mesh\Mesh.hpp" />

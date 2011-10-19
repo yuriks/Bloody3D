@@ -5,6 +5,7 @@
 #include "gl/ShaderProgram.hpp"
 #include "math/Matrix.hpp"
 #include "math/MatrixTransform.hpp"
+#include "math/Quaternion.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -198,8 +199,8 @@ int main(int argc, char *argv[])
 			//int lod_level = 0;
 
 			math::mat3x4 view;
-			float rot_amount = 0.f;
-			float move_amount = 0.f;
+			//float move_amount = 0.f;
+			math::Quaternion rot_amount;
 
 			while (running)
 			{
@@ -245,9 +246,19 @@ int main(int argc, char *argv[])
 					prev_keys[1] = key;
 					*/
 
-					rot_amount += 0.0105f;
-					move_amount += 0.005;
-					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, move_amount)), math::mat_transform::rotate(math::vec3(0.f, 1.f, 0.f), rot_amount));
+					static const float ROT_SPEED = 0.02f;
+
+					if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
+					if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
+
+					if (glfwGetKey('W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
+					if (glfwGetKey('S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
+
+					if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
+					if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
+
+					//move_amount += 0.005;
+					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 2.5f)), math::matrixFromQuaternion(rot_amount));
 
 					elapsed_game_time += 1./60.;
 				}
