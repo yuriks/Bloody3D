@@ -105,6 +105,7 @@ int main(int argc, char *argv[])
 		s.vbo.bind(GL_ARRAY_BUFFER);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*4, triangle_vertex_data, GL_STATIC_DRAW);
 
+		// 0 - in_Position
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*4, (char*)0);
 		glEnableVertexAttribArray(0);
 		//glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, sizeof(Vertex), (char*)0 + offsetof(Vertex, texcoord));
@@ -116,10 +117,6 @@ int main(int argc, char *argv[])
 		{
 			Material material;
 			material.loadFromFiles("test.vert", "test.frag");
-
-			//shader_prog.bindAttribute(0, "in_Position");
-			//shader_prog.bindAttribute(1, "in_TexCoord");
-			//glBindFragDataLocation(shader_prog, 0, "out_Color");
 
 			material.shader_program.use();
 
