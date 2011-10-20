@@ -31,6 +31,7 @@ public:
 		vec_data_end(vec_alloc_end)
 	{
 		assert(vec_data != 0);
+		std::memcpy(vec_data, o.vec_data, o.size() * sizeof(T));
 	}
 
 	~AlignedVector() {
@@ -129,7 +130,7 @@ public:
 protected:
 	void expandStorage() {
 		if (size() == capacity())
-			reserve(capacity() + capacity() / 2); // k = 1.5
+			reserve(capacity() == 0 ? 16 : capacity() + capacity() / 2); // k = 1.5
 	}
 
 	T* vec_data;
