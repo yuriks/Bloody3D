@@ -6,6 +6,7 @@
 #include "math/Matrix.hpp"
 #include "math/MatrixTransform.hpp"
 #include "math/Quaternion.hpp"
+#include "math/misc.hpp"
 #include "mesh/Material.hpp"
 #include "mesh/VertexFormats.hpp"
 #include "mesh/GPUMesh.hpp"
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
 
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
 			glEnable(GL_DEPTH_TEST);
-			//glEnable(GL_CULL_FACE);
+			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -120,8 +121,6 @@ int main(int argc, char *argv[])
 			ubo.bind(GL_UNIFORM_BUFFER);
 
 			GLuint uniform_block_index = glGetUniformBlockIndex(material.shader_program, "SystemUniforms");
-
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
 			glUniformBlockBinding(material.shader_program, uniform_block_index, 0);
 
@@ -150,7 +149,7 @@ int main(int argc, char *argv[])
 
 			math::mat3x4 view;
 			//float move_amount = 0.f;
-			math::Quaternion rot_amount;
+			math::Quaternion rot_amount(math::up, math::pi);
 
 			int last_mouse_pos[2];
 			glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
