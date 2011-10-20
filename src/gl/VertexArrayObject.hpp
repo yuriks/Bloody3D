@@ -12,6 +12,7 @@ class VertexArrayObject : boost::noncopyable
 public:
 	VertexArrayObject();
 	~VertexArrayObject();
+	VertexArrayObject(VertexArrayObject&& o);
 
 	void bind() const;
 
@@ -28,7 +29,14 @@ inline VertexArrayObject::VertexArrayObject()
 
 inline VertexArrayObject::~VertexArrayObject()
 {
-	glDeleteVertexArrays(1, &id);
+	if (id != 0)
+		glDeleteVertexArrays(1, &id);
+}
+
+inline VertexArrayObject::VertexArrayObject(VertexArrayObject&& o)
+	: id(o.id)
+{
+	o.id = 0;
 }
 
 inline void VertexArrayObject::bind() const

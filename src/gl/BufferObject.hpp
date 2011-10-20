@@ -12,6 +12,7 @@ class BufferObject : boost::noncopyable
 public:
 	BufferObject();
 	~BufferObject();
+	BufferObject(BufferObject&& o);
 
 	void bind(GLenum target) const;
 
@@ -28,7 +29,14 @@ inline BufferObject::BufferObject()
 
 inline BufferObject::~BufferObject()
 {
-	glDeleteBuffers(1, &id);
+	if (id != 0)
+		glDeleteBuffers(1, &id);
+}
+
+inline BufferObject::BufferObject(BufferObject&& o)
+	: id(o.id)
+{
+	o.id = 0;
 }
 
 inline void BufferObject::bind(GLenum target) const
