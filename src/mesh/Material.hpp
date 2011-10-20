@@ -3,6 +3,7 @@
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
 #include <GL3/gl3.h>
+#include <memory>
 
 struct Material {
 	gl::Shader vertex_shader, geometry_shader, fragment_shader;
@@ -17,5 +18,10 @@ struct Material {
 	void loadFromFiles(const char* vert, const char* frag, const char* geom = nullptr);
 };
 
+struct MaterialUniforms {
+};
+
 struct MaterialOptions {
+	std::unique_ptr<MaterialUniforms> uniforms;
+	std::vector<unsigned int> texture_ids;
 };

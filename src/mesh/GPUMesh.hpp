@@ -5,7 +5,6 @@
 #include "gl/BufferObject.hpp"
 #include "Material.hpp"
 #include "VertexFormats.hpp"
-#include <memory>
 
 struct GPUMesh {
 	GPUMesh() : vertex_format(vertex_fmt::FMT_NONE) {}
@@ -20,5 +19,5 @@ struct GPUMesh {
 
 	vertex_fmt::VertexFormat vertex_format;
 	int material_id;
-	std::unique_ptr<MaterialOptions> material_options;
+	MaterialOptions material_options;
 };
