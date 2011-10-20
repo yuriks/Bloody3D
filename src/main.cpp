@@ -9,6 +9,7 @@
 #include "mesh/Material.hpp"
 #include "mesh/VertexFormats.hpp"
 #include "mesh/GPUMesh.hpp"
+#include "mesh/ObjLoader.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -79,14 +80,6 @@ bool init_window()
 	return true;
 }
 
-HW_ALIGN_VAR_SSE static const vertex_fmt::Pos3f triangle_vertex_data[3] = {
-	{ math::vec3(0.f, 0.5f, 0.f) },
-	{ math::vec3(0.5f, -0.5f, 0.f) },
-	{ math::vec3(-0.5f, -0.5f, 0.f) }
-};
-
-static const u16 triangle_indices[3] = { 0, 1, 2 };
-
 int main(int argc, char *argv[])
 {
 	if (!init_window())
@@ -94,8 +87,16 @@ int main(int argc, char *argv[])
 
 	{
 		GPUMesh mesh;
-		mesh.loadVertexData(triangle_vertex_data, sizeof(triangle_vertex_data), vertex_fmt::FMT_POS3F);
-		mesh.loadIndices(triangle_indices, 3);
+		unsigned int indices_count = 0;
+		{
+			std::ifstream objf("data/base.obj");
+			Mesh base_mesh = load_obj(objf);
+			auto& vertices = base_mesh.sub_meshes[0].vertices;
+			auto& indices = base_mesh.sub_meshes[0].indices;
+			mesh.loadVertexData(vertices.data(), vertices.size() * sizeof(vertex_fmt::Pos3f_Norm3f_Tex2f), vertex_fmt::FMT_POS3F_NORM3F_TEX2F);
+			mesh.loadIndices(indices.data(), indices.size());
+			indices_count = indices.size();
+		}
 
 		{
 			Material material;
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
 					last_mouse_pos[1] = cur_mouse_pos[1];
 
 					//move_amount += 0.005;
-					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 2.5f)), math::matrixFromQuaternion(rot_amount));
+					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 5.f)), math::matrixFromQuaternion(rot_amount));
 
 					elapsed_game_time += 1./60.;
 				}
@@ -248,7 +249,7 @@ int main(int argc, char *argv[])
 
 				mesh.vao.bind();
 				mesh.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-				glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
 
 				glfwSwapBuffers();
 
