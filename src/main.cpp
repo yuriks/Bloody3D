@@ -71,6 +71,8 @@ bool init_window()
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
+	glfwDisable(GLFW_MOUSE_CURSOR);
+
 	return true;
 }
 
@@ -202,6 +204,9 @@ int main(int argc, char *argv[])
 			//float move_amount = 0.f;
 			math::Quaternion rot_amount;
 
+			int last_mouse_pos[2];
+			glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
+
 			while (running)
 			{
 				double frame_start = glfwGetTime();
@@ -247,6 +252,7 @@ int main(int argc, char *argv[])
 					*/
 
 					static const float ROT_SPEED = 0.02f;
+					static const float MOUSE_ROT_SPEED = 0.01f;
 
 					if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
 					if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
@@ -256,6 +262,17 @@ int main(int argc, char *argv[])
 
 					if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
 					if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
+
+					int cur_mouse_pos[2];
+					glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
+
+					float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
+					float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
+					rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+					rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+
+					last_mouse_pos[0] = cur_mouse_pos[0];
+					last_mouse_pos[1] = cur_mouse_pos[1];
 
 					//move_amount += 0.005;
 					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 2.5f)), math::matrixFromQuaternion(rot_amount));
