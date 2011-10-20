@@ -6,6 +6,7 @@
 #include "math/Matrix.hpp"
 #include "math/MatrixTransform.hpp"
 #include "math/Quaternion.hpp"
+#include "mesh/Material.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -113,48 +114,14 @@ int main(int argc, char *argv[])
 		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * indices.size(), static_cast<const void*>(indices.data()), GL_STATIC_DRAW);
 
 		{
-			gl::ShaderProgram shader_prog;
+			Material material;
+			material.loadFromFiles("test.vert", "test.frag");
 
-			{
-				gl::Shader vert_shader(GL_VERTEX_SHADER);
-				//gl::Shader geom_shader(GL_GEOMETRY_SHADER);
-				gl::Shader frag_shader(GL_FRAGMENT_SHADER);
+			//shader_prog.bindAttribute(0, "in_Position");
+			//shader_prog.bindAttribute(1, "in_TexCoord");
+			//glBindFragDataLocation(shader_prog, 0, "out_Color");
 
-				{
-					std::ifstream f("data/terrain.vert");
-					vert_shader.setSource(f);
-				}
-				{
-					//std::ifstream f("data/terrain.geom");
-					//geom_shader.setSource(f);
-				}
-				{
-					std::ifstream f("data/terrain.frag");
-					frag_shader.setSource(f);
-				}
-
-				vert_shader.compile();
-				//geom_shader.compile();
-				frag_shader.compile();
-
-				vert_shader.printInfoLog(std::cout);
-				//geom_shader.printInfoLog(std::cout);
-				frag_shader.printInfoLog(std::cout);
-
-				shader_prog.attachShader(vert_shader);
-				//shader_prog.attachShader(geom_shader);
-				shader_prog.attachShader(frag_shader);
-
-				shader_prog.bindAttribute(0, "in_Position");
-				//shader_prog.bindAttribute(1, "in_TexCoord");
-				glBindFragDataLocation(shader_prog, 0, "out_Color");
-
-				shader_prog.link();
-				shader_prog.printInfoLog(std::cout);
-			}
-
-			shader_prog.use();
-
+			material.shader_program.use();
 
 			bool running = true;
 
@@ -171,11 +138,11 @@ int main(int argc, char *argv[])
 			gl::BufferObject ubo;
 			ubo.bind(GL_UNIFORM_BUFFER);
 
-			GLuint uniform_block_index = glGetUniformBlockIndex(shader_prog, "UniformBlock");
+			GLuint uniform_block_index = glGetUniformBlockIndex(material.shader_program, "SystemUniforms");
 
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-			glUniformBlockBinding(shader_prog, uniform_block_index, 0);
+			glUniformBlockBinding(material.shader_program, uniform_block_index, 0);
 
 			/*
 			vec3 cam_rot(0.f, 0.f, 0.f);
