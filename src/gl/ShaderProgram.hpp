@@ -24,6 +24,7 @@ public:
 	void attachShader(const Shader& shader) const;
 	void link() const;
 
+	bool linkSuccess() const;
 	void printInfoLog(std::ostream& s) const;
 
 	operator GLuint() const;
@@ -65,6 +66,12 @@ inline void ShaderProgram::attachShader(const Shader& shader) const
 inline void ShaderProgram::link() const
 {
 	glLinkProgram(id);
+}
+
+inline bool ShaderProgram::linkSuccess() const {
+	GLint result;
+	glGetProgramiv(id, GL_LINK_STATUS, &result);
+	return result == GL_TRUE;
 }
 
 inline ShaderProgram::operator GLuint() const

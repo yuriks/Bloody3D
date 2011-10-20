@@ -19,6 +19,7 @@ public:
 	void setSource(std::ifstream& f) const;
 	void compile() const;
 
+	bool compileSuccess() const;
 	void printInfoLog(std::ostream& s) const;
 
 	operator GLuint() const;
@@ -45,6 +46,12 @@ inline void Shader::setSource(const char* src) const
 inline void Shader::compile() const
 {
 	glCompileShader(id);
+}
+
+inline bool Shader::compileSuccess() const {
+	GLint result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	return result == GL_TRUE;
 }
 
 inline Shader::operator GLuint() const
