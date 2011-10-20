@@ -93,7 +93,7 @@ Mesh load_obj(std::istream& f)
 					else
 					{
 						// Doesn't exist yet
-						Vertex vert;
+						vertex_fmt::Pos3f_Norm3f_Tex2f vert;
 						unsigned int pos_i = get<0>(tri)-1;
 						unsigned int norm_i = get<1>(tri)-1;
 						unsigned int uv_i = get<2>(tri)-1;
@@ -102,8 +102,8 @@ Mesh load_obj(std::istream& f)
 							std::cerr << "Invalid vertex index: " << pos_i << ' ' << norm_i << ' ' << uv_i << std::endl;
 							goto abort_while;
 						}
-						vert.position = pos_db[pos_i];
-						vert.normal = norm_db[norm_i];
+						vert.pos = pos_db[pos_i];
+						vert.norm = norm_db[norm_i];
 						auto pair = uv_db[uv_i];
 						vert.tex_coord[0] = get<0>(pair);
 						vert.tex_coord[1] = get<1>(pair);
