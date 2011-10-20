@@ -95,11 +95,11 @@ Mesh load_obj(std::istream& f)
 						// Doesn't exist yet
 						vertex_fmt::Pos3f_Norm3f_Tex2f vert;
 						unsigned int pos_i = get<0>(tri)-1;
-						unsigned int norm_i = get<1>(tri)-1;
-						unsigned int uv_i = get<2>(tri)-1;
+						unsigned int uv_i = get<1>(tri)-1;
+						unsigned int norm_i = get<2>(tri)-1;
 
 						if (pos_i >= pos_db.size() || norm_i >= norm_db.size() || uv_i >= uv_db.size()) {
-							std::cerr << "Invalid vertex index: " << pos_i << ' ' << norm_i << ' ' << uv_i << std::endl;
+							std::cerr << "Invalid vertex index: " << pos_i << ' ' << uv_i << ' ' << norm_i << std::endl;
 							goto abort_while;
 						}
 						vert.pos = pos_db[pos_i];
