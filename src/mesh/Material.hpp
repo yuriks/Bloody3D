@@ -7,18 +7,10 @@
 #include <memory>
 #include <array>
 
-struct Material {
-	gl::Shader vertex_shader, geometry_shader, fragment_shader;
-	gl::ShaderProgram shader_program;
-
-	Material()
-		: vertex_shader(GL_VERTEX_SHADER),
-		geometry_shader(GL_GEOMETRY_SHADER),
-		fragment_shader(GL_FRAGMENT_SHADER)
-	{}
-
-	void loadFromFiles(const char* vert, const char* frag, const char* geom = nullptr);
-};
+namespace gl {
+	class BufferObject;
+}
+class TextureManager;
 
 struct MaterialUniforms {
 };
@@ -26,4 +18,23 @@ struct MaterialUniforms {
 struct MaterialOptions {
 	std::shared_ptr<MaterialUniforms> uniforms;
 	std::array<u16, 4> texture_ids;
+};
+
+struct Material {
+	gl::Shader vertex_shader, geometry_shader, fragment_shader;
+	gl::ShaderProgram shader_program;
+	size_t options_size;
+	std::array<GLuint, 4> tex_uniform_index;
+
+	Material()
+		: vertex_shader(GL_VERTEX_SHADER),
+		geometry_shader(GL_GEOMETRY_SHADER),
+		fragment_shader(GL_FRAGMENT_SHADER)
+	{
+		tex_uniform_index.fill(0);
+	}
+
+	void setOptionsSize(size_t s) { options_size = s; }
+
+	void loadFromFiles(const char* vert, const char* frag, const char* geom = nullptr);
 };

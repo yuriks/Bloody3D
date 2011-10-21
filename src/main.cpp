@@ -82,6 +82,10 @@ bool init_window()
 	return true;
 }
 
+struct MatUniforms : public MaterialUniforms {
+	float dummy;
+};
+
 int main(int argc, char *argv[])
 {
 	if (!init_window())
@@ -101,10 +105,18 @@ int main(int argc, char *argv[])
 			mesh.loadIndices(indices.data(), indices.size());
 			indices_count = indices.size();
 		}
+		{
+			MaterialOptions mtl_options;
+			mtl_options.uniforms = std::make_shared<MatUniforms>();
+			mtl_options.texture_ids.fill(-1);
+			mtl_options.texture_ids[0] = tex_manager.loadTexture("panel_beams_diffuse.png");
+			mesh.material_options = mtl_options;
+		}
 
 		{
 			Material material;
 			material.loadFromFiles("test.vert", "test.frag");
+			material.setOptionsSize(sizeof(MatUniforms));
 
 			material.shader_program.use();
 
@@ -120,12 +132,10 @@ int main(int argc, char *argv[])
 			UniformBlock uniforms;
 			uniforms.projection_mat = math::mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
 
-			gl::BufferObject ubo;
-			ubo.bind(GL_UNIFORM_BUFFER);
-
-			GLuint uniform_block_index = glGetUniformBlockIndex(material.shader_program, "SystemUniforms");
-			glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-			glUniformBlockBinding(material.shader_program, uniform_block_index, 0);
+			gl::BufferObject system_ubo;
+			glBindBufferBase(GL_UNIFORM_BUFFER, 0, system_ubo);
+			gl::BufferObject material_ubo;
+			glBindBufferBase(GL_UNIFORM_BUFFER, 1, system_ubo);
 
 			/*
 			vec3 cam_rot(0.f, 0.f, 0.f);
@@ -244,13 +254,17 @@ int main(int argc, char *argv[])
 
 				uniforms.view_model_mat = view;
 
-				ubo.bind(GL_UNIFORM_BUFFER);
+				system_ubo.bind(GL_UNIFORM_BUFFER);
 				glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
+
+				material_ubo.bind(GL_UNIFORM_BUFFER);
+				glBufferData(GL_UNIFORM_BUFFER, material.options_size, mesh.material_options.uniforms.get(), GL_STREAM_DRAW);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 				mesh.vao.bind();
 				mesh.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+
 				glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
 
 				glfwSwapBuffers();

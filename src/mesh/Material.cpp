@@ -1,5 +1,6 @@
 #include "Material.hpp"
 
+#include "gl/BufferObject.hpp"
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -78,5 +79,18 @@ void Material::loadFromFiles(const char* vert, const char* frag, const char* geo
 	shader_program.link();
 	if (!shader_program.linkSuccess()) {
 		shader_program.printInfoLog(std::cerr);
+	}
+
+	GLuint sys_uniform_index = glGetUniformBlockIndex(shader_program, "SystemUniforms");
+	glUniformBlockBinding(shader_program, sys_uniform_index, 0);
+	GLuint mtl_uniform_index = glGetUniformBlockIndex(shader_program, "MaterialUniforms");
+	glUniformBlockBinding(shader_program, mtl_uniform_index, 1);
+
+	GLuint tex_uniform_index = glGetUniformLocation(shader_program, "tex");
+
+	shader_program.use();
+	if (tex_uniform_index != -1) {
+		static const int samplers[4] = { 0, 1, 2, 3 };
+		glUniform1iv(tex_uniform_index, 4, samplers);
 	}
 }
