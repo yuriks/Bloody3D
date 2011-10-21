@@ -31,4 +31,5 @@ void GPUMesh::loadVertexData(const void* data, size_t data_size, vertex_fmt::Ver
 void GPUMesh::loadIndices(const u16* data, unsigned int count) {
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16) * count, data, GL_STATIC_DRAW);
+	indices_count = count;
 }

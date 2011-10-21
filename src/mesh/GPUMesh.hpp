@@ -19,5 +19,6 @@ struct GPUMesh {
 
 	vertex_fmt::VertexFormat vertex_format;
 	int material_id;
+	unsigned int indices_count;
 	MaterialOptions material_options;
 };
