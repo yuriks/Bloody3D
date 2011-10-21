@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 		GPUMesh mesh;
 		unsigned int indices_count = 0;
 		{
-			std::ifstream objf("data/base.obj");
+			std::ifstream objf("data/panel_beams.obj");
 			Mesh base_mesh = load_obj(objf);
 			auto& vertices = base_mesh.sub_meshes[0].vertices;
 			auto& indices = base_mesh.sub_meshes[0].indices;
