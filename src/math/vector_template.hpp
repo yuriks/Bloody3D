@@ -80,3 +80,15 @@ public:
 #endif
 #endif
 };
+
+HW_FORCE_INLINE Vec<N> operator-(const Vec<N>& a) {
+	return Vec<N>(_mm_xor_ps(a.xmm,
+#if N == 4
+		_mm_setr_ps(-0.f, -0.f, -0.f, -0.f)
+#elif N == 3
+		_mm_setr_ps(-0.f, -0.f, -0.f, 0.f)
+#elif N == 2
+		_mm_setr_ps(-0.f, -0.f, 0.f, 0.f)
+#endif
+	));
+}
