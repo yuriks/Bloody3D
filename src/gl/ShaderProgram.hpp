@@ -15,6 +15,9 @@ class ShaderProgram : boost::noncopyable
 {
 public:
 	ShaderProgram();
+	ShaderProgram(ShaderProgram&& o) : id(o.id) {
+		o.id = 0;
+	}
 	~ShaderProgram();
 
 	void use() const;
@@ -40,7 +43,8 @@ inline ShaderProgram::ShaderProgram()
 
 inline ShaderProgram::~ShaderProgram()
 {
-	glDeleteProgram(id);
+	if (id != 0)
+		glDeleteProgram(id);
 }
 
 inline void ShaderProgram::use() const

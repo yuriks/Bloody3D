@@ -13,6 +13,9 @@ class Shader : boost::noncopyable
 {
 public:
 	explicit Shader(GLenum type);
+	Shader(Shader&& o) : id(o.id) {
+		o.id = 0;
+	}
 	~Shader();
 
 	void setSource(const char* src) const;
@@ -35,7 +38,8 @@ inline Shader::Shader(GLenum type)
 
 inline Shader::~Shader()
 {
-	glDeleteShader(id);
+	if (id != 0)
+		glDeleteShader(id);
 }
 
 inline void Shader::setSource(const char* src) const
