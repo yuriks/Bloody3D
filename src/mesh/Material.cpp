@@ -22,9 +22,11 @@ static void preprocessFile(std::string& source, const std::string& fname, std::v
 	unsigned int file_n = file_list.size();
 	file_list.push_back(fname);
 
-	source.append("#line 1 ");
-	source.append(std::to_string((unsigned long long)file_n));
-	source.push_back('\n');
+	if (file_n > 0) {
+		source.append("#line 1 ");
+		source.append(std::to_string((unsigned long long)file_n));
+		source.push_back('\n');
+	}
 
 	std::string line;
 	unsigned int line_n = 1;
@@ -82,9 +84,11 @@ void Material::loadFromFiles(const char* vert, const char* frag, const char* geo
 	}
 
 	GLuint sys_uniform_index = glGetUniformBlockIndex(shader_program, "SystemUniforms");
-	glUniformBlockBinding(shader_program, sys_uniform_index, 0);
 	GLuint mtl_uniform_index = glGetUniformBlockIndex(shader_program, "MaterialUniforms");
-	glUniformBlockBinding(shader_program, mtl_uniform_index, 1);
+	if (sys_uniform_index != GL_INVALID_INDEX)
+		glUniformBlockBinding(shader_program, sys_uniform_index, 0);
+	if (mtl_uniform_index != GL_INVALID_INDEX)
+		glUniformBlockBinding(shader_program, mtl_uniform_index, 1);
 
 	GLuint tex_uniform_index = glGetUniformLocation(shader_program, "tex");
 

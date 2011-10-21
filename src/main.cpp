@@ -136,9 +136,14 @@ int main(int argc, char *argv[])
 			uniforms.projection_mat = math::mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
 
 			gl::BufferObject system_ubo;
+			system_ubo.bind(GL_UNIFORM_BUFFER);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), 0, GL_STREAM_DRAW);
 			glBindBufferBase(GL_UNIFORM_BUFFER, 0, system_ubo);
+
 			gl::BufferObject material_ubo;
-			glBindBufferBase(GL_UNIFORM_BUFFER, 1, system_ubo);
+			material_ubo.bind(GL_UNIFORM_BUFFER);
+			glBufferData(GL_UNIFORM_BUFFER, material.options_size, 0, GL_STREAM_DRAW);
+			glBindBufferBase(GL_UNIFORM_BUFFER, 1, material_ubo);
 
 			/*
 			vec3 cam_rot(0.f, 0.f, 0.f);
