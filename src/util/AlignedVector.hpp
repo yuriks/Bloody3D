@@ -105,6 +105,14 @@ public:
 		*vec_data_end++ = val;
 	}
 
+	T& back() {
+		return *(vec_data_end - 1);
+	}
+
+	const T& back() const {
+		return *(vec_data_end - 1);
+	}
+
 	iterator begin() {
 		return vec_data;
 	}
