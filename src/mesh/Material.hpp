@@ -2,8 +2,10 @@
 
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
+#include "Heatwave.hpp"
 #include <GL3/gl3.h>
 #include <memory>
+#include <array>
 
 struct Material {
 	gl::Shader vertex_shader, geometry_shader, fragment_shader;
@@ -22,6 +24,6 @@ struct MaterialUniforms {
 };
 
 struct MaterialOptions {
-	std::unique_ptr<MaterialUniforms> uniforms;
-	std::vector<unsigned int> texture_ids;
+	std::shared_ptr<MaterialUniforms> uniforms;
+	std::array<u16, 4> texture_ids;
 };
