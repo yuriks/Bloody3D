@@ -12,6 +12,7 @@ class Texture : boost::noncopyable
 public:
 	Texture();
 	~Texture();
+	Texture(Texture&& o);
 
 	void bind(GLenum target) const;
 
@@ -32,7 +33,14 @@ inline Texture::Texture()
 
 inline Texture::~Texture()
 {
-	glDeleteTextures(1, &id);
+	if (id != 0)
+		glDeleteTextures(1, &id);
+}
+
+inline Texture::Texture(Texture&& o)
+	: id(o.id), width(o.width), height(o.height)
+{
+	o.id = 0;
 }
 
 inline void Texture::bind(GLenum target) const
