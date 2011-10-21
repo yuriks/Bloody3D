@@ -106,8 +106,11 @@ int main(int argc, char *argv[])
 			indices_count = indices.size();
 		}
 		{
+			auto u = std::make_shared<MatUniforms>();
+			u->dummy = 1.f;
+
 			MaterialOptions mtl_options;
-			mtl_options.uniforms = std::make_shared<MatUniforms>();
+			mtl_options.uniforms = std::move(u);
 			mtl_options.texture_ids.fill(-1);
 			mtl_options.texture_ids[0] = tex_manager.loadTexture("panel_beams_diffuse.png");
 			mesh.material_options = mtl_options;
