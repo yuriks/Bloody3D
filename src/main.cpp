@@ -11,6 +11,7 @@
 #include "mesh/VertexFormats.hpp"
 #include "mesh/GPUMesh.hpp"
 #include "mesh/ObjLoader.hpp"
+#include "mesh/TextureManager.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -87,6 +88,8 @@ int main(int argc, char *argv[])
 		return 1;
 
 	{
+		TextureManager tex_manager;
+
 		GPUMesh mesh;
 		unsigned int indices_count = 0;
 		{
