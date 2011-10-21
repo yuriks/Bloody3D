@@ -16,6 +16,7 @@
     <ClCompile Include="src\image\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
+    <ClCompile Include="src\math\Quaternion.cpp" />
     <ClCompile Include="src\mesh\GPUMesh.cpp" />
     <ClCompile Include="src\mesh\Material.cpp" />
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
