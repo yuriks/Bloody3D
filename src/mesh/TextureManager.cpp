@@ -39,7 +39,7 @@ u16 TextureManager::loadTexture(const char* fname) {
 	}
 }
 
-gl::Texture* TextureManager::lookupTexture(u16 tex_id) {
+const gl::Texture* TextureManager::lookupTexture(u16 tex_id) const {
 	if (tex_id < texture_map.size()) {
 		return &texture_map[tex_id];
 	} else {

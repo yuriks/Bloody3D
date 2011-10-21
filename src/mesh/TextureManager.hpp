@@ -10,7 +10,7 @@
 class TextureManager : boost::noncopyable {
 public:
 	u16 loadTexture(const char* fname);
-	gl::Texture* lookupTexture(u16 tex_id);
+	const gl::Texture* lookupTexture(u16 tex_id) const;
 
 private:
 	std::map<std::string, u16> fname_map;
