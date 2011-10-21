@@ -25,6 +25,7 @@
   <ItemGroup>
     <ClInclude Include="src\gl3w.hpp" />
     <ClInclude Include="src\gl\BufferObject.hpp" />
+    <ClInclude Include="src\gl\Framebuffer.h" />
     <ClInclude Include="src\gl\Shader.hpp" />
     <ClInclude Include="src\gl\ShaderProgram.hpp" />
     <ClInclude Include="src\gl\Texture.hpp" />
