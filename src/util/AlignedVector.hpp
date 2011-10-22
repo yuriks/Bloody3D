@@ -70,6 +70,11 @@ public:
 		return vec_data == vec_data_end;
 	}
 
+	void resize(unsigned int count) {
+		reserve(count);
+		vec_data_end = vec_data + count;
+	}
+
 	void reserve(unsigned int count) {
 		if (capacity() < count) {
 			unsigned int old_size = size();
