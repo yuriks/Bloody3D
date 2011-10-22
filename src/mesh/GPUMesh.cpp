@@ -3,6 +3,8 @@
 using namespace vertex_fmt;
 
 void GPUMesh::loadVertexData(const void* data, size_t data_size, vertex_fmt::VertexFormat format) {
+	vertex_format = format;
+
 	vao.bind();
 
 	vbo.bind(GL_ARRAY_BUFFER);
