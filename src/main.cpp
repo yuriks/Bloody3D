@@ -3,6 +3,7 @@
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
+#include "gl/Framebuffer.h"
 #include "math/Matrix.hpp"
 #include "math/MatrixTransform.hpp"
 #include "math/Quaternion.hpp"
@@ -12,6 +13,8 @@
 #include "mesh/GPUMesh.hpp"
 #include "mesh/ObjLoader.hpp"
 #include "mesh/TextureManager.hpp"
+#include "scene/Scene.hpp"
+#include "scene/RenderContext.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -20,11 +23,6 @@
 
 //#define GLFW_GL3_H
 #include <GL/glfw.h>
-
-struct UniformBlock {
-	math::mat4 projection_mat;
-	math::mat3x4 view_model_mat;
-};
 
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
@@ -49,7 +47,7 @@ bool init_window()
 	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	if (glfwOpenWindow(800, 600, 8, 8, 8, 8, 24, 0, GLFW_WINDOW) != GL_TRUE)
+	if (glfwOpenWindow(800, 600, 8, 8, 8, 0, 0, 0, GLFW_WINDOW) != GL_TRUE)
 	{
 		char tmp;
 		std::cerr << "Failed to open window." << std::endl;
@@ -86,71 +84,85 @@ struct MatUniforms : public MaterialUniforms {
 	float dummy;
 };
 
+struct ShadingUniforms : public MaterialUniforms {
+	float dummy;
+};
+
 int main(int argc, char *argv[])
 {
 	if (!init_window())
 		return 1;
 
 	{
-		TextureManager tex_manager;
+		scene::RenderContext render_context(800, 600);
+		scene::Scene scene;
 
-		GPUMesh mesh;
-		unsigned int indices_count = 0;
+		int mesh_id;
 		{
+			int mat_id;
+			{
+				Material material;
+				material.loadFromFiles("test.vert", "test.frag");
+				material.setOptionsSize(sizeof(MatUniforms));
+
+				mat_id = scene.addMaterial(std::move(material));
+			}
+
+			GPUMesh mesh;
+
 			std::ifstream objf("data/panel_beams.obj");
 			Mesh base_mesh = load_obj(objf);
 			auto& vertices = base_mesh.sub_meshes[0].vertices;
 			auto& indices = base_mesh.sub_meshes[0].indices;
 			mesh.loadVertexData(vertices.data(), vertices.size() * sizeof(vertex_fmt::Pos3f_Norm3f_Tex2f), vertex_fmt::FMT_POS3F_NORM3F_TEX2F);
 			mesh.loadIndices(indices.data(), indices.size());
-			indices_count = indices.size();
+
+			mesh.material_id = mat_id;
+
+			{
+				auto u = std::make_shared<MatUniforms>();
+				u->dummy = 1.f;
+
+				MaterialOptions mtl_options;
+				mtl_options.uniforms = std::move(u);
+				mtl_options.texture_ids.fill(-1);
+				mtl_options.texture_ids[0] = scene.tex_manager.loadTexture("panel_beams_diffuse.png");
+				mtl_options.texture_ids[1] = scene.tex_manager.loadTexture("panel_beams_normal.png");
+				mesh.material_options = mtl_options;
+			}
+
+			mesh_id = scene.addMesh(std::move(mesh));
 		}
+
+		scene::MeshInstance& inst = scene.newInstance(mesh_id);
+		inst.pos_scale = math::vec4(0.f, 0.f, 0.f, 1.f);
+		inst.rot = math::Quaternion();
+
+		scene::Camera camera;
+		camera.fov = 45.f;
+		camera.clip_near = 0.1f;
+		camera.clip_far = 500.f;
+		camera.pos = math::vec3(0.f, 0.f, -5.f);
+		camera.rot = math::Quaternion();
+
 		{
-			auto u = std::make_shared<MatUniforms>();
-			u->dummy = 1.f;
-
-			MaterialOptions mtl_options;
-			mtl_options.uniforms = std::move(u);
-			mtl_options.texture_ids.fill(-1);
-			mtl_options.texture_ids[0] = tex_manager.loadTexture("panel_beams_diffuse.png");
-			mesh.material_options = mtl_options;
-		}
-
-		{
-			Material material;
-			material.loadFromFiles("test.vert", "test.frag");
-			material.setOptionsSize(sizeof(MatUniforms));
-
-			material.shader_program.use();
+			Material shading_material;
+			shading_material.loadFromFiles("shading.vert", "shading.frag");
+			shading_material.setOptionsSize(sizeof(ShadingUniforms));
 
 			bool running = true;
 
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_CULL_FACE);
+			//glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			UniformBlock uniforms;
-			uniforms.projection_mat = math::mat_transform::perspective_proj(35.f, 800.f/600.f, 0.1f, 500.f);
-
-			gl::BufferObject system_ubo;
-			system_ubo.bind(GL_UNIFORM_BUFFER);
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), 0, GL_STREAM_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 0, system_ubo);
-
-			gl::BufferObject material_ubo;
-			material_ubo.bind(GL_UNIFORM_BUFFER);
-			glBufferData(GL_UNIFORM_BUFFER, material.options_size, 0, GL_STREAM_DRAW);
-			glBindBufferBase(GL_UNIFORM_BUFFER, 1, material_ubo);
+			scene::RenderBufferSet def_buffers;
+			def_buffers.initialize(800, 600);
 
 			/*
-			vec3 cam_rot(0.f, 0.f, 0.f);
-			vec3 cam_pos(0.f, 0.f, 0.f);
-
-			vec3 *pos = &cam_pos;
-
 			std::cout <<
 				"Teclas:\n"
 				"  WASD - Movimentacao\n"
@@ -166,10 +178,6 @@ int main(int argc, char *argv[])
 
 			//bool prev_keys[2] = {false};
 
-			//int lod_level = 0;
-
-			math::mat3x4 view;
-			//float move_amount = 0.f;
 			math::Quaternion rot_amount(math::up, math::pi);
 
 			int last_mouse_pos[2];
@@ -242,8 +250,8 @@ int main(int argc, char *argv[])
 					last_mouse_pos[0] = cur_mouse_pos[0];
 					last_mouse_pos[1] = cur_mouse_pos[1];
 
-					//move_amount += 0.005;
-					view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 5.f)), math::matrixFromQuaternion(rot_amount));
+					inst.rot = rot_amount;
+					//view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 5.f)), math::matrixFromQuaternion(rot_amount));
 
 					elapsed_game_time += 1./60.;
 				}
@@ -260,20 +268,8 @@ int main(int argc, char *argv[])
 				}
 				*/
 
-				uniforms.view_model_mat = view;
-
-				system_ubo.bind(GL_UNIFORM_BUFFER);
-				glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformBlock), &uniforms, GL_STREAM_DRAW);
-
-				material_ubo.bind(GL_UNIFORM_BUFFER);
-				glBufferData(GL_UNIFORM_BUFFER, material.options_size, mesh.material_options.uniforms.get(), GL_STREAM_DRAW);
-
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				mesh.vao.bind();
-				mesh.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-
-				glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
+				scene::renderGeometry(scene, camera, def_buffers, render_context);
+				scene::shadeBuffers(scene.lights, shading_material, def_buffers, 0, render_context);
 
 				glfwSwapBuffers();
 
