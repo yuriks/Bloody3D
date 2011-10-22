@@ -156,8 +156,7 @@ int main(int argc, char *argv[])
 			bool running = true;
 
 			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
-			//glEnable(GL_DEPTH_TEST);
-			//glEnable(GL_CULL_FACE);
+			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -165,21 +164,9 @@ int main(int argc, char *argv[])
 			scene::RenderBufferSet def_buffers;
 			def_buffers.initialize(800, 600);
 
-			/*
-			std::cout <<
-				"Teclas:\n"
-				"  WASD - Movimentacao\n"
-				"  R/F - Subir/descer\n"
-				"  OKL; - Rotaciona camera\n"
-				"\n"
-				"  1/2 - Mudar nivel de detalhe fixo.\n" << std::endl;
-			*/
-
 			double elapsed_game_time = 0.;
 			double elapsed_real_time = 0.;
 			double last_frame_time;
-
-			//bool prev_keys[2] = {false};
 
 			math::Quaternion rot_amount(math::up, math::pi);
 
@@ -193,43 +180,6 @@ int main(int argc, char *argv[])
 				int i;
 				for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 				{
-					/*
-					if (glfwGetKey('O')) cam_rot -= vec3(0.02f, 0.f, 0.f); // Y - O
-					if (glfwGetKey('L')) cam_rot += vec3(0.02f, 0.f, 0.f); // I - L
-					if (glfwGetKey('K')) cam_rot -= vec3(0.f, 0.02f, 0.f); // E - K
-					if (glfwGetKey(';')) cam_rot += vec3(0.f, 0.02f, 0.f); // O - ;
-
-					// Inverse of view_rot below
-					const mat3x4 view_rot_move = concatTransform(mat_transform::rotate(vec3(0.f, 1.f, 0.f), -cam_rot.getY()), mat_transform::rotate(vec3(1.f, 0.f, 0.f), -cam_rot.getX()));
-
-					vec3 x_axis = transform(view_rot_move, vec3(1.f, 0.f, 0.f));
-					vec3 y_axis = transform(view_rot_move, vec3(0.f, 1.f, 0.f));
-					vec3 z_axis = transform(view_rot_move, vec3(0.f, 0.f, 1.f));
-
-					if (glfwGetKey('A')) (*pos) -= x_axis * 0.25f; // A - A
-					if (glfwGetKey('D')) (*pos) += x_axis * 0.25f; // S - D
-					if (glfwGetKey('R')) (*pos) += y_axis * 0.25f; // P - R
-					if (glfwGetKey('F')) (*pos) -= y_axis * 0.25f; // T - F
-					if (glfwGetKey('W')) (*pos) += z_axis * 0.25f; // W - W
-					if (glfwGetKey('S')) (*pos) -= z_axis * 0.25f; // R - S
-
-					bool key = glfwGetKey('1') != 0;
-					if (key && !prev_keys[0])
-					{
-						if (lod_level > 0)
-							glUniform1i(u_LodLevel, --lod_level);
-					}
-					prev_keys[0] = key;
-
-					key = glfwGetKey('2') != 0;
-					if (key && !prev_keys[1])
-					{
-						//if (lod_level > 0)
-						glUniform1i(u_LodLevel, ++lod_level);
-					}
-					prev_keys[1] = key;
-					*/
-
 					static const float ROT_SPEED = 0.02f;
 					static const float MOUSE_ROT_SPEED = 0.01f;
 
@@ -257,22 +207,9 @@ int main(int argc, char *argv[])
 						scene::MeshInstance& inst = insth.resolve(scene);
 						inst.rot = rot_amount;
 					}
-					//view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 5.f)), math::matrixFromQuaternion(rot_amount));
 
 					elapsed_game_time += 1./60.;
 				}
-
-				//const mat3x4 view_rot = concatTransform(mat_transform::rotate(vec3(1.f, 0.f, 0.f), cam_rot.getX()), mat_transform::rotate(vec3(0.f, 1.f, 0.f),  cam_rot.getY()));
-				//view = concatTransform(view_rot, mat_transform::translate3x4(cam_pos * -1.f));
-				//view = mat_transform::look_at(make_vec(0.f, 1.f, 0.f), cam_pos, obj_pos);
-
-				/*
-				Light light_transformed;
-				{
-					light_transformed.color = lights.color;
-					light_transformed.direction = vec3(transform(view, vec4(lights.direction)));
-				}
-				*/
 
 				scene::renderGeometry(scene, camera, def_buffers, render_context);
 				scene::shadeBuffers(scene.lights, shading_material, def_buffers, 0, render_context);
