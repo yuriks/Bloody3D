@@ -11,7 +11,7 @@ RenderContext::RenderContext(int width, int height)
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, system_ubo);
 
 	material_ubo.bind(GL_UNIFORM_BUFFER);
-	glBufferData(GL_UNIFORM_BUFFER, 0, 0, GL_STREAM_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 4, 0, GL_STREAM_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 1, material_ubo);
 }
 
