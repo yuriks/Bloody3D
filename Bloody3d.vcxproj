@@ -22,6 +22,7 @@
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
     <ClCompile Include="src\mesh\TextureManager.cpp" />
     <ClCompile Include="src\scene\RenderContext.cpp" />
+    <ClCompile Include="src\scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl3w.hpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="src\mesh\TextureManager.hpp" />
     <ClInclude Include="src\mesh\VertexFormats.hpp" />
     <ClInclude Include="src\scene\RenderContext.hpp" />
+    <ClInclude Include="src\scene\Scene.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
