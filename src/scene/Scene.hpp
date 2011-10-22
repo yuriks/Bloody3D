@@ -12,9 +12,18 @@
 
 namespace scene {
 
+struct Scene;
+
 struct MeshInstance {
 	math::vec4 pos_scale;
 	math::Quaternion rot;
+};
+
+struct MeshInstanceHandle {
+	u16 mesh_id;
+	u16 instance_id;
+
+	MeshInstance& resolve(Scene& scene);
 };
 
 struct Light {
@@ -48,8 +57,12 @@ struct Scene {
 
 	int addMaterial(Material&& mat);
 	int addMesh(GPUMesh&& mesh);
-	MeshInstance& newInstance(int mesh_id);
+	MeshInstanceHandle newInstance(int mesh_id);
 };
+
+inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
+	return scene.mesh_instances[mesh_id][instance_id];
+}
 
 void renderGeometry(const Scene& scene, const Camera& camera, RenderBufferSet& buffers, RenderContext& render_context);
 void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, RenderBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context);

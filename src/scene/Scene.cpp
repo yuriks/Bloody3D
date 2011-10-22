@@ -55,9 +55,13 @@ int Scene::addMesh(GPUMesh&& mesh) {
 	return new_id;
 }
 
-MeshInstance& Scene::newInstance(int mesh_id) {
+MeshInstanceHandle Scene::newInstance(int mesh_id) {
+	MeshInstanceHandle handle;
+	handle.mesh_id = mesh_id;
+	handle.instance_id = mesh_instances[mesh_id].size();
+
 	mesh_instances[mesh_id].push_back(MeshInstance());
-	return mesh_instances[mesh_id].back();
+	return handle;
 }
 
 void renderGeometry(const Scene& scene, const Camera& camera, RenderBufferSet& buffers, RenderContext& render_context) {

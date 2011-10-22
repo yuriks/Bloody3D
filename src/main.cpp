@@ -134,9 +134,12 @@ int main(int argc, char *argv[])
 			mesh_id = scene.addMesh(std::move(mesh));
 		}
 
-		scene::MeshInstance& inst = scene.newInstance(mesh_id);
-		inst.pos_scale = math::vec4(0.f, 0.f, 0.f, 1.f);
-		inst.rot = math::Quaternion();
+		scene::MeshInstanceHandle insth = scene.newInstance(mesh_id);
+		{
+			scene::MeshInstance& inst = insth.resolve(scene);
+			inst.pos_scale = math::vec4(0.f, 0.f, 0.f, 1.f);
+			inst.rot = math::Quaternion();
+		}
 
 		scene::Camera camera;
 		camera.fov = 45.f;
@@ -250,7 +253,10 @@ int main(int argc, char *argv[])
 					last_mouse_pos[0] = cur_mouse_pos[0];
 					last_mouse_pos[1] = cur_mouse_pos[1];
 
-					inst.rot = rot_amount;
+					{
+						scene::MeshInstance& inst = insth.resolve(scene);
+						inst.rot = rot_amount;
+					}
 					//view = math::concatTransform(math::mat_transform::translate3x4(math::vec3(0.f, 0.f, 5.f)), math::matrixFromQuaternion(rot_amount));
 
 					elapsed_game_time += 1./60.;
