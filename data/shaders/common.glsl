@@ -20,15 +20,12 @@ vec4 transform(mat3x4_rows m, vec4 v) {
 }
 
 vec2 encodeNormal(vec3 n) {
-	vec2 enc = normalize(n.xy) * sqrt(-n.z);
-	return enc;
+	return n.xy * inversesqrt(1-n.z);
 }
 
 vec3 decodeNormal(vec2 enc) {
-	vec3 n;
-	n.z = -dot(enc, enc);
-	n.xy = normalize(enc) * sqrt(1 - n.z*n.z);
-	return n;
+	float len2 = dot(enc, enc);
+	return vec3(enc * sqrt(2 - len2), len2 - 1);
 }
 
 struct VertFragData {
