@@ -3,7 +3,7 @@
 #include "image/ImageLoader.hpp"
 #include <fstream>
 
-u16 TextureManager::loadTexture(const char* fname) {
+u16 TextureManager::loadTexture(const char* fname, TexFlags flags) {
 	static const std::string texture_path("data/textures/");
 
 	auto lb = fname_map.lower_bound(fname);
@@ -28,7 +28,15 @@ u16 TextureManager::loadTexture(const char* fname) {
 
 		tex.width = img.getWidth();
 		tex.height = img.getHeight();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.getData());
+
+		static const GLenum texture_formats[] = {
+			GL_RGB, /* TEXF_NONE */
+			GL_RGBA, /* TEXF_ALPHA */
+			GL_SRGB, /* TEXF_SRGB */
+			GL_SRGB_ALPHA /* TEXF_ALPHA | TEXF_SRGB */
+		};
+
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_formats[flags & (TEXF_ALPHA | TEXF_SRGB)], tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		u16 new_id = texture_map.size();
