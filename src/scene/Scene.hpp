@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gl/Framebuffer.h"
+#include "gl/Framebuffer.hpp"
 #include "gl/Texture.hpp"
 #include "math/Vector.hpp"
 #include "math/Quaternion.hpp"

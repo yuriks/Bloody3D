@@ -3,7 +3,7 @@
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
-#include "gl/Framebuffer.h"
+#include "gl/Framebuffer.hpp"
 #include "math/Matrix.hpp"
 #include "math/MatrixTransform.hpp"
 #include "math/Quaternion.hpp"
