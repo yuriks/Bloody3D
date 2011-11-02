@@ -5,7 +5,7 @@
 
 namespace scene {
 
-void RenderBufferSet::initialize(int width, int height) {
+void GBufferSet::initialize(int width, int height) {
 	depth_tex.bind(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -64,7 +64,7 @@ MeshInstanceHandle Scene::newInstance(int mesh_id) {
 	return handle;
 }
 
-void renderGeometry(const Scene& scene, const Camera& camera, RenderBufferSet& buffers, RenderContext& render_context) {
+void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context) {
 	SystemUniformBlock sys_uniforms;
 	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 
@@ -145,7 +145,7 @@ void renderGeometry(const Scene& scene, const Camera& camera, RenderBufferSet& b
 	}
 }
 
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, RenderBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context) {
+void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, GBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context) {
 	glDisable(GL_DEPTH_TEST);
 	shading_material.shader_program.use();
 

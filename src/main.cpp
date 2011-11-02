@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			scene::RenderBufferSet def_buffers;
+			scene::GBufferSet def_buffers;
 			def_buffers.initialize(800, 600);
 
 			double elapsed_game_time = 0.;

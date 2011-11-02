@@ -39,7 +39,7 @@ struct Camera {
 	float clip_far;
 };
 
-struct RenderBufferSet {
+struct GBufferSet {
 	gl::Framebuffer fbo;
 	gl::Texture depth_tex;
 	gl::Texture diffuse_tex;
@@ -64,7 +64,7 @@ inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
 	return scene.mesh_instances[mesh_id][instance_id];
 }
 
-void renderGeometry(const Scene& scene, const Camera& camera, RenderBufferSet& buffers, RenderContext& render_context);
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, RenderBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context);
+void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context);
+void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, GBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context);
 
 } // namespace scene
