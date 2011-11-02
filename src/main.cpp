@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 				MaterialOptions mtl_options;
 				mtl_options.uniforms = std::move(u);
 				mtl_options.texture_ids.fill(-1);
-				mtl_options.texture_ids[0] = scene.tex_manager.loadTexture("panel_beams_diffuse.png");
+				mtl_options.texture_ids[0] = scene.tex_manager.loadTexture("panel_beams_diffuse.png", TEXF_SRGB);
 				mtl_options.texture_ids[1] = scene.tex_manager.loadTexture("panel_beams_normal.png");
 				mesh.material_options = mtl_options;
 			}
@@ -159,6 +159,7 @@ int main(int argc, char *argv[])
 			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
+			glEnable(GL_FRAMEBUFFER_SRGB);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			scene::RenderBufferSet def_buffers;
