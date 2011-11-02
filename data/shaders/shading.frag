@@ -6,8 +6,9 @@ in vec2 vf_TexCoord;
 
 layout(location = 0) out vec4 out_Color;
 
-#define TEX_DIFFUSE 0
-#define TEX_NORMAL 1
+#define TEX_DEPTH 0
+#define TEX_DIFFUSE 1
+#define TEX_NORMAL 2
 
 void main() {
 	vec3 normal = decodeNormal(texture(tex[TEX_NORMAL], vf_TexCoord).rg);

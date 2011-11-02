@@ -11,7 +11,7 @@ void RenderBufferSet::initialize(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 
 	diffuse_tex.bind(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -28,7 +28,7 @@ void RenderBufferSet::initialize(int width, int height) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
 	fbo.bind(GL_FRAMEBUFFER);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuse_tex, 0);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normal_tex, 0);
 
@@ -153,8 +153,10 @@ void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shad
 	glBufferData(GL_UNIFORM_BUFFER, shading_material.options_size, 0, GL_STREAM_DRAW);
 
 	glActiveTexture(GL_TEXTURE0);
-	buffers.diffuse_tex.bind(GL_TEXTURE_2D);
+	buffers.depth_tex.bind(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE1);
+	buffers.diffuse_tex.bind(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE2);
 	buffers.normal_tex.bind(GL_TEXTURE_2D);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, destination_fbo);
