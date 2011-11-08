@@ -15,6 +15,7 @@
 #include "mesh/TextureManager.hpp"
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"
+#include "scene/PostProcessing.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -152,6 +153,9 @@ int main(int argc, char *argv[])
 			Material shading_material;
 			shading_material.loadFromFiles("fullscreen_triangle.vert", "shading.frag");
 			shading_material.setOptionsSize(sizeof(ShadingUniforms));
+			Material tonemap_material;
+			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
+			tonemap_material.setOptionsSize(sizeof(ShadingUniforms));
 
 			bool running = true;
 
