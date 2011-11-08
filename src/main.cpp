@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
 		{
 			Material shading_material;
-			shading_material.loadFromFiles("shading.vert", "shading.frag");
+			shading_material.loadFromFiles("fullscreen_triangle.vert", "shading.frag");
 			shading_material.setOptionsSize(sizeof(ShadingUniforms));
 
 			bool running = true;
