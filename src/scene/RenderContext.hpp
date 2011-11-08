@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gl/VertexArrayObject.hpp"
 #include "gl/BufferObject.hpp"
 #include "math/Matrix.hpp"
 
@@ -19,6 +20,11 @@ struct RenderContext {
 	int screen_width;
 	int screen_height;
 	float aspect_ratio;
+
+	gl::VertexArrayObject cube_vao;
+	gl::BufferObject cube_vbo;
+	gl::BufferObject cube_ibo;
+	static const unsigned int cube_num_indices = 6*2*3;
 };
 
 } // namespace scene
