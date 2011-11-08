@@ -167,9 +167,9 @@ int main(int argc, char *argv[])
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			scene::GBufferSet def_buffers;
-			def_buffers.initialize(800, 600);
+			def_buffers.initialize(render_context.screen_width, render_context.screen_height);
 			scene::ShadingBufferSet shading_buffers;
-			shading_buffers.initialize(800, 600, def_buffers.depth_tex);
+			shading_buffers.initialize(render_context.screen_width, render_context.screen_height, def_buffers.depth_tex);
 
 			double elapsed_game_time = 0.;
 			double elapsed_real_time = 0.;
