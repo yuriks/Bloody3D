@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 
 			bool running = true;
 
-			glClearColor(0.2f, 0.2f, 0.2f, 1.f);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.f);
 			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
@@ -168,6 +168,8 @@ int main(int argc, char *argv[])
 
 			scene::GBufferSet def_buffers;
 			def_buffers.initialize(800, 600);
+			scene::ShadingBufferSet shading_buffers;
+			shading_buffers.initialize(800, 600, def_buffers.depth_tex);
 
 			double elapsed_game_time = 0.;
 			double elapsed_real_time = 0.;
@@ -217,7 +219,9 @@ int main(int argc, char *argv[])
 				}
 
 				scene::renderGeometry(scene, camera, def_buffers, render_context);
-				scene::shadeBuffers(scene.lights, shading_material, def_buffers, 0, render_context);
+				scene::shadeBuffers(scene.lights, camera, shading_material, def_buffers, shading_buffers, render_context);
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				scene::tonemap(shading_buffers, tonemap_material, render_context);
 
 				glfwSwapBuffers();
 

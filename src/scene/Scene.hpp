@@ -48,6 +48,13 @@ struct GBufferSet {
 	void initialize(int width, int height);
 };
 
+struct ShadingBufferSet {
+	gl::Framebuffer fbo;
+	gl::Texture accum_tex;
+
+	void initialize(int width, int height, gl::Texture& depth_tex);
+};
+
 struct Scene {
 	TextureManager tex_manager;
 	std::vector<Material> material_list;
@@ -65,6 +72,7 @@ inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
 }
 
 void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context);
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, GBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context);
+void shadeBuffers(const util::AlignedVector<Light>& lights, const Camera& camera, const Material& shading_material,
+	GBufferSet& gbuffer, ShadingBufferSet& shade_bufs, RenderContext& render_context);
 
 } // namespace scene

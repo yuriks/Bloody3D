@@ -18,7 +18,7 @@ void GBufferSet::initialize(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
 	normal_tex.bind(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -40,6 +40,27 @@ void GBufferSet::initialize(int width, int height) {
 		GL_COLOR_ATTACHMENT1
 	};
 	glDrawBuffers(2, render_targets);
+}
+
+void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex) {
+	accum_tex.bind(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+	fbo.bind(GL_FRAMEBUFFER);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accum_tex, 0);
+
+	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cerr << "Incomplete framebuffer." << std::endl;
+
+	static const GLenum render_targets[1] = {
+		GL_COLOR_ATTACHMENT0
+	};
+	glDrawBuffers(1, render_targets);
 }
 
 int Scene::addMaterial(Material&& mat) {
@@ -92,8 +113,16 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 
 	buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
+
+	glDisable(GL_BLEND);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// nVidia bug workaround!!!
+	glDisable(GL_FRAMEBUFFER_SRGB);
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	for (unsigned int i = 0; i < scene.gpu_meshes.size(); ++i) {
 		const GPUMesh& mesh = scene.gpu_meshes[gpumesh_indices[i]];
@@ -145,21 +174,35 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 	}
 }
 
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Material& shading_material, GBufferSet& buffers, GLuint destination_fbo, RenderContext& render_context) {
-	glDisable(GL_DEPTH_TEST);
+void shadeBuffers(const util::AlignedVector<Light>& lights, const Camera& camera, const Material& shading_material,
+	GBufferSet& gbuffer, ShadingBufferSet& shade_bufs, RenderContext& render_context)
+{
+	SystemUniformBlock sys_uniforms;
+	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+
+	shade_bufs.fbo.bind(GL_DRAW_FRAMEBUFFER);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
 	shading_material.shader_program.use();
 
 	render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, shading_material.options_size, 0, GL_STREAM_DRAW);
 
 	glActiveTexture(GL_TEXTURE0);
-	buffers.depth_tex.bind(GL_TEXTURE_2D);
+	gbuffer.depth_tex.bind(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE1);
-	buffers.diffuse_tex.bind(GL_TEXTURE_2D);
+	gbuffer.diffuse_tex.bind(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE2);
-	buffers.normal_tex.bind(GL_TEXTURE_2D);
+	gbuffer.normal_tex.bind(GL_TEXTURE_2D);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, destination_fbo);
+	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
