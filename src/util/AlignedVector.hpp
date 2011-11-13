@@ -110,6 +110,11 @@ public:
 		*vec_data_end++ = val;
 	}
 
+	T& push_back() {
+		expandStorage();
+		return *vec_data_end++;
+	}
+
 	T& back() {
 		return *(vec_data_end - 1);
 	}
