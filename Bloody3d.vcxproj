@@ -24,6 +24,7 @@
     <ClCompile Include="src\scene\PostProcessing.cpp" />
     <ClCompile Include="src\scene\RenderContext.cpp" />
     <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl3w.hpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="src\scene\RenderContext.hpp" />
     <ClInclude Include="src\scene\Scene.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
+    <ClInclude Include="src\util\mmap.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>
