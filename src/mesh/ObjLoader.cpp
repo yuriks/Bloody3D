@@ -116,7 +116,7 @@ Mesh load_obj(std::istream& f)
 						int uv_i = get<1>(tri);
 						int norm_i = get<2>(tri);
 
-						if ((pos_i != -1 && (unsigned)pos_i-1 >= pos_db.size()) || (norm_i != -1 && (unsigned)norm_i-1 >= norm_db.size()) || (uv_i != -1 && (unsigned)uv_i >= uv_db.size())) {
+						if ((pos_i != -1 && (unsigned)pos_i-1 >= pos_db.size()) || (norm_i != -1 && (unsigned)norm_i-1 >= norm_db.size()) || (uv_i != -1 && (unsigned)uv_i-1 >= uv_db.size())) {
 							std::cerr << "Invalid vertex index: " << pos_i << ' ' << uv_i << ' ' << norm_i << std::endl;
 							goto abort_while;
 						}
