@@ -77,6 +77,8 @@ bool init_window()
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
+	glViewport(0, 0, 800, 600);
+
 	glfwDisable(GLFW_MOUSE_CURSOR);
 
 	return true;
