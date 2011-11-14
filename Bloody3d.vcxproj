@@ -96,7 +96,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DONT_USE_SSE2;DONT_USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -119,7 +119,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DONT_USE_SSE2;DONT_USE_SSE3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
