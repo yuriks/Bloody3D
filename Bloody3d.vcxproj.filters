@@ -143,6 +143,9 @@
     <ClInclude Include="src\util\mmap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\mesh\HWMesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\util\StringHash.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
