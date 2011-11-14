@@ -169,7 +169,7 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 			sys_uniforms.view_model_mat = model2view_mats[j];
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
 
-			glDrawElements(GL_TRIANGLES, mesh.indices_count, GL_UNSIGNED_SHORT, 0);
+			glDrawElements(GL_TRIANGLES, mesh.indices_count, mesh.indices_type, 0);
 		}
 	}
 }

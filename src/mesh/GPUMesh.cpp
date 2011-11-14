@@ -1,5 +1,7 @@
 #include "GPUMesh.hpp"
 
+#include <cassert>
+
 using namespace vertex_fmt;
 
 void GPUMesh::loadVertexData(const void* data, size_t data_size, vertex_fmt::VertexFormat format) {
@@ -30,8 +32,14 @@ void GPUMesh::loadVertexData(const void* data, size_t data_size, vertex_fmt::Ver
 	}
 }
 
-void GPUMesh::loadIndices(const u16* data, unsigned int count) {
+void GPUMesh::loadIndices(const void* data, size_t data_size, size_t element_size) {
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16) * count, data, GL_STATIC_DRAW);
-	indices_count = count;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data_size, data, GL_STATIC_DRAW);
+	indices_count = data_size / element_size;
+	switch (element_size) {
+		case 1: indices_type = GL_UNSIGNED_BYTE; break;
+		case 2: indices_type = GL_UNSIGNED_SHORT; break;
+		case 4: indices_type = GL_UNSIGNED_INT; break;
+		default: assert(false);
+	}
 }

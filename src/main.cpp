@@ -13,10 +13,13 @@
 #include "mesh/GPUMesh.hpp"
 #include "mesh/ObjLoader.hpp"
 #include "mesh/TextureManager.hpp"
+#include "mesh/HWMesh.hpp"
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"
 #include "scene/PostProcessing.hpp"
 #include "editor/AssetProcessing.hpp"
+#include "util/mmap.hpp"
+#include "util/StringHash.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -118,12 +121,35 @@ int main(int argc, char *argv[])
 
 			GPUMesh mesh;
 
-			std::ifstream objf("data/panel_beams.obj");
-			Mesh base_mesh = load_obj(objf);
-			auto& vertices = base_mesh.sub_meshes[0].vertices;
-			auto& indices = base_mesh.sub_meshes[0].indices;
-			mesh.loadVertexData(vertices.data(), vertices.size() * sizeof(vertex_fmt::Pos3f_Norm3f_Tex2f), vertex_fmt::FMT_POS3F_NORM3F_TEX2F);
-			mesh.loadIndices(indices.data(), indices.size());
+			util::MMapHandle mmap_h = util::mmapFile("data/panel_beams.hwmesh");
+			assert(mmap_h != -1);
+
+			auto file_data = static_cast<const char*>(util::mmapGetData(mmap_h));
+
+			auto mesh_header = reinterpret_cast<const mesh::HWMeshHeader*>(file_data);
+			assert(std::strcmp(mesh_header->magic, "HWMESH") == 0);
+			assert(mesh_header->version == 0);
+
+			auto mesh_index = reinterpret_cast<const mesh::HWMeshIndex*>(file_data + sizeof(mesh::HWMeshHeader));
+			u32 name_hash = util::fnv_hash("panel_beams");
+			auto entry = std::find_if(mesh_index, mesh_index + mesh_header->num_meshes, [&](const mesh::HWMeshIndex& i) { return i.name_hash == name_hash; });
+			assert(entry != mesh_index + mesh_header->num_meshes);
+
+			auto mesh_data = reinterpret_cast<const mesh::HWMeshData*>(file_data + entry->file_offset);
+			assert(mesh_data->vertex_format == vertex_fmt::FMT_POS3F_NORM3F_TEX2F);
+			assert(mesh_data->num_submeshes == 1); // for now
+			mesh.indices_count = mesh_data->submesh_indices_size[0];
+
+			auto vertex_data = reinterpret_cast<const char*>(file_data + entry->file_offset + sizeof(mesh::HWMeshData));
+			vertex_data = reinterpret_cast<const char*>((((std::intptr_t)vertex_data - 1) | 0xf) + 1);
+
+			auto index_data = vertex_data + mesh_data->vertex_data_size;
+			index_data = reinterpret_cast<const char*>((((std::intptr_t)index_data - 1) | 0x3) + 1);
+
+			mesh.loadVertexData(vertex_data, mesh_data->vertex_data_size, (vertex_fmt::VertexFormat)mesh_data->vertex_format);
+			mesh.loadIndices(index_data, mesh_data->index_data_size, mesh_data->index_type);
+
+			util::mmapClose(mmap_h);
 
 			mesh.material_id = mat_id;
 
