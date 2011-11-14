@@ -6,7 +6,7 @@
 /Debug/
 /Release/
 /ipch/
-/assets/
+/data/*.hwmesh
 /*.dll
 
 /src/GL3/
