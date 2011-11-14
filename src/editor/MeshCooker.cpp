@@ -108,6 +108,11 @@ bool cook_mesh(int& argc, char **& argv) {
 		}
 
 		Mesh obj_mesh = load_obj(objf);
+		for (unsigned int j = 0; j < obj_mesh.sub_meshes.size(); ++j) {
+			SubMesh& m = obj_mesh.sub_meshes[j];
+			std::cerr << "[CookMesh] " << m.name << ": verts(" << m.vertices.size() <<
+				") indices(" << m.indices.size() << ")\n";
+		}
 
 		mesh_data[i].num_submeshes = obj_mesh.sub_meshes.size();
 
@@ -144,7 +149,6 @@ bool cook_mesh(int& argc, char **& argv) {
 			out_file.write(reinterpret_cast<const char*>(alignment_padding), aligned_pos - cur_pos);
 		}
 
-		// TODO: Vertices
 		if (mesh_data[i].vertex_format == vertex_fmt::FMT_POS3F) {
 			util::AlignedVector<vertex_fmt::Pos3f> v_data;
 			v_data.resize(max_index);
