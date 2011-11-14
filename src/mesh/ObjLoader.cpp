@@ -14,7 +14,7 @@ using std::get;
 
 Mesh load_obj(std::istream& f)
 {
-	typedef std::tuple<int, int, int> Triangle;
+	typedef std::tuple<unsigned int, unsigned int, unsigned int> Triangle;
 	typedef std::tuple<float, float> floatPair;
 
 	Mesh mesh;
@@ -77,7 +77,7 @@ Mesh load_obj(std::istream& f)
 					Triangle tri;
 
 					if (tri_str[0] == '/') {
-						get<0>(tri) = -1;
+						get<0>(tri) = 0;
 						tri_str.erase(0, 1);
 					} else {
 						size_t off;
@@ -85,7 +85,7 @@ Mesh load_obj(std::istream& f)
 						tri_str.erase(0, off+1);
 					}
 					if (tri_str[0] == '/') {
-						get<1>(tri) = -1;
+						get<1>(tri) = 0;
 						tri_str.erase(0, 1);
 					} else {
 						size_t off;
@@ -93,7 +93,7 @@ Mesh load_obj(std::istream& f)
 						tri_str.erase(0, off+1);
 					}
 					if (tri_str.empty()) {
-						get<2>(tri) = -1;
+						get<2>(tri) = 0;
 						tri_str.erase(0, 1);
 					} else {
 						size_t off;
@@ -112,17 +112,17 @@ Mesh load_obj(std::istream& f)
 					{
 						// Doesn't exist yet
 						vertex_fmt::Pos3f_Norm3f_Tex2f vert;
-						int pos_i = get<0>(tri);
-						int uv_i = get<1>(tri);
-						int norm_i = get<2>(tri);
+						unsigned int pos_i = get<0>(tri);
+						unsigned int uv_i = get<1>(tri);
+						unsigned int norm_i = get<2>(tri);
 
-						if ((pos_i != -1 && (unsigned)pos_i-1 >= pos_db.size()) || (norm_i != -1 && (unsigned)norm_i-1 >= norm_db.size()) || (uv_i != -1 && (unsigned)uv_i-1 >= uv_db.size())) {
+						if ((pos_i != 0 && pos_i-1 >= pos_db.size()) || (norm_i != 0 && norm_i-1 >= norm_db.size()) || (uv_i != 0 && uv_i-1 >= uv_db.size())) {
 							std::cerr << "Invalid vertex index: " << pos_i << ' ' << uv_i << ' ' << norm_i << std::endl;
 							goto abort_while;
 						}
-						vert.pos = pos_i == -1 ? vec3(0.f) : pos_db[pos_i-1];
-						vert.norm = norm_i == -1 ? vec3(0.f) : norm_db[norm_i-1];
-						auto pair = uv_i == -1 ? floatPair(0.f, 0.f) : uv_db[uv_i-1];
+						vert.pos = pos_i == 0 ? vec3(0.f) : pos_db[pos_i-1];
+						vert.norm = norm_i == 0 ? vec3(0.f) : norm_db[norm_i-1];
+						auto pair = uv_i == 0 ? floatPair(0.f, 0.f) : uv_db[uv_i-1];
 						vert.tex_coord[0] = get<0>(pair);
 						vert.tex_coord[1] = get<1>(pair);
 
