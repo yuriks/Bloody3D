@@ -16,6 +16,7 @@
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"
 #include "scene/PostProcessing.hpp"
+#include "editor/AssetProcessing.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -91,6 +92,10 @@ struct ShadingUniforms : public MaterialUniforms {
 
 int main(int argc, char *argv[])
 {
+	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
+		return editor::asset_processing(argc - 2, argv + 2);
+	}
+
 	if (!init_window())
 		return 1;
 

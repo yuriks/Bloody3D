@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\editor\AssetProcessing.cpp" />
+    <ClCompile Include="src\editor\MeshCooker.cpp" />
     <ClCompile Include="src\gl3w.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\image\ImageLoader.cpp" />
@@ -27,6 +29,8 @@
     <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\editor\AssetProcessing.hpp" />
+    <ClInclude Include="src\editor\MeshCooker.hpp" />
     <ClInclude Include="src\gl3w.hpp" />
     <ClInclude Include="src\gl\BufferObject.hpp" />
     <ClInclude Include="src\gl\Framebuffer.hpp" />
