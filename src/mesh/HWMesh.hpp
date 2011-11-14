@@ -3,6 +3,8 @@
 #include "Heatwave.hpp"
 #include "VertexFormats.hpp"
 
+struct GPUMesh;
+
 namespace mesh {
 
 struct HWMeshHeader {
@@ -41,5 +43,7 @@ struct HWMeshData {
 	//u8 index_data[index_data_size];
 };
 static_assert(sizeof(HWMeshData) == 76, "Struct size changed! (Breaks I/O compatibility.)");
+
+void loadHWMesh(const void* file_data_ptr, u32 name_hash, GPUMesh& gpu_mesh);
 
 } // namespace mesh

@@ -63,6 +63,9 @@
     <ClCompile Include="src\editor\MeshCooker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mesh\HWMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl\BufferObject.hpp">
