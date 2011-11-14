@@ -55,6 +55,7 @@
     <ClInclude Include="src\scene\Scene.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />
+    <ClInclude Include="src\util\StringHash.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>
