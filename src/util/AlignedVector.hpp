@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
+#include "util/noncopyable.hpp"
 #include <malloc.h>
 #include <cstring>
 #include <cassert>

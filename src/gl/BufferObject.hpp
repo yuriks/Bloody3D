@@ -1,14 +1,14 @@
 #ifndef BLOODY3D_GL_BUFFEROBJECT
 #define BLOODY3D_GL_BUFFEROBJECT
 
-#include "../gl3w.hpp"
-
-#include <boost/noncopyable.hpp>
+#include "GL3/gl3w.h"
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class BufferObject : boost::noncopyable
+class BufferObject
 {
+	NONCOPYABLE(BufferObject);
 public:
 	BufferObject();
 	~BufferObject();

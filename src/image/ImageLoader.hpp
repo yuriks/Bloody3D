@@ -1,9 +1,9 @@
 #ifndef BLOODY3D_IMAGE_IMAGELOADER_HPP
 #define BLOODY3D_IMAGE_IMAGELOADER_HPP
 
-#include <boost/noncopyable.hpp>
+#include "util/noncopyable.hpp"
 
-#include <iosfwd>
+#include <string>
 #include <stdexcept>
 
 namespace image {
@@ -14,34 +14,27 @@ public:
 	PngException(const std::string& str);
 };
 
-class Image : boost::noncopyable
+class Image
 {
+	NONCOPYABLE(Image);
 public:
 	Image();
 	Image(unsigned int width, unsigned int height);
 	~Image();
 
-	void initialize(unsigned int width, unsigned int height);
+	void initialize(unsigned char* data, unsigned int width, unsigned int height);
 	void clear();
 
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 	unsigned char* getData() const;
 
-	static void loadPNGFileRGBA8(Image& image, std::istream& stream);
+	static void loadPNGFileRGBA8(Image& image, std::string& fname);
 
 protected:
 	unsigned int width;
 	unsigned int height;
 	unsigned char* data;
-};
-
-class GrayscaleImage : public Image
-{
-public:
-	void initialize(unsigned int width, unsigned int height);
-
-	static void loadPNGFileGray16(Image& image, std::istream& stream);
 };
 
 void preMultiplyAlpha(Image& image);
@@ -61,7 +54,7 @@ inline Image::Image()
 inline Image::Image(unsigned int width, unsigned int height)
 	: width(~0u), height(~0u), data(0)
 {
-	initialize(width, height);
+	initialize(nullptr, width, height);
 }
 
 inline Image::~Image()

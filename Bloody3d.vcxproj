@@ -13,9 +13,10 @@
   <ItemGroup>
     <ClCompile Include="src\editor\AssetProcessing.cpp" />
     <ClCompile Include="src\editor\MeshCooker.cpp" />
-    <ClCompile Include="src\gl3w.cpp" />
+    <ClCompile Include="src\GL3\gl3w.c" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\image\ImageLoader.cpp" />
+    <ClCompile Include="src\image\stb_image.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
     <ClCompile Include="src\math\Quaternion.cpp" />
@@ -32,7 +33,8 @@
   <ItemGroup>
     <ClInclude Include="src\editor\AssetProcessing.hpp" />
     <ClInclude Include="src\editor\MeshCooker.hpp" />
-    <ClInclude Include="src\gl3w.hpp" />
+    <ClInclude Include="src\GL3\gl3.h" />
+    <ClInclude Include="src\GL3\gl3w.h" />
     <ClInclude Include="src\gl\BufferObject.hpp" />
     <ClInclude Include="src\gl\Framebuffer.hpp" />
     <ClInclude Include="src\gl\Renderbuffer.hpp" />
@@ -42,6 +44,7 @@
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Heatwave.hpp" />
     <ClInclude Include="src\image\ImageLoader.hpp" />
+    <ClInclude Include="src\image\stb_image.h" />
     <ClInclude Include="src\math\Matrix.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
     <ClInclude Include="src\math\matrix_template.hpp" />
@@ -61,6 +64,7 @@
     <ClInclude Include="src\scene\Scene.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />
+    <ClInclude Include="src\util\noncopyable.hpp" />
     <ClInclude Include="src\util\StringHash.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -72,12 +76,14 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -96,19 +102,18 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <StringPooling>true</StringPooling>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>GLFWd.lib;opengl32.lib;libpng15.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GLFW.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>lib/</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -125,7 +130,7 @@
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
       <AdditionalIncludeDirectories>src/</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
@@ -133,7 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>GLFW.lib;opengl32.lib;libpng15.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>GLFW.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>lib/</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

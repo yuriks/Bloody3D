@@ -13,10 +13,7 @@ u16 TextureManager::loadTexture(const char* fname, TexFlags flags) {
 	} else {
 		// Doesn't exist yet
 		image::Image img;
-		std::ifstream f(texture_path + fname, std::ios::in | std::ios::binary);
-		if (!f)
-			return -1;
-		image::Image::loadPNGFileRGBA8(img, f);
+		image::Image::loadPNGFileRGBA8(img, texture_path + fname);
 
 		gl::Texture tex;
 		tex.bind(GL_TEXTURE_2D);

@@ -2,11 +2,12 @@
 
 #include "../gl3w.hpp"
 
-#include <boost/noncopyable.hpp>
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class Renderbuffer : boost::noncopyable {
+class Renderbuffer {
+	NONCOPYABLE(Renderbuffer);
 public:
 	Renderbuffer();
 	~Renderbuffer();

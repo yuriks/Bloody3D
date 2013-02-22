@@ -1,16 +1,17 @@
 #ifndef BLOODY3D_GL_SHADER
 #define BLOODY3D_GL_SHADER
 
-#include "../gl3w.hpp"
+#include "GL3/gl3w.h"
 
 #include <iosfwd>
 #include <vector>
-#include <boost/noncopyable.hpp>
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class Shader : boost::noncopyable
+class Shader
 {
+	NONCOPYABLE(Shader);
 public:
 	explicit Shader(GLenum type);
 	Shader(Shader&& o) : id(o.id) {

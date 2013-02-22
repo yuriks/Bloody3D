@@ -3,16 +3,17 @@
 
 #include "Shader.hpp"
 
-#include "../gl3w.hpp"
+#include "GL3/gl3w.h"
 
 #include <iostream>
 #include <vector>
-#include <boost/noncopyable.hpp>
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class ShaderProgram : boost::noncopyable
+class ShaderProgram
 {
+	NONCOPYABLE(ShaderProgram);
 public:
 	ShaderProgram();
 	ShaderProgram(ShaderProgram&& o) : id(o.id) {

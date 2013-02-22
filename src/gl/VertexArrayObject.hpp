@@ -1,14 +1,14 @@
 #ifndef BLOODY3D_GL_VERTEXARRAYOBJECT
 #define BLOODY3D_GL_VERTEXARRAYOBJECT
 
-#include "../gl3w.hpp"
-
-#include <boost/noncopyable.hpp>
+#include "GL3/gl3w.h"
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class VertexArrayObject : boost::noncopyable
+class VertexArrayObject
 {
+	NONCOPYABLE(VertexArrayObject);
 public:
 	VertexArrayObject();
 	~VertexArrayObject();

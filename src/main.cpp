@@ -24,7 +24,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "gl3w.hpp"
+#include "GL3/gl3w.h"
 
 //#define GLFW_GL3_H
 #include <GL/glfw.h>

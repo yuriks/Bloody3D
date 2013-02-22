@@ -7,12 +7,3 @@
 /Release/
 /ipch/
 /data/*.hwmesh
-/*.dll
-
-/src/GL3/
-/src/GL/glfw.h
-/src/boost/
-/src/png.h
-/src/pngconf.h
-/src/pnglibconf.h
-/lib/

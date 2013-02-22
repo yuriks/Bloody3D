@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../gl3w.hpp"
-
-#include "boost/noncopyable.hpp"
+#include "GL3/gl3w.h"
+#include "util/noncopyable.hpp"
 
 namespace gl {
 
-class Framebuffer : boost::noncopyable
+class Framebuffer
 {
+	NONCOPYABLE(Framebuffer);
 public:
 	Framebuffer();
 	~Framebuffer();
