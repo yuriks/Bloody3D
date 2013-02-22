@@ -79,6 +79,7 @@ public:
 		if (capacity() < count) {
 			unsigned int old_size = size();
 			T* new_vec = static_cast<T*>(_aligned_malloc(count * sizeof(T), Align));
+			assert(new_vec);
 
 			std::memcpy(new_vec, vec_data, old_size * sizeof(T));
 

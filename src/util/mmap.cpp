@@ -41,7 +41,7 @@ MMapHandle mmapFile(const char* fname) {
 		goto error_file;
 
 	HANDLE mmap_handle = CreateFileMapping(file_handle, NULL, PAGE_READONLY, 0, 0, NULL);
-	if (mmap_handle == INVALID_HANDLE_VALUE)
+	if (mmap_handle == NULL || mmap_handle == INVALID_HANDLE_VALUE)
 		goto error_mmap;
 
 	void* data_ptr = MapViewOfFile(mmap_handle, FILE_MAP_READ, 0, 0, 0);
