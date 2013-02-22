@@ -13,4 +13,4 @@ void main(void) {
 	vf.normal = transform(u.view_model_mat, vec4(in_Normal, 0.0)).xyz;
 	vf.tex_coord = in_TexCoord;
 	gl_Position = u.projection_mat * pos;
-};
+}
