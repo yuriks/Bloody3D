@@ -173,7 +173,6 @@ int main(int argc, char *argv[])
 			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
-			glEnable(GL_FRAMEBUFFER_SRGB);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			scene::GBufferSet def_buffers;
@@ -221,6 +220,7 @@ int main(int argc, char *argv[])
 					last_mouse_pos[1] = cur_mouse_pos[1];
 
 					{
+						// TODO: Experiment with changing to immediate mode style API
 						scene::MeshInstance& inst = insth.resolve(scene);
 						inst.rot = rot_amount;
 					}

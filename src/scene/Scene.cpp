@@ -119,9 +119,6 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 	glDisable(GL_BLEND);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// nVidia bug workaround!!!
-	glDisable(GL_FRAMEBUFFER_SRGB);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	for (unsigned int i = 0; i < scene.gpu_meshes.size(); ++i) {
@@ -172,6 +169,8 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 			glDrawElements(GL_TRIANGLES, mesh.indices_count, mesh.indices_type, 0);
 		}
 	}
+
+	glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
 void shadeBuffers(const util::AlignedVector<Light>& lights, const Camera& camera, const Material& shading_material,

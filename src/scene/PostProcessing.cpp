@@ -5,7 +5,7 @@ namespace scene {
 void tonemap(const ShadingBufferSet& shading_buffers, const Material& material, const RenderContext& render_context) {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	glEnable(GL_FRAMEBUFFER_SRGB);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	material.shader_program.use();
 
