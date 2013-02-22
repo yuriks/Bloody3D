@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../gl3w.hpp"
+#include "GL3/gl3w.h"
 
 #include "util/noncopyable.hpp"
 
