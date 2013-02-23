@@ -3,16 +3,17 @@
 namespace math {
 
 mat4 matrixFromQuaternion(const Quaternion& q) {
-	const float x = q.val.getX();
-	const float y = q.val.getY();
-	const float z = q.val.getZ();
-	const float w = q.val.getW();
+	const float x = q.v[0];
+	const float y = q.v[1];
+	const float z = q.v[2];
+	const float w = q.w;
 
-	mat4 m;
-	m.rows[0] = vec4(1.f - 2.f*y*y - 2.f*z*z,       2.f*x*y - 2.f*z*w,       2.f*x*z + 2.f*y*w, 0.f);
-	m.rows[1] = vec4(      2.f*x*y + 2.f*z*w, 1.f - 2.f*x*x - 2.f*z*z,       2.f*y*z - 2.f*x*w, 0.f);
-	m.rows[2] = vec4(      2.f*x*z - 2.f*y*w,       2.f*y*z + 2.f*x*w, 1.f - 2.f*x*x - 2.f*y*y, 0.f);
-	m.rows[3] = vec4(                    0.f,                     0.f,                     0.f, 1.f);
+	mat4 m = {{
+		{1 - 2*y*y - 2*z*z,     2*x*y - 2*z*w,     2*x*z + 2*y*w, 0},
+		{    2*x*y + 2*z*w, 1 - 2*x*x - 2*z*z,     2*y*z - 2*x*w, 0},
+		{    2*x*z - 2*y*w,     2*y*z + 2*x*w, 1 - 2*x*x - 2*y*y, 0},
+		{                0,                 0,                 0, 1}
+	}};
 
 	return m;
 }

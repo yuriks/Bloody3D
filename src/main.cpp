@@ -4,7 +4,7 @@
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
 #include "gl/Framebuffer.hpp"
-#include "math/Matrix.hpp"
+#include "math/mat.hpp"
 #include "math/MatrixTransform.hpp"
 #include "math/Quaternion.hpp"
 #include "math/misc.hpp"
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 		scene::MeshInstanceHandle insth = scene.newInstance(mesh_id);
 		{
 			scene::MeshInstance& inst = insth.resolve(scene);
-			inst.pos_scale = math::vec4(0.f, 0.f, 0.f, 1.f);
+			inst.pos_scale = math::mvec4(0.f, 0.f, 0.f, 1.f);
 			inst.rot = math::Quaternion();
 		}
 
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
 		camera.clip_far = 500.f;
-		camera.pos = math::vec3(0.f, 0.f, -5.f);
+		camera.pos = math::mvec3(0.f, 0.f, -5.f);
 		camera.rot = math::Quaternion();
 
 		{

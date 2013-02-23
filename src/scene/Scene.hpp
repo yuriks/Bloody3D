@@ -2,7 +2,7 @@
 
 #include "gl/Framebuffer.hpp"
 #include "gl/Texture.hpp"
-#include "math/Vector.hpp"
+#include "math/vec.hpp"
 #include "math/Quaternion.hpp"
 #include "mesh/GPUMesh.hpp"
 #include "mesh/TextureManager.hpp"

@@ -153,9 +153,9 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 		model2view_mats.resize(inst_list.size());
 		for (unsigned int j = 0; j < model2view_mats.size(); ++j) {
 			const MeshInstance& inst = inst_list[j];
-			math::mat4 t = math::mat_transform::translate(math::vec3(inst.pos_scale));
+			math::mat4 t = math::mat_transform::translate(math::mvec3(inst.pos_scale));
 			math::mat4 r = math::matrixFromQuaternion(inst.rot);
-			math::mat4 s = math::mat_transform::scale(inst.pos_scale.getW());
+			math::mat4 s = math::mat_transform::scale(inst.pos_scale[3]);
 			math::mat4 model2world_mat = t * (r * s);
 			model2view_mats[j] = world2view_mat * model2world_mat;
 		}

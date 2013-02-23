@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/Vector.hpp"
+#include "math/vec.hpp"
 
 namespace vertex_fmt {
 

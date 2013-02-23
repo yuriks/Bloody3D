@@ -1,6 +1,6 @@
 #include "ObjLoader.hpp"
 
-#include "math/Vector.hpp"
+#include "math/vec.hpp"
 #include "util/AlignedVector.hpp"
 #include <sstream>
 #include <iostream>
@@ -10,6 +10,7 @@
 
 using math::vec2;
 using math::vec3;
+using math::mvec3;
 using std::get;
 
 Mesh load_obj(std::istream& f)
@@ -50,7 +51,7 @@ Mesh load_obj(std::istream& f)
 		{
 			float x, y, z;
 			ss >> x >> y >> z;
-			pos_db.push_back(vec3(x, y, z));
+			pos_db.push_back(mvec3(x, y, z));
 		}
 		else if (command == "vt")
 		{
@@ -62,7 +63,7 @@ Mesh load_obj(std::istream& f)
 		{
 			float x, y, z;
 			ss >> x >> y >> z;
-			norm_db.push_back(vec3(x, y, z));
+			norm_db.push_back(mvec3(x, y, z));
 		}
 		else if (command == "f")
 		{
@@ -120,8 +121,8 @@ Mesh load_obj(std::istream& f)
 							std::cerr << "Invalid vertex index: " << pos_i << ' ' << uv_i << ' ' << norm_i << std::endl;
 							goto abort_while;
 						}
-						vert.pos = pos_i == 0 ? vec3(0.f) : pos_db[pos_i-1];
-						vert.norm = norm_i == 0 ? vec3(0.f) : norm_db[norm_i-1];
+						vert.pos = pos_i == 0 ? mvec3(0.f) : pos_db[pos_i-1];
+						vert.norm = norm_i == 0 ? mvec3(0.f) : norm_db[norm_i-1];
 						auto pair = uv_i == 0 ? floatPair(0.f, 0.f) : uv_db[uv_i-1];
 						vert.tex_coord[0] = get<0>(pair);
 						vert.tex_coord[1] = get<1>(pair);

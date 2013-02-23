@@ -2,8 +2,8 @@
 #define BLOODY3D_MATRIXTRANSFORM
 
 #include "Heatwave.hpp"
-#include "Matrix.hpp"
-#include "Vector.hpp"
+#include "mat.hpp"
+#include "vec.hpp"
 
 namespace math {
 
@@ -13,36 +13,36 @@ extern const float mat_identity[];
 
 HW_FORCE_INLINE const mat4 translate(const vec3& v)
 {
-	mat4 m(mat_identity);
-
-	// TODO: Optimize
-	m.rows[0].setW(v.getX());
-	m.rows[1].setW(v.getY());
-	m.rows[2].setW(v.getZ());
+	mat4 m = {{
+		{1, 0, 0, v[0]},
+		{0, 1, 0, v[1]},
+		{0, 0, 1, v[2]},
+		{0, 0, 0, 1}
+	}};
 
 	return m;
 }
 
 HW_FORCE_INLINE const mat4 scale(float scale)
 {
-	mat4 m;
-
-	m.rows[0] = vec4(scale, 0.f,   0.f,   0.f);
-	m.rows[1] = vec4(0.f,   scale, 0.f,   0.f);
-	m.rows[2] = vec4(0.f,   0.f,   scale, 0.f);
-	m.rows[3] = vec4(0.f,   0.f,   0.f,   1.f);
+	mat4 m = {{
+		{scale, 0,     0,     0},
+		{0,     scale, 0,     0},
+		{0,     0,     scale, 0},
+		{0,     0,     0,     1}
+	}};
 
 	return m;
 }
 
 HW_FORCE_INLINE const mat4 scale(const vec3& scale)
 {
-	mat4 m;
-
-	m.rows[0] = vec4(scale.getX(), 0.f,          0.f,          0.f);
-	m.rows[1] = vec4(0.f,          scale.getY(), 0.f,          0.f);
-	m.rows[2] = vec4(0.f,          0.f,          scale.getZ(), 0.f);
-	m.rows[3] = vec4(0.f,          0.f,          0.f,          1.f);
+	mat4 m = {{
+		{scale[0], 0,        0,        0},
+		{0,        scale[1], 0,        0},
+		{0,        0,        scale[2], 0},
+		{0,        0,        0,        1}
+	}};
 
 	return m;
 }

@@ -2,7 +2,7 @@
 
 #include "gl/VertexArrayObject.hpp"
 #include "gl/BufferObject.hpp"
-#include "math/Matrix.hpp"
+#include "math/mat.hpp"
 
 namespace scene {
 
