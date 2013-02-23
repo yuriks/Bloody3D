@@ -189,6 +189,23 @@ mat<C,R,T> transpose(const mat<R,C,T>& m) {
 	return t;
 }
 
+template<unsigned int DN, unsigned int SN, typename T>
+mat<DN,DN,T> pad(const mat<SN,SN,T>& m) {
+	mat<DN,DN,T> rm;
+
+	for (unsigned int i = 0; i < DN; ++i) {
+		for (unsigned int j = 0; j < DN; ++j) {
+			if (i < SN && j < SN) {
+				rm(i,j) = m(i,j);
+			} else {
+				rm(i,j) = i == j ? T(1) : T(0);
+			}
+		}
+	}
+
+	return rm;
+}
+
 // Prints matrix m to stream.
 template<unsigned int R, unsigned int C, typename T>
 std::ostream& operator <<(std::ostream& s, const mat<R,C,T>& m) {

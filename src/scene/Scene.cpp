@@ -89,7 +89,7 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 	SystemUniformBlock sys_uniforms;
 	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 
-	math::mat4 world2view_mat = math::mat_transform::translate(-camera.pos) * math::matrixFromQuaternion(math::conjugate(camera.rot));
+	math::mat4 world2view_mat = math::mat_transform::translate(-camera.pos) * math::pad<4>(math::matrixFromQuaternion(math::conjugate(camera.rot)));
 
 	std::vector<unsigned int> gpumesh_indices(scene.gpu_meshes.size());
 	for (unsigned int i = 0; i < gpumesh_indices.size(); ++i)
@@ -154,9 +154,9 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 		for (unsigned int j = 0; j < model2view_mats.size(); ++j) {
 			const MeshInstance& inst = inst_list[j];
 			math::mat4 t = math::mat_transform::translate(math::mvec3(inst.pos_scale));
-			math::mat4 r = math::matrixFromQuaternion(inst.rot);
-			math::mat4 s = math::mat_transform::scale(inst.pos_scale[3]);
-			math::mat4 model2world_mat = t * (r * s);
+			math::mat3 r = math::matrixFromQuaternion(inst.rot);
+			math::mat3 s = math::mat_transform::scale(inst.pos_scale[3]);
+			math::mat4 model2world_mat = t * math::pad<4>(r * s);
 			model2view_mats[j] = world2view_mat * model2world_mat;
 		}
 

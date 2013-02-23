@@ -9,45 +9,41 @@ namespace math {
 
 namespace mat_transform {
 
-extern const float mat_identity[];
-
 HW_FORCE_INLINE const mat4 translate(const vec3& v)
 {
 	mat4 m = {{
 		{1, 0, 0, v[0]},
 		{0, 1, 0, v[1]},
 		{0, 0, 1, v[2]},
-		{0, 0, 0, 1}
+		{0, 0, 0,   1 }
 	}};
 
 	return m;
 }
 
-HW_FORCE_INLINE const mat4 scale(float scale)
+HW_FORCE_INLINE const mat3 scale(float scale)
 {
-	mat4 m = {{
-		{scale, 0,     0,     0},
-		{0,     scale, 0,     0},
-		{0,     0,     scale, 0},
-		{0,     0,     0,     1}
+	mat3 m = {{
+		{scale,   0,     0, },
+		{  0,   scale,   0, },
+		{  0,     0,   scale}
 	}};
 
 	return m;
 }
 
-HW_FORCE_INLINE const mat4 scale(const vec3& scale)
+HW_FORCE_INLINE const mat3 scale(const vec3& scale)
 {
-	mat4 m = {{
-		{scale[0], 0,        0,        0},
-		{0,        scale[1], 0,        0},
-		{0,        0,        scale[2], 0},
-		{0,        0,        0,        1}
+	mat3 m = {{
+		{scale[0],    0,        0,   },
+		{   0,     scale[1],    0,   },
+		{   0,        0,     scale[2]}
 	}};
 
 	return m;
 }
 
-mat4 rotate(const vec3& axis, float angle);
+mat3 rotate(const vec3& axis, float angle);
 
 // Projections
 mat4 orthographic_proj(float left, float right, float bottom, float top, float z_near, float z_far);

@@ -36,6 +36,6 @@ inline vec3 rotate(const Quaternion& q, const vec3& v) {
 	return (q * Quaternion(v, 0.f, 0) * conjugate(q)).v;
 }
 
-mat4 matrixFromQuaternion(const Quaternion& q);
+mat3 matrixFromQuaternion(const Quaternion& q);
 
 } // namespace math
