@@ -152,6 +152,14 @@ int main(int argc, char *argv[])
 			inst.rot = math::Quaternion();
 		}
 
+		std::vector<scene::DirectionalLight> directional_lights;
+		{
+			scene::DirectionalLight light;
+			light.direction = math::normalized(math::mvec3(-0.5f, -1.f, 0.5f));
+			light.color = math::mvec3(1.5f, 1.2f, 1.2f);
+			directional_lights.push_back(light);
+		}
+
 		scene::Camera camera;
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
@@ -160,9 +168,9 @@ int main(int argc, char *argv[])
 		camera.rot = math::Quaternion();
 
 		{
-			Material shading_material;
-			shading_material.loadFromFiles("fullscreen_triangle.vert", "shading.frag");
-			shading_material.setOptionsSize(sizeof(ShadingUniforms));
+			Material dirlight_material;
+			dirlight_material.loadFromFiles("fullscreen_triangle.vert", "light_directional.frag");
+			dirlight_material.setOptionsSize(sizeof(scene::DirectionalLight));
 			Material tonemap_material;
 			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
 			tonemap_material.setOptionsSize(sizeof(ShadingUniforms));
@@ -229,7 +237,14 @@ int main(int argc, char *argv[])
 				}
 
 				scene::renderGeometry(scene, camera, def_buffers, render_context);
-				scene::shadeBuffers(scene.lights, camera, shading_material, def_buffers, shading_buffers, render_context);
+
+				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
+				bindGBufferTextures(def_buffers);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_ONE, GL_ONE);
+				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context);
+
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				scene::tonemap(shading_buffers, tonemap_material, render_context);
 

@@ -31,6 +31,11 @@ struct Light {
 	math::vec3 color;
 };
 
+struct DirectionalLight {
+	math::vec3 direction;
+	math::vec3 color;
+};
+
 struct Camera {
 	math::vec3 pos;
 	math::Quaternion rot;
@@ -71,8 +76,12 @@ inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
 	return scene.mesh_instances[mesh_id][instance_id];
 }
 
+void bindGBufferTextures(GBufferSet& gbuffer);
+
 void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context);
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Camera& camera, const Material& shading_material,
-	GBufferSet& gbuffer, ShadingBufferSet& shade_bufs, RenderContext& render_context);
+void shadeDirectionalLights(
+	const std::vector<DirectionalLight>& lights,
+	const Material& light_material,
+	RenderContext& render_context);
 
 } // namespace scene

@@ -173,37 +173,39 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 	glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
-void shadeBuffers(const util::AlignedVector<Light>& lights, const Camera& camera, const Material& shading_material,
-	GBufferSet& gbuffer, ShadingBufferSet& shade_bufs, RenderContext& render_context)
-{
-	SystemUniformBlock sys_uniforms;
-	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
-
-	shade_bufs.fbo.bind(GL_DRAW_FRAMEBUFFER);
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-
-	shading_material.shader_program.use();
-
-	render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
-	glBufferData(GL_UNIFORM_BUFFER, shading_material.options_size, 0, GL_STREAM_DRAW);
-
+void bindGBufferTextures(GBufferSet& gbuffer) {
 	glActiveTexture(GL_TEXTURE0);
 	gbuffer.depth_tex.bind(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE1);
 	gbuffer.diffuse_tex.bind(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE2);
 	gbuffer.normal_tex.bind(GL_TEXTURE_2D);
+}
+
+// Shades a collection of directional lights to the shading buffer. Lights are in view-space.
+void shadeDirectionalLights(
+	const std::vector<DirectionalLight>& lights,
+	const Material& light_material,
+	RenderContext& render_context)
+{
+	SystemUniformBlock sys_uniforms;
+	sys_uniforms.projection_mat = math::mat4_identity;
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+
+	light_material.shader_program.use();
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
+
+	for (const DirectionalLight& light : lights) {
+		assert(light_material.options_size == sizeof(DirectionalLight));
+		glBufferData(GL_UNIFORM_BUFFER, light_material.options_size, &light, GL_STREAM_DRAW);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
 }
 
 } // namespace scene
