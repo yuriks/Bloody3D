@@ -102,7 +102,6 @@ HW_FORCE_INLINE Mat<R, C> operator * (float b, const Mat<R, C>& a) {
 typedef Mat<4, 4> mat4;
 typedef Mat<3, 3> mat3;
 typedef Mat<2, 2> mat2;
-typedef Mat<3, 4> mat3x4;
 
 inline mat4 operator * (const mat4& a, const mat4& b)
 {
@@ -167,28 +166,6 @@ inline mat2 operator * (const mat2& a, const mat2& b)
 	return mr;
 }
 
-inline mat3x4 concatTransform(const mat3x4& a, const mat3x4& b)
-{
-	mat3x4 mr;
-
-	const vec4 b0 = b.rows[0];
-	const vec4 b1 = b.rows[1];
-	const vec4 b2 = b.rows[2];
-
-	for (unsigned int i = 0; i < 3; ++i) {
-		const vec4 row = a.rows[i];
-
-		vec4 result;
-		result  = b0 * row.spreadX();
-		result += b1 * row.spreadY();
-		result += b2 * row.spreadZ();
-		result += vec4(0.f, 0.f, 0.f, 1.f) * row;
-		mr.rows[i] = result;
-	}
-
-	return mr;
-}
-
 // TODO: Write batch versions that transpose
 // This is not specially efficient, storage has been optimized for GPU
 inline vec4 operator * (const mat4& m, const vec4& v) {
@@ -202,39 +179,6 @@ inline vec4 operator * (const mat4& m, const vec4& v) {
 	__m128 xyzw = _mm_shuffle_ps(xxyy, zzww, _MM_SHUFFLE(2, 0, 2, 0));
 
 	return vec4(xyzw);
-}
-
-// This is not specially efficient, storage has been optimized for GPU
-inline vec4 transform(const mat3x4& m, const vec4& v) {
-	const vec4 x = spreadDot(m.rows[0], v);
-	const vec4 y = spreadDot(m.rows[1], v);
-	const vec4 z = spreadDot(m.rows[2], v);
-	const vec4 w = v.spreadW();
-
-	__m128 xxyy = _mm_shuffle_ps(x.xmm, y.xmm, _MM_SHUFFLE(0, 0, 0, 0));
-	__m128 zzww = _mm_shuffle_ps(z.xmm, w.xmm, _MM_SHUFFLE(0, 0, 0, 0));
-	__m128 xyzw = _mm_shuffle_ps(xxyy, zzww, _MM_SHUFFLE(2, 0, 2, 0));
-
-	return vec4(xyzw);
-}
-
-inline vec3 transform(const mat3x4& m, const vec3& v) {
-	vec4 v1(v);
-	v1.setW(1.f);
-	const vec4 x = spreadDot(m.rows[0], v1);
-	const vec4 y = spreadDot(m.rows[1], v1);
-	const vec4 z = spreadDot(m.rows[2], v1);
-
-	__m128 xxyy = _mm_shuffle_ps(x.xmm, y.xmm, _MM_SHUFFLE(0, 0, 0, 0));
-	//__m128 zz00 = _mm_shuffle_ps(z.xmm, _mm_setzero_ps(), _MM_SHUFFLE(0, 0, 0, 0));
-	__m128 zz00 = _mm_castsi128_ps(_mm_srli_si128(_mm_castps_si128(z.xmm), 8));
-	__m128 xyz0 = _mm_shuffle_ps(xxyy, zz00, _MM_SHUFFLE(2, 0, 2, 0));
-
-	return vec3(xyz0);
-}
-
-HW_FORCE_INLINE mat4 padMat3x4(const mat3x4& m) {
-	return mat4(m.rows[0], m.rows[1], m.rows[2], vec4(0.f, 0.f, 0.f, 1.f));
 }
 
 } // namespace math

@@ -8,7 +8,7 @@ namespace scene {
 
 struct SystemUniformBlock {
 	math::mat4 projection_mat;
-	math::mat3x4 view_model_mat;
+	math::mat4 view_model_mat;
 };
 
 struct RenderContext {
