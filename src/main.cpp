@@ -34,7 +34,7 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum sever
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity != GL_DEBUG_SEVERITY_LOW_ARB)
 		std::cerr << message << std::endl;
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity == GL_DEBUG_SEVERITY_HIGH_ARB)
-		__asm int 3; // Breakpoint
+		DebugBreak(); // Breakpoint
 }
 
 bool init_window()
