@@ -78,7 +78,7 @@ mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 		z_axis
 	}};
 
-	return pad<4>(m) * mat_transform::translate(camera * -1.f);
+	return pad<4>(m) * mat_transform::translate(-camera);
 }
 
 } // namespace mat_transform
