@@ -27,6 +27,8 @@ void GBufferSet::initialize(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	fbo.bind(GL_FRAMEBUFFER);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuse_tex, 0);
@@ -49,6 +51,8 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	fbo.bind(GL_FRAMEBUFFER);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
@@ -172,6 +176,11 @@ void renderGeometry(
 
 			glDrawElements(GL_TRIANGLES, mesh.indices_count, mesh.indices_type, 0);
 		}
+	}
+
+	for (int t = 0; t < 4; ++t) {
+		glActiveTexture(GL_TEXTURE0 + t);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	glDisable(GL_FRAMEBUFFER_SRGB);

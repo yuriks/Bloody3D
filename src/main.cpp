@@ -247,6 +247,10 @@ int main(int argc, char *argv[])
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
 				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context, sys_uniforms);
+				for (int t = 0; t < 3; ++t) {
+					glActiveTexture(GL_TEXTURE0 + t);
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				scene::tonemap(shading_buffers, tonemap_material, render_context);

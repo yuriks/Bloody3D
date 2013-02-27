@@ -16,6 +16,8 @@ void tonemap(const ShadingBufferSet& shading_buffers, const Material& material, 
 	shading_buffers.accum_tex.bind(GL_TEXTURE_2D);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 } // namespace scene
