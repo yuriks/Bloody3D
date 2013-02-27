@@ -125,7 +125,12 @@ void renderGeometry(
 
 	glDisable(GL_BLEND);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	math::vec4 clear_albedo = {0, 0, 0, 0};
+	math::vec4 clear_normal = {0.5f, 0.5f, 0, 0};
+	float clear_depth = 1.f;
+	glClearBufferfv(GL_COLOR, 0, clear_albedo.data);
+	glClearBufferfv(GL_COLOR, 1, clear_normal.data);
+	glClearBufferfv(GL_DEPTH, 0, &clear_depth);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	for (unsigned int i = 0; i < scene.gpu_meshes.size(); ++i) {

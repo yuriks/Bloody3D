@@ -177,7 +177,6 @@ int main(int argc, char *argv[])
 
 			bool running = true;
 
-			glClearColor(0.0f, 0.0f, 0.0f, 1.f);
 			glEnable(GL_CULL_FACE);
 			//glEnable(GL_DEPTH_CLAMP);
 			glFrontFace(GL_CW);
@@ -243,7 +242,8 @@ int main(int argc, char *argv[])
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);
-				glClear(GL_COLOR_BUFFER_BIT);
+				math::vec4 clear_color = {0, 0, 0, 0};
+				glClearBufferfv(GL_COLOR, 0, clear_color.data);
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
 				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context, sys_uniforms);
