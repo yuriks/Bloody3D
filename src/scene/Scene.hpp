@@ -78,10 +78,16 @@ inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
 
 void bindGBufferTextures(GBufferSet& gbuffer);
 
-void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context);
+void renderGeometry(
+	const Scene& scene,
+	const Camera& camera,
+	GBufferSet& buffers,
+	RenderContext& render_context,
+	const SystemUniformBlock& sys_uniforms);
 void shadeDirectionalLights(
 	const std::vector<DirectionalLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context);
+	RenderContext& render_context,
+	const SystemUniformBlock& sys_uniforms);
 
 } // namespace scene

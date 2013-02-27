@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 		{
 			scene::DirectionalLight light;
 			light.direction = math::normalized(math::mvec3(-0.5f, -1.f, 0.5f));
-			light.color = math::mvec3(1.5f, 1.2f, 1.2f);
+			light.color = 2.5f * math::vec3_1;
 			directional_lights.push_back(light);
 		}
 
@@ -236,14 +236,17 @@ int main(int argc, char *argv[])
 					elapsed_game_time += 1./60.;
 				}
 
-				scene::renderGeometry(scene, camera, def_buffers, render_context);
+				scene::SystemUniformBlock sys_uniforms;
+				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+
+				scene::renderGeometry(scene, camera, def_buffers, render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);
 				glClear(GL_COLOR_BUFFER_BIT);
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
-				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context);
+				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context, sys_uniforms);
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				scene::tonemap(shading_buffers, tonemap_material, render_context);

@@ -85,10 +85,13 @@ MeshInstanceHandle Scene::newInstance(int mesh_id) {
 	return handle;
 }
 
-void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffers, RenderContext& render_context) {
-	SystemUniformBlock sys_uniforms;
-	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
-
+void renderGeometry(
+	const Scene& scene,
+	const Camera& camera,
+	GBufferSet& buffers,
+	RenderContext& render_context,
+	const SystemUniformBlock& sys_uniforms)
+{
 	math::mat4 world2view_mat = math::mat_transform::translate(-camera.pos) * math::pad<4>(math::matrixFromQuaternion(math::conjugate(camera.rot)));
 
 	std::vector<unsigned int> gpumesh_indices(scene.gpu_meshes.size());
@@ -163,8 +166,9 @@ void renderGeometry(const Scene& scene, const Camera& camera, GBufferSet& buffer
 		// TODO: Instancing
 		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 		for (unsigned int j = 0; j < model2view_mats.size(); ++j) {
-			sys_uniforms.view_model_mat = model2view_mats[j];
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
+			SystemUniformBlock sys_uniforms_copy = sys_uniforms;
+			sys_uniforms_copy.view_model_mat = model2view_mats[j];
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms_copy, GL_STREAM_DRAW);
 
 			glDrawElements(GL_TRIANGLES, mesh.indices_count, mesh.indices_type, 0);
 		}
@@ -186,11 +190,9 @@ void bindGBufferTextures(GBufferSet& gbuffer) {
 void shadeDirectionalLights(
 	const std::vector<DirectionalLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context)
+	RenderContext& render_context,
+	const SystemUniformBlock& sys_uniforms)
 {
-	SystemUniformBlock sys_uniforms;
-	sys_uniforms.projection_mat = math::mat4_identity;
-
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 
