@@ -16,7 +16,7 @@ layout(location = 0) out vec4 out_Color;
 vec3 brdf(vec3 normal, vec3 light_dir, vec3 view_dir) {
 	vec3 diffuse_term = texture(tex[TEX_DIFFUSE], vf_TexCoord).rgb / C_PI;
 
-	vec3 spec_color = vec3(1, 1, 1);
+	vec3 spec_color = 0.02f * vec3(1, 1, 1);
 	float spec_m = 1000;
 	vec3 h = normalize(light_dir + view_dir);
 	vec3 specular_term = (spec_m + 8)/(8*C_PI) * pow(dot(normal, h), spec_m) * spec_color;

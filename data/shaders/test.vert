@@ -12,5 +12,6 @@ void main(void) {
 	vec4 pos = u.view_model_mat * vec4(in_Position, 1.0);
 	vf.normal = (u.view_model_mat * vec4(in_Normal, 0.0)).xyz;
 	vf.tex_coord = in_TexCoord;
+	vf.position = pos.xyz;
 	gl_Position = u.projection_mat * pos;
 }

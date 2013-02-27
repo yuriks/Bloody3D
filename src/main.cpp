@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
 		camera.clip_far = 500.f;
-		camera.pos = math::mvec3(0.f, 0.f, -5.f);
+		camera.pos = math::mvec3(0.f, 0.f, -3.5f);
 		camera.rot = math::Quaternion();
 
 		{

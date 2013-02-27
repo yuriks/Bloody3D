@@ -27,4 +27,5 @@ vec3 decodeNormal(vec2 renc) {
 struct VertFragData {
 	vec3 normal;
 	vec2 tex_coord;
+	vec3 position;
 };
