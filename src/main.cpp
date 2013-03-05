@@ -29,6 +29,9 @@
 //#define GLFW_GL3_H
 #include <GL/glfw.h>
 
+static const int WINDOW_WIDTH = 800;
+static const int WINDOW_HEIGHT = 600;
+
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity != GL_DEBUG_SEVERITY_LOW_ARB)
@@ -52,7 +55,7 @@ bool init_window()
 	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	if (glfwOpenWindow(800, 600, 8, 8, 8, 0, 0, 0, GLFW_WINDOW) != GL_TRUE)
+	if (glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 8, 8, 8, 0, 0, 0, GLFW_WINDOW) != GL_TRUE)
 	{
 		char tmp;
 		std::cerr << "Failed to open window." << std::endl;
@@ -80,7 +83,7 @@ bool init_window()
 		glDebugMessageCallbackARB(debug_callback, 0);
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glfwDisable(GLFW_MOUSE_CURSOR);
 
@@ -105,7 +108,7 @@ int main(int argc, char *argv[])
 		return 1;
 
 	{
-		scene::RenderContext render_context(800, 600);
+		scene::RenderContext render_context(WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene::Scene scene;
 
 		int mesh_id;
