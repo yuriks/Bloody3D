@@ -12,11 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libs\src\gl3w.c" />
+    <ClCompile Include="libs\src\stb_image.c" />
     <ClCompile Include="src\editor\AssetProcessing.cpp" />
     <ClCompile Include="src\editor\MeshCooker.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\image\ImageLoader.cpp" />
-    <ClCompile Include="src\image\stb_image.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
     <ClCompile Include="src\math\Quaternion.cpp" />
@@ -34,6 +34,7 @@
     <ClInclude Include="libs\include\GL\gl3w.h" />
     <ClInclude Include="libs\include\GL\glcorearb.h" />
     <ClInclude Include="libs\include\GL\glfw.h" />
+    <ClInclude Include="libs\include\stb_image.h" />
     <ClInclude Include="src\editor\AssetProcessing.hpp" />
     <ClInclude Include="src\editor\MeshCooker.hpp" />
     <ClInclude Include="src\GL3\gl3.h" />
@@ -47,7 +48,6 @@
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Heatwave.hpp" />
     <ClInclude Include="src\image\ImageLoader.hpp" />
-    <ClInclude Include="src\image\stb_image.h" />
     <ClInclude Include="src\math\mat.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
     <ClInclude Include="src\math\misc.hpp" />

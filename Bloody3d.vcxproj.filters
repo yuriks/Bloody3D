@@ -63,10 +63,10 @@
     <ClCompile Include="src\mesh\HWMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\image\stb_image.c">
+    <ClCompile Include="libs\src\gl3w.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libs\src\gl3w.c">
+    <ClCompile Include="libs\src\stb_image.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,9 +161,6 @@
     <ClInclude Include="src\util\noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\image\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\math\mat.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -177,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libs\include\GL\glcorearb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libs\include\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
