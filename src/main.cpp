@@ -147,8 +147,6 @@ int main(int argc, char *argv[])
 		scene::MeshInstanceHandle insth = scene.newInstance(mesh_id);
 		{
 			scene::MeshInstance& inst = insth.resolve(scene);
-			inst.pos_scale = math::mvec4(0.f, 0.f, 0.f, 1.f);
-			inst.rot = math::Quaternion();
 		}
 
 		std::vector<scene::DirectionalLight> directional_lights;
@@ -163,8 +161,7 @@ int main(int argc, char *argv[])
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
 		camera.clip_far = 500.f;
-		camera.pos = math::mvec3(0.f, 0.f, -3.5f);
-		camera.rot = math::Quaternion();
+		camera.t.pos = math::mvec3(0.f, 0.f, -3.5f);
 
 		{
 			Material dirlight_material;
@@ -228,7 +225,7 @@ int main(int argc, char *argv[])
 					{
 						// TODO: Experiment with changing to immediate mode style API
 						scene::MeshInstance& inst = insth.resolve(scene);
-						inst.rot = rot_amount;
+						inst.t.rot = rot_amount;
 					}
 
 					elapsed_game_time += 1./60.;

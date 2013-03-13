@@ -9,14 +9,14 @@
 #include "mesh/Material.hpp"
 #include "util/AlignedVector.hpp"
 #include "scene/RenderContext.hpp"
+#include "scene/Transform.hpp"
 
 namespace scene {
 
 struct Scene;
 
 struct MeshInstance {
-	math::vec4 pos_scale;
-	math::Quaternion rot;
+	Transform t;
 };
 
 struct MeshInstanceHandle {
@@ -37,8 +37,7 @@ struct DirectionalLight {
 };
 
 struct Camera {
-	math::vec3 pos;
-	math::Quaternion rot;
+	Transform t;
 	float fov;
 	float clip_near;
 	float clip_far;

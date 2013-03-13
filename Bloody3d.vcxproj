@@ -63,6 +63,7 @@
     <ClInclude Include="src\scene\PostProcessing.hpp" />
     <ClInclude Include="src\scene\RenderContext.hpp" />
     <ClInclude Include="src\scene\Scene.hpp" />
+    <ClInclude Include="src\scene\Transform.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />
     <ClInclude Include="src\util\noncopyable.hpp" />
