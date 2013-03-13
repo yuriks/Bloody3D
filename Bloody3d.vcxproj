@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="libs\src\gl3w.c" />
     <ClCompile Include="src\editor\AssetProcessing.cpp" />
     <ClCompile Include="src\editor\MeshCooker.cpp" />
-    <ClCompile Include="src\GL3\gl3w.c" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\image\ImageLoader.cpp" />
     <ClCompile Include="src\image\stb_image.c" />
@@ -31,6 +31,8 @@
     <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libs\include\GL\gl3w.h" />
+    <ClInclude Include="libs\include\GL\glcorearb.h" />
     <ClInclude Include="libs\include\GL\glfw.h" />
     <ClInclude Include="src\editor\AssetProcessing.hpp" />
     <ClInclude Include="src\editor\MeshCooker.hpp" />

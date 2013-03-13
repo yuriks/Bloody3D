@@ -3,7 +3,7 @@
 #include "gl/Shader.hpp"
 #include "gl/ShaderProgram.hpp"
 #include "Heatwave.hpp"
-#include <GL3/gl3.h>
+#include <GL/gl3w.h>
 #include <memory>
 #include <array>
 

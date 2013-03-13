@@ -1,7 +1,7 @@
 #ifndef BLOODY3D_GL_VERTEXARRAYOBJECT
 #define BLOODY3D_GL_VERTEXARRAYOBJECT
 
-#include "GL3/gl3w.h"
+#include <GL/gl3w.h>
 #include "util/noncopyable.hpp"
 
 namespace gl {
