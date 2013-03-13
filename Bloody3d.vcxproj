@@ -28,6 +28,7 @@
     <ClCompile Include="src\scene\PostProcessing.cpp" />
     <ClCompile Include="src\scene\RenderContext.cpp" />
     <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\scene\Transform.cpp" />
     <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
   <ItemGroup>
