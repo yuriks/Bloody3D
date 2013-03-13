@@ -170,5 +170,11 @@
     <ClInclude Include="src\math\vec.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libs\include\GL\glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\msvc110\GLFW.lib" />
   </ItemGroup>
 </Project>
