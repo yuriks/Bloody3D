@@ -94,10 +94,6 @@ struct MatUniforms : public MaterialUniforms {
 	float dummy;
 };
 
-struct ShadingUniforms : public MaterialUniforms {
-	float dummy;
-};
-
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -176,7 +172,7 @@ int main(int argc, char *argv[])
 			dirlight_material.setOptionsSize(sizeof(scene::DirectionalLight));
 			Material tonemap_material;
 			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
-			tonemap_material.setOptionsSize(sizeof(ShadingUniforms));
+			tonemap_material.setOptionsSize(0);
 
 			bool running = true;
 
