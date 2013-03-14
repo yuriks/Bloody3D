@@ -228,6 +228,7 @@ void shadeDirectionalLights(
 	for (const GPUDirectionalLight& light : lights) {
 		glBufferData(GL_UNIFORM_BUFFER, light_material.options_size, &light, GL_STREAM_DRAW);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glFlush(); // Workaround what seems to be Intel bug. Buffer contents aren't update without this.
 	}
 }
 
