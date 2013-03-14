@@ -17,4 +17,11 @@ mat3 matrixFromQuaternion(const Quaternion& q) {
 	return m;
 }
 
+// Returns the shortest rotation between unit vectors a and b.
+// TODO: Doesn't handle a == -b case.
+Quaternion shortestArc(const vec3& a, const vec3& b) {
+	// From http://stackoverflow.com/a/1171995
+	return normalized(Quaternion(cross(a, b), 1 + dot(a, b), 0));
+}
+
 } // namespace math
