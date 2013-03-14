@@ -17,6 +17,7 @@
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"
 #include "scene/PostProcessing.hpp"
+#include "scene/DirectionalLight.hpp"
 #include "editor/AssetProcessing.hpp"
 #include "util/mmap.hpp"
 #include "util/StringHash.hpp"
