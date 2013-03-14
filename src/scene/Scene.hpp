@@ -27,11 +27,16 @@ struct MeshInstanceHandle {
 };
 
 struct Light {
-	math::vec3 pos;
+	Transform t;
 	math::vec3 color;
 };
 
 struct DirectionalLight {
+	Transform t;
+	math::vec3 color;
+};
+
+struct GPUDirectionalLight {
 	math::vec3 direction;
 	math::vec3 color;
 };
@@ -79,12 +84,17 @@ void bindGBufferTextures(GBufferSet& gbuffer);
 
 void renderGeometry(
 	const Scene& scene,
-	const Camera& camera,
+	const math::mat4& world2view_mat,
 	GBufferSet& buffers,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
+
+void transformDirectionalLights(
+	const std::vector<DirectionalLight>& in_lights,
+	std::vector<GPUDirectionalLight>& out_lights,
+	const math::mat4& world2view_mat);
 void shadeDirectionalLights(
-	const std::vector<DirectionalLight>& lights,
+	const std::vector<GPUDirectionalLight>& lights,
 	const Material& light_material,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);

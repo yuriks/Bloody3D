@@ -91,13 +91,11 @@ MeshInstanceHandle Scene::newInstance(int mesh_id) {
 
 void renderGeometry(
 	const Scene& scene,
-	const Camera& camera,
+	const math::mat4& world2view_mat,
 	GBufferSet& buffers,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
 {
-	math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
-
 	std::vector<unsigned int> gpumesh_indices(scene.gpu_meshes.size());
 	for (unsigned int i = 0; i < gpumesh_indices.size(); ++i)
 		gpumesh_indices[i] = i;
@@ -196,9 +194,22 @@ void bindGBufferTextures(GBufferSet& gbuffer) {
 	gbuffer.normal_tex.bind(GL_TEXTURE_2D);
 }
 
+void transformDirectionalLights(
+	const std::vector<DirectionalLight>& in_lights,
+	std::vector<GPUDirectionalLight>& out_lights,
+	const math::mat4& world2view_mat)
+{
+	out_lights.resize(in_lights.size());
+	for (size_t i = 0; i < in_lights.size(); ++i) {
+		const math::mat4 model2view_mat = world2view_mat * calcTransformMtx(in_lights[i].t);
+		out_lights[i].direction = -math::mvec3(model2view_mat * math::mvec4(math::vec3_z, 0.0f));
+		out_lights[i].color = in_lights[i].color;
+	}
+}
+
 // Shades a collection of directional lights to the shading buffer. Lights are in view-space.
 void shadeDirectionalLights(
-	const std::vector<DirectionalLight>& lights,
+	const std::vector<GPUDirectionalLight>& lights,
 	const Material& light_material,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
@@ -207,14 +218,14 @@ void shadeDirectionalLights(
 	glDepthMask(GL_FALSE);
 
 	light_material.shader_program.use();
+	assert(light_material.options_size == sizeof(GPUDirectionalLight));
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
 
 	render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
 
-	for (const DirectionalLight& light : lights) {
-		assert(light_material.options_size == sizeof(DirectionalLight));
+	for (const GPUDirectionalLight& light : lights) {
 		glBufferData(GL_UNIFORM_BUFFER, light_material.options_size, &light, GL_STREAM_DRAW);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}

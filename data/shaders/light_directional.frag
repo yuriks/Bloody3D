@@ -43,5 +43,5 @@ void main() {
 	vec3 normal = decodeNormal(texture(tex[TEX_NORMAL], vf_TexCoord).rg);
 	vec3 position = calcViewspacePosition();
 
-	out_Color = vec4(surface_radiance(normal, -mtl.light_dir, -normalize(position)), 1.0);
+	out_Color = vec4(surface_radiance(normal, mtl.light_dir, -normalize(position)), 1.0);
 }

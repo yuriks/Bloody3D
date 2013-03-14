@@ -152,8 +152,13 @@ int main(int argc, char *argv[])
 		std::vector<scene::DirectionalLight> directional_lights;
 		{
 			scene::DirectionalLight light;
-			light.direction = math::normalized(math::mvec3(-0.5f, -1.f, 0.5f));
+
+			light.t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
 			light.color = 2.5f * math::vec3_1;
+			directional_lights.push_back(light);
+
+			light.t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
+			light.color = math::mvec3(0.1f, 0.1f, 0.8f);
 			directional_lights.push_back(light);
 		}
 
@@ -166,7 +171,7 @@ int main(int argc, char *argv[])
 		{
 			Material dirlight_material;
 			dirlight_material.loadFromFiles("fullscreen_triangle.vert", "light_directional.frag");
-			dirlight_material.setOptionsSize(sizeof(scene::DirectionalLight));
+			dirlight_material.setOptionsSize(sizeof(scene::GPUDirectionalLight));
 			Material tonemap_material;
 			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
 			tonemap_material.setOptionsSize(0);
@@ -233,8 +238,9 @@ int main(int argc, char *argv[])
 
 				scene::SystemUniformBlock sys_uniforms;
 				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+				math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
 
-				scene::renderGeometry(scene, camera, def_buffers, render_context, sys_uniforms);
+				scene::renderGeometry(scene, world2view_mat, def_buffers, render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);
@@ -242,7 +248,10 @@ int main(int argc, char *argv[])
 				glClearBufferfv(GL_COLOR, 0, clear_color.data);
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
-				scene::shadeDirectionalLights(directional_lights, dirlight_material, render_context, sys_uniforms);
+
+				std::vector<scene::GPUDirectionalLight> gpu_dirlights;
+				scene::transformDirectionalLights(directional_lights, gpu_dirlights, world2view_mat);
+				scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
 				for (int t = 0; t < 3; ++t) {
 					glActiveTexture(GL_TEXTURE0 + t);
 					glBindTexture(GL_TEXTURE_2D, 0);
