@@ -173,6 +173,7 @@ int main(int argc, char *argv[])
 			dirlight_material.loadFromFiles("fullscreen_triangle.vert", "light_directional.frag");
 			dirlight_material.setOptionsSize(sizeof(scene::GPUDirectionalLight));
 			Material tonemap_material;
+			gl::VertexArrayObject null_vao;
 			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
 			tonemap_material.setOptionsSize(0);
 
@@ -258,7 +259,9 @@ int main(int argc, char *argv[])
 				}
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				null_vao.bind();
 				scene::tonemap(shading_buffers, tonemap_material, render_context);
+				glBindVertexArray(0);
 
 				glfwSwapBuffers();
 
