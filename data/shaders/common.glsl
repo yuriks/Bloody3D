@@ -24,6 +24,11 @@ vec3 decodeNormal(vec2 renc) {
 	return vec3(enc * sqrt(4 - 4 * len2), 2 * len2 - 1);
 }
 
+struct GPUDirectionalLight {
+	vec3 dir;
+	vec3 color;
+};
+
 struct VertFragData {
 	vec3 normal;
 	vec2 tex_coord;

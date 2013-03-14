@@ -218,18 +218,13 @@ void shadeDirectionalLights(
 	glDepthMask(GL_FALSE);
 
 	light_material.shader_program.use();
-	assert(light_material.options_size == sizeof(GPUDirectionalLight));
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
 
-	render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
-
-	for (const GPUDirectionalLight& light : lights) {
-		glBufferData(GL_UNIFORM_BUFFER, light_material.options_size, &light, GL_STREAM_DRAW);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glFlush(); // Workaround what seems to be Intel bug. Buffer contents aren't update without this.
-	}
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GPUDirectionalLight) * lights.size(), lights.data(), GL_STREAM_DRAW);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, lights.size());
+	glBindVertexArray(0);
 }
 
 } // namespace scene

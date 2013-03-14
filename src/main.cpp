@@ -170,8 +170,27 @@ int main(int argc, char *argv[])
 
 		{
 			Material dirlight_material;
-			dirlight_material.loadFromFiles("fullscreen_triangle.vert", "light_directional.frag");
-			dirlight_material.setOptionsSize(sizeof(scene::GPUDirectionalLight));
+			gl::VertexArrayObject dirlight_vao;
+			gl::BufferObject dirlight_vbo;
+			dirlight_material.loadFromFiles("light_directional.vert", "light_directional.frag");
+			dirlight_material.setOptionsSize(0);
+
+			// Setup Directional Light vertex attribs
+			{
+				using scene::GPUDirectionalLight;
+				dirlight_vao.bind();
+
+				dirlight_vbo.bind(GL_ARRAY_BUFFER);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, direction));
+				glEnableVertexAttribArray(0);
+				glVertexAttribDivisor(0, 1);
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
+					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, color));
+				glEnableVertexAttribArray(1);
+				glVertexAttribDivisor(1, 1);
+			}
+
 			Material tonemap_material;
 			gl::VertexArrayObject null_vao;
 			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
@@ -252,6 +271,7 @@ int main(int argc, char *argv[])
 
 				std::vector<scene::GPUDirectionalLight> gpu_dirlights;
 				scene::transformDirectionalLights(directional_lights, gpu_dirlights, world2view_mat);
+				dirlight_vao.bind();
 				scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
 				for (int t = 0; t < 3; ++t) {
 					glActiveTexture(GL_TEXTURE0 + t);
