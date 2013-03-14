@@ -29,6 +29,11 @@ struct GPUDirectionalLight {
 	vec3 color;
 };
 
+struct GPUOmniLight {
+	vec3 pos;
+	vec3 color;
+};
+
 struct VertFragData {
 	vec3 normal;
 	vec2 tex_coord;

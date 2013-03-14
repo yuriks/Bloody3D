@@ -26,6 +26,7 @@
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
     <ClCompile Include="src\mesh\TextureManager.cpp" />
     <ClCompile Include="src\scene\DirectionalLight.cpp" />
+    <ClCompile Include="src\scene\OmniLight.cpp" />
     <ClCompile Include="src\scene\PostProcessing.cpp" />
     <ClCompile Include="src\scene\RenderContext.cpp" />
     <ClCompile Include="src\scene\Scene.cpp" />
@@ -63,6 +64,7 @@
     <ClInclude Include="src\mesh\TextureManager.hpp" />
     <ClInclude Include="src\mesh\VertexFormats.hpp" />
     <ClInclude Include="src\scene\DirectionalLight.hpp" />
+    <ClInclude Include="src\scene\OmniLight.hpp" />
     <ClInclude Include="src\scene\PostProcessing.hpp" />
     <ClInclude Include="src\scene\RenderContext.hpp" />
     <ClInclude Include="src\scene\Scene.hpp" />

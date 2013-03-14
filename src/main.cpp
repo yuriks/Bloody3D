@@ -18,6 +18,7 @@
 #include "scene/RenderContext.hpp"
 #include "scene/PostProcessing.hpp"
 #include "scene/DirectionalLight.hpp"
+#include "scene/OmniLight.hpp"
 #include "editor/AssetProcessing.hpp"
 #include "util/mmap.hpp"
 #include "util/StringHash.hpp"
@@ -163,6 +164,15 @@ int main(int argc, char *argv[])
 			directional_lights.push_back(light);
 		}
 
+		std::vector<scene::OmniLight> omni_lights;
+		{
+			scene::OmniLight light;
+
+			light.t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
+			light.color = math::mvec3(32.0f, 0.0f, 0.0f);
+			omni_lights.push_back(light);
+		}
+
 		scene::Camera camera;
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
@@ -188,6 +198,28 @@ int main(int argc, char *argv[])
 				glVertexAttribDivisor(0, 1);
 				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
 					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, color));
+				glEnableVertexAttribArray(1);
+				glVertexAttribDivisor(1, 1);
+			}
+
+			Material omnilight_material;
+			gl::VertexArrayObject omnilight_vao;
+			gl::BufferObject omnilight_vbo;
+			omnilight_material.loadFromFiles("light_omni.vert", "light_omni.frag");
+			omnilight_material.setOptionsSize(0);
+
+			// Setup Omnilight vertex attribs
+			{
+				using scene::GPUOmniLight;
+				omnilight_vao.bind();
+
+				omnilight_vbo.bind(GL_ARRAY_BUFFER);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, pos));
+				glEnableVertexAttribArray(0);
+				glVertexAttribDivisor(0, 1);
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
+					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, color));
 				glEnableVertexAttribArray(1);
 				glVertexAttribDivisor(1, 1);
 			}
@@ -270,10 +302,22 @@ int main(int argc, char *argv[])
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
 
-				std::vector<scene::GPUDirectionalLight> gpu_dirlights;
-				scene::transformDirectionalLights(directional_lights, gpu_dirlights, world2view_mat);
-				dirlight_vao.bind();
-				scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
+				{
+					std::vector<scene::GPUDirectionalLight> gpu_dirlights;
+					scene::transformDirectionalLights(directional_lights, gpu_dirlights, world2view_mat);
+					dirlight_vao.bind();
+					dirlight_vbo.bind(GL_ARRAY_BUFFER);
+					scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
+				}
+
+				{
+					std::vector<scene::GPUOmniLight> gpu_omnilights;
+					scene::transformOmniLights(omni_lights, gpu_omnilights, world2view_mat);
+					omnilight_vao.bind();
+					omnilight_vbo.bind(GL_ARRAY_BUFFER);
+					scene::shadeOmniLights(gpu_omnilights, omnilight_material, render_context, sys_uniforms);
+				}
+
 				for (int t = 0; t < 3; ++t) {
 					glActiveTexture(GL_TEXTURE0 + t);
 					glBindTexture(GL_TEXTURE_2D, 0);
