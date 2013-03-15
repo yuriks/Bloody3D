@@ -19,6 +19,7 @@
 #include "scene/PostProcessing.hpp"
 #include "scene/DirectionalLight.hpp"
 #include "scene/OmniLight.hpp"
+#include "scene/SpotLight.hpp"
 #include "editor/AssetProcessing.hpp"
 #include "util/mmap.hpp"
 #include "util/StringHash.hpp"
@@ -173,6 +174,17 @@ int main(int argc, char *argv[])
 			omni_lights.push_back(light);
 		}
 
+		std::vector<scene::SpotLight> spot_lights;
+		{
+			scene::SpotLight light;
+
+			light.t.pos = math::mvec3(0.0f, 3.0f, 0.0f);
+			light.t.rot = math::Quaternion(math::vec3_x, math::pi / 2.0f);
+			light.exponent = 64;
+			light.color = math::mvec3(32.0f, 0.0f, 0.0f);
+			spot_lights.push_back(light);
+		}
+
 		scene::Camera camera;
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
@@ -222,6 +234,32 @@ int main(int argc, char *argv[])
 					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, color));
 				glEnableVertexAttribArray(1);
 				glVertexAttribDivisor(1, 1);
+			}
+
+			Material spotlight_material;
+			gl::VertexArrayObject spotlight_vao;
+			gl::BufferObject spotlight_vbo;
+			spotlight_material.loadFromFiles("light_spot.vert", "light_spot.frag");
+			spotlight_material.setOptionsSize(0);
+
+			// Setup Spotlight vertex attribs
+			{
+				using scene::GPUSpotLight;
+				spotlight_vao.bind();
+
+				spotlight_vbo.bind(GL_ARRAY_BUFFER);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, pos));
+				glEnableVertexAttribArray(0);
+				glVertexAttribDivisor(0, 1);
+				glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,
+					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, dir_exp));
+				glEnableVertexAttribArray(1);
+				glVertexAttribDivisor(1, 1);
+				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,
+					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, color));
+				glEnableVertexAttribArray(2);
+				glVertexAttribDivisor(2, 1);
 			}
 
 			Material tonemap_material;
@@ -316,6 +354,14 @@ int main(int argc, char *argv[])
 					omnilight_vao.bind();
 					omnilight_vbo.bind(GL_ARRAY_BUFFER);
 					scene::shadeOmniLights(gpu_omnilights, omnilight_material, render_context, sys_uniforms);
+				}
+
+				{
+					std::vector<scene::GPUSpotLight> gpu_spotlights;
+					scene::transformSpotLights(spot_lights, gpu_spotlights, world2view_mat);
+					spotlight_vao.bind();
+					spotlight_vbo.bind(GL_ARRAY_BUFFER);
+					scene::shadeSpotLights(gpu_spotlights, spotlight_material, render_context, sys_uniforms);
 				}
 
 				for (int t = 0; t < 3; ++t) {

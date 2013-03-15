@@ -30,6 +30,7 @@
     <ClCompile Include="src\scene\PostProcessing.cpp" />
     <ClCompile Include="src\scene\RenderContext.cpp" />
     <ClCompile Include="src\scene\Scene.cpp" />
+    <ClCompile Include="src\scene\SpotLight.cpp" />
     <ClCompile Include="src\scene\Transform.cpp" />
     <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
@@ -68,6 +69,7 @@
     <ClInclude Include="src\scene\PostProcessing.hpp" />
     <ClInclude Include="src\scene\RenderContext.hpp" />
     <ClInclude Include="src\scene\Scene.hpp" />
+    <ClInclude Include="src\scene\SpotLight.hpp" />
     <ClInclude Include="src\scene\Transform.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />

@@ -34,6 +34,12 @@ struct GPUOmniLight {
 	vec3 color;
 };
 
+struct GPUSpotLight {
+	vec3 pos;
+	vec4 dir_exp; // xyz: Direction, w: Exponent
+	vec3 color;
+};
+
 struct VertFragData {
 	vec3 normal;
 	vec2 tex_coord;
