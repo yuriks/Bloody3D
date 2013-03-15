@@ -7,7 +7,7 @@ vec3 calcViewspacePosition() {
 	float proj_a = u.projection_mat[2][2];
 	float proj_b = u.projection_mat[3][2];
 	float projected_z = texture(tex[TEX_DEPTH], vf_TexCoord).r;
-	float view_z = proj_b / (projected_z - proj_a);
+	float view_z = proj_b / (projected_z - proj_a) * 0.5f;
 	return vec3(vf_ViewspacePos * view_z, view_z);
 }
 
