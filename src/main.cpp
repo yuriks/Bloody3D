@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <GL/gl3w.h>
 
@@ -327,11 +328,14 @@ int main(int argc, char *argv[])
 					elapsed_game_time += 1./60.;
 				}
 
+				std::vector<math::mat4> model2world_mats(scene.transforms.pool.size());
+				scene::calculateModel2WorldMatrices(scene.transforms, model2world_mats.data());
+
 				scene::SystemUniformBlock sys_uniforms;
 				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 				math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
 
-				scene::renderGeometry(scene, world2view_mat, def_buffers, render_context, sys_uniforms);
+				scene::renderGeometry(scene, world2view_mat, model2world_mats.data(), def_buffers, render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);

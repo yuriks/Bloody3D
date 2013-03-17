@@ -70,6 +70,7 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 void renderGeometry(
 	const Scene& scene,
 	const math::mat4& world2view_mat,
+	const math::mat4* model2world_mats,
 	GBufferSet& buffers,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
@@ -149,7 +150,7 @@ void renderGeometry(
 		}
 
 		// TODO: Instancing
-		math::mat4 model2world_mat = calcTransformMtx(*scene.transforms[instance->transform]);
+		math::mat4 model2world_mat = model2world_mats[scene.transforms.getPoolIndex(instance->transform)];
 		math::mat4 model2view_mat = world2view_mat * model2world_mat;
 
 		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);

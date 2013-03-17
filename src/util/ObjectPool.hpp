@@ -88,6 +88,14 @@ struct ObjectPool {
 			return Handle(index, roster[pool[index].first].generation);
 	}
 
+	size_t getPoolIndex(const Handle h) const {
+		if (isValid(h)) {
+			return roster[h.index].index;
+		} else {
+			return SIZE_MAX;
+		}
+	}
+
 private:
 	void expand_roster() {
 		const Handle new_entry(first_free_index, 0);

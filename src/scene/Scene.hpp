@@ -66,6 +66,7 @@ void bindGBufferTextures(GBufferSet& gbuffer);
 void renderGeometry(
 	const Scene& scene,
 	const math::mat4& world2view_mat,
+	const math::mat4* model2world_mats,
 	GBufferSet& buffers,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
