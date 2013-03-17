@@ -12,7 +12,7 @@
 #include "mesh/VertexFormats.hpp"
 #include "mesh/GPUMesh.hpp"
 #include "mesh/ObjLoader.hpp"
-#include "mesh/TextureManager.hpp"
+#include "texture/TextureManager.hpp"
 #include "mesh/HWMesh.hpp"
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"

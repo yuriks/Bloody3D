@@ -16,7 +16,7 @@
     <ClCompile Include="src\editor\AssetProcessing.cpp" />
     <ClCompile Include="src\editor\MeshCooker.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
-    <ClCompile Include="src\image\ImageLoader.cpp" />
+    <ClCompile Include="src\texture\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
     <ClCompile Include="src\math\Quaternion.cpp" />
@@ -24,7 +24,7 @@
     <ClCompile Include="src\mesh\HWMesh.cpp" />
     <ClCompile Include="src\mesh\Material.cpp" />
     <ClCompile Include="src\mesh\ObjLoader.cpp" />
-    <ClCompile Include="src\mesh\TextureManager.cpp" />
+    <ClCompile Include="src\texture\TextureManager.cpp" />
     <ClCompile Include="src\scene\DirectionalLight.cpp" />
     <ClCompile Include="src\scene\OmniLight.cpp" />
     <ClCompile Include="src\scene\PostProcessing.cpp" />
@@ -51,7 +51,7 @@
     <ClInclude Include="src\gl\Texture.hpp" />
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Heatwave.hpp" />
-    <ClInclude Include="src\image\ImageLoader.hpp" />
+    <ClInclude Include="src\texture\ImageLoader.hpp" />
     <ClInclude Include="src\math\mat.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
     <ClInclude Include="src\math\misc.hpp" />
@@ -62,7 +62,7 @@
     <ClInclude Include="src\mesh\Material.hpp" />
     <ClInclude Include="src\mesh\Mesh.hpp" />
     <ClInclude Include="src\mesh\ObjLoader.hpp" />
-    <ClInclude Include="src\mesh\TextureManager.hpp" />
+    <ClInclude Include="src\texture\TextureManager.hpp" />
     <ClInclude Include="src\mesh\VertexFormats.hpp" />
     <ClInclude Include="src\scene\DirectionalLight.hpp" />
     <ClInclude Include="src\scene\OmniLight.hpp" />

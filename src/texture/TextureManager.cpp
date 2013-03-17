@@ -1,6 +1,6 @@
 #include "TextureManager.hpp"
 
-#include "image/ImageLoader.hpp"
+#include "ImageLoader.hpp"
 #include <fstream>
 
 static gl::Texture loadTexture(const std::string& fname, TexFlags flags) {

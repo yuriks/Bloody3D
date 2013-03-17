@@ -5,7 +5,7 @@
 #include "math/vec.hpp"
 #include "math/Quaternion.hpp"
 #include "mesh/GPUMesh.hpp"
-#include "mesh/TextureManager.hpp"
+#include "texture/TextureManager.hpp"
 #include "mesh/Material.hpp"
 #include "util/AlignedVector.hpp"
 #include "scene/RenderContext.hpp"
