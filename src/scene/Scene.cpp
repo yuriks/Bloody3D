@@ -67,12 +67,6 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 	glDrawBuffers(1, render_targets);
 }
 
-int Scene::addMaterial(Material&& mat) {
-	int new_id = material_list.size();
-	material_list.push_back(std::move(mat));
-	return new_id;
-}
-
 int Scene::addMesh(GPUMesh&& mesh) {
 	int new_id = gpu_meshes.size();
 	gpu_meshes.push_back(std::move(mesh));
@@ -102,16 +96,16 @@ void renderGeometry(
 		gpumesh_indices[i] = i;
 
 	std::sort(gpumesh_indices.begin(), gpumesh_indices.end(), [&](unsigned int a, unsigned int b) -> bool {
-		int mat_id_a = scene.gpu_meshes[a].material_id;
-		int mat_id_b = scene.gpu_meshes[b].material_id;
+		Handle mat_id_a = scene.gpu_meshes[a].material_id;
+		Handle mat_id_b = scene.gpu_meshes[b].material_id;
 		if (mat_id_a == mat_id_b) {
 			return a < b;
 		} else {
-			return mat_id_a < mat_id_b;
+			return mat_id_a.index < mat_id_b.index;
 		}
 	});
 
-	int cur_material_id = -1;
+	Handle cur_material_id;
 	int mtl_options_size = 0;
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
@@ -139,8 +133,9 @@ void renderGeometry(
 			// Load material
 			cur_material_id = mesh.material_id;
 
-			scene.material_list[cur_material_id].shader_program.use();
-			mtl_options_size = scene.material_list[cur_material_id].options_size;
+			const Material* mtl = engine.materials[cur_material_id];
+			mtl->shader_program.use();
+			mtl_options_size = mtl->options_size;
 		}
 
 		// Load mesh

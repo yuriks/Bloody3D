@@ -55,12 +55,10 @@ struct ShadingBufferSet {
 };
 
 struct Scene {
-	std::vector<Material> material_list;
 	std::vector<GPUMesh> gpu_meshes;
 	std::vector<util::AlignedVector<MeshInstance>> mesh_instances;
 	util::AlignedVector<Light> lights;
 
-	int addMaterial(Material&& mat);
 	int addMesh(GPUMesh&& mesh);
 	MeshInstanceHandle newInstance(int mesh_id);
 };

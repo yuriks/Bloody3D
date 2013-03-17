@@ -5,6 +5,7 @@
 #include "gl/BufferObject.hpp"
 #include "Material.hpp"
 #include "VertexFormats.hpp"
+#include "util/Handle.hpp"
 
 struct GPUMesh {
 	GPUMesh() : vertex_format(vertex_fmt::FMT_NONE) {}
@@ -24,7 +25,7 @@ struct GPUMesh {
 	gl::BufferObject ibo;
 
 	vertex_fmt::VertexFormat vertex_format;
-	int material_id;
+	Handle material_id;
 	unsigned int indices_count;
 	GLenum indices_type;
 	MaterialOptions material_options;

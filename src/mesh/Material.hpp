@@ -6,6 +6,7 @@
 #include <GL/gl3w.h>
 #include <memory>
 #include <array>
+#include <string>
 #include "util/Handle.hpp"
 
 namespace gl {
@@ -22,29 +23,37 @@ struct MaterialOptions {
 };
 
 struct Material {
-	gl::Shader vertex_shader, geometry_shader, fragment_shader;
 	gl::ShaderProgram shader_program;
 	size_t options_size;
-	std::array<GLuint, 4> tex_uniform_index;
 
-	Material()
-		: vertex_shader(GL_VERTEX_SHADER),
-		geometry_shader(GL_GEOMETRY_SHADER),
-		fragment_shader(GL_FRAGMENT_SHADER)
-	{
-		tex_uniform_index.fill(0);
-	}
-
-	Material(Material&& o)
-		: vertex_shader(std::move(o.vertex_shader)),
-		geometry_shader(std::move(o.geometry_shader)),
-		fragment_shader(std::move(o.fragment_shader)),
-		shader_program(std::move(o.shader_program)),
-		options_size(o.options_size),
-		tex_uniform_index(o.tex_uniform_index)
+	Material(gl::ShaderProgram&& shader_program, size_t options_size)
+		: shader_program(std::move(shader_program)),
+		options_size(options_size)
 	{}
 
-	void setOptionsSize(size_t s) { options_size = s; }
+	Material(Material&& o)
+		: shader_program(std::move(o.shader_program)),
+		options_size(o.options_size)
+	{}
+};
 
-	void loadFromFiles(const char* vert, const char* frag, const char* geom = nullptr);
+struct MaterialTemplate {
+	size_t options_size;
+
+	void attachShader(const std::string& fname, GLenum type);
+
+	void attachShaders(const std::string& vert, const std::string& frag) {
+		attachShader(vert, GL_VERTEX_SHADER);
+		attachShader(frag, GL_FRAGMENT_SHADER);
+	}
+
+	void attachShaders(const std::string& base_fname) {
+		attachShaders(base_fname + ".vert", base_fname + ".frag");
+	}
+
+	Material compile();
+	void clear();
+
+private:
+	std::vector<gl::Shader> shaders;
 };

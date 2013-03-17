@@ -115,13 +115,13 @@ int main(int argc, char *argv[])
 
 		int mesh_id;
 		{
-			int mat_id;
+			Handle mat_id;
 			{
-				Material material;
-				material.loadFromFiles("test.vert", "test.frag");
-				material.setOptionsSize(sizeof(MatUniforms));
+				MaterialTemplate material_template;
+				material_template.attachShaders("test");
+				material_template.options_size = sizeof(MatUniforms);
 
-				mat_id = scene.addMaterial(std::move(material));
+				mat_id = engine.materials.insert(material_template.compile());
 			}
 
 			GPUMesh mesh;
@@ -194,11 +194,13 @@ int main(int argc, char *argv[])
 		camera.t.pos = math::mvec3(0.f, 0.f, -3.5f);
 
 		{
-			Material dirlight_material;
+			MaterialTemplate material_template;
+			material_template.attachShaders("light_directional");
+			material_template.options_size = 0;
+			Material dirlight_material = material_template.compile();
+
 			gl::VertexArrayObject dirlight_vao;
 			gl::BufferObject dirlight_vbo;
-			dirlight_material.loadFromFiles("light_directional.vert", "light_directional.frag");
-			dirlight_material.setOptionsSize(0);
 
 			// Setup Directional Light vertex attribs
 			{
@@ -216,11 +218,13 @@ int main(int argc, char *argv[])
 				glVertexAttribDivisor(1, 1);
 			}
 
-			Material omnilight_material;
+			material_template.clear();
+			material_template.attachShaders("light_omni");
+			material_template.options_size = 0;
+			Material omnilight_material = material_template.compile();
+
 			gl::VertexArrayObject omnilight_vao;
 			gl::BufferObject omnilight_vbo;
-			omnilight_material.loadFromFiles("light_omni.vert", "light_omni.frag");
-			omnilight_material.setOptionsSize(0);
 
 			// Setup Omnilight vertex attribs
 			{
@@ -238,11 +242,13 @@ int main(int argc, char *argv[])
 				glVertexAttribDivisor(1, 1);
 			}
 
-			Material spotlight_material;
+			material_template.clear();
+			material_template.attachShaders("light_spot");
+			material_template.options_size = 0;
+			Material spotlight_material = material_template.compile();
+
 			gl::VertexArrayObject spotlight_vao;
 			gl::BufferObject spotlight_vbo;
-			spotlight_material.loadFromFiles("light_spot.vert", "light_spot.frag");
-			spotlight_material.setOptionsSize(0);
 
 			// Setup Spotlight vertex attribs
 			{
@@ -264,10 +270,12 @@ int main(int argc, char *argv[])
 				glVertexAttribDivisor(2, 1);
 			}
 
-			Material tonemap_material;
+			material_template.clear();
+			material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");
+			material_template.options_size = 0;
+			Material tonemap_material = material_template.compile();
+
 			gl::VertexArrayObject null_vao;
-			tonemap_material.loadFromFiles("fullscreen_triangle.vert", "tonemap.frag");
-			tonemap_material.setOptionsSize(0);
 
 			bool running = true;
 

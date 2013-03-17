@@ -52,11 +52,12 @@ static void preprocessFile(std::string& source, const std::string& fname, std::v
 	}
 }
 
-static void loadShader(const char* fname, gl::Shader& shader) {
+static bool loadShaderSource(const std::string& fname, gl::Shader& shader) {
 	std::vector<std::string> filenames;
 	std::string source;
 
 	preprocessFile(source, fname, filenames);
+
 	shader.setSource(source.c_str());
 	shader.compile();
 	if (!shader.compileSuccess()) {
@@ -64,19 +65,24 @@ static void loadShader(const char* fname, gl::Shader& shader) {
 			std::cerr << '(' << i << "): " << filenames[i] << '\n';
 		}
 		shader.printInfoLog(std::cerr);
+		return false;
+	}
+	return true;
+}
+
+void MaterialTemplate::attachShader(const std::string& fname, GLenum type) {
+	gl::Shader shader(type);
+	if (loadShaderSource(fname, shader)) {
+		shaders.push_back(std::move(shader));
 	}
 }
 
-void Material::loadFromFiles(const char* vert, const char* frag, const char* geom) {
-	loadShader(vert, vertex_shader);
-	loadShader(frag, fragment_shader);
-	if (geom != nullptr)
-		loadShader(geom, geometry_shader);
+Material MaterialTemplate::compile() {
+	gl::ShaderProgram shader_program;
 
-	shader_program.attachShader(vertex_shader);
-	shader_program.attachShader(fragment_shader);
-	if (geom != nullptr)
-		shader_program.attachShader(geometry_shader);
+	for (const gl::Shader& shader : shaders) {
+		shader_program.attachShader(shader);
+	}
 
 	shader_program.link();
 	if (!shader_program.linkSuccess()) {
@@ -97,4 +103,10 @@ void Material::loadFromFiles(const char* vert, const char* frag, const char* geo
 		static const int samplers[4] = { 0, 1, 2, 3 };
 		glUniform1iv(tex_uniform_index, 4, samplers);
 	}
+
+	return Material(std::move(shader_program), options_size);
+}
+
+void MaterialTemplate::clear() {
+	shaders.clear();
 }
