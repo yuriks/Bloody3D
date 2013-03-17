@@ -74,6 +74,7 @@
     <ClInclude Include="src\util\AlignedVector.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />
     <ClInclude Include="src\util\noncopyable.hpp" />
+    <ClInclude Include="src\util\ObjectPool.hpp" />
     <ClInclude Include="src\util\StringHash.hpp" />
   </ItemGroup>
   <ItemGroup>

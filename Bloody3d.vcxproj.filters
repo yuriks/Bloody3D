@@ -203,6 +203,9 @@
     <ClInclude Include="src\scene\SpotLight.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\util\ObjectPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\msvc110\GLFW.lib" />
