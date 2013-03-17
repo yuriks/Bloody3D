@@ -19,7 +19,7 @@ struct ObjectPool {
 		: first_free_index(MAXSIZE_T)
 	{}
 
-	Handle allocate(T object = T()) {
+	Handle insert(T object = T()) {
 		// Expand roster if we're out of entries
 		if (first_free_index >= roster.size()) {
 			expand_roster();
@@ -36,7 +36,7 @@ struct ObjectPool {
 		return Handle(roster_index, roster[roster_index].generation);
 	}
 
-	void free(const Handle h) {
+	void remove(const Handle h) {
 		if (!isValid(h))
 			return;
 
@@ -96,29 +96,29 @@ void test_ObjectPool() {
 	ObjectPool<float> objp;
 	const auto& objp_c = objp;
 
-	Handle h1 = objp.allocate(42.0f);
-	Handle h2 = objp.allocate(1000.0f);
+	Handle h1 = objp.insert(42.0f);
+	Handle h2 = objp.insert(1000.0f);
 
 	float* f1 = objp[h1];
 	assert(f1 && *f1 == 42.0f);
 	const float* f2 = objp_c[h2];
 	assert(f2 && *f2 == 1000.0f);
 
-	objp.free(h2);
+	objp.remove(h2);
 
 	const float* f3 = objp_c[h2];
 	assert(!f3);
 
-	objp.free(h1);
+	objp.remove(h1);
 
-	Handle h3 = objp.allocate(112233.0f);
+	Handle h3 = objp.insert(112233.0f);
 
-	objp.free(h1);
+	objp.remove(h1);
 
 	const float* f4 = objp[h3];
 	assert(f4 && *f4 == 112233.0f);
 
-	objp.free(h3);
+	objp.remove(h3);
 
 	assert(objp.pool.empty());
 }
