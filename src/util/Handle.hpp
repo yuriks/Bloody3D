@@ -1,13 +1,14 @@
 #pragma once
 
 #include "Heatwave.hpp"
+#include <cstdint>
 
 struct Handle {
 	size_t index;
 	u32 generation;
 
 	Handle()
-		: index(MAXSIZE_T), generation(-1)
+		: index(SIZE_MAX), generation(-1)
 	{}
 
 	Handle(size_t index, u32 generation)

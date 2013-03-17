@@ -16,7 +16,7 @@ struct ObjectPool {
 	std::vector<std::pair<size_t, T>> pool;
 
 	ObjectPool()
-		: first_free_index(MAXSIZE_T)
+		: first_free_index(SIZE_MAX)
 	{}
 
 	Handle insert(T object = T()) {
