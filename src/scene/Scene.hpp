@@ -21,11 +21,6 @@ struct MeshInstance {
 	Handle mesh_id;
 };
 
-struct Light {
-	Transform t;
-	math::vec3 color;
-};
-
 struct Camera {
 	Transform t;
 	float fov;
@@ -53,7 +48,6 @@ struct Scene {
 	const Engine* engine;
 
 	ObjectPool<MeshInstance> mesh_instances;
-	util::AlignedVector<Light> lights;
 
 	Scene(const Engine* engine)
 		: engine(engine)
