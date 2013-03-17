@@ -41,6 +41,7 @@
     <ClInclude Include="libs\include\stb_image.h" />
     <ClInclude Include="src\editor\AssetProcessing.hpp" />
     <ClInclude Include="src\editor\MeshCooker.hpp" />
+    <ClInclude Include="src\Engine.hpp" />
     <ClInclude Include="src\GL3\gl3.h" />
     <ClInclude Include="src\GL3\gl3w.h" />
     <ClInclude Include="src\gl\BufferObject.hpp" />

@@ -203,6 +203,9 @@
     <ClInclude Include="src\util\Handle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\texture\ImageLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,4 +1,5 @@
 #include "Heatwave.hpp"
+#include "Engine.hpp"
 #include "gl/VertexArrayObject.hpp"
 #include "gl/BufferObject.hpp"
 #include "gl/Shader.hpp"
@@ -107,6 +108,8 @@ int main(int argc, char *argv[])
 		return 1;
 
 	{
+		Engine engine;
+
 		scene::RenderContext render_context(WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene::Scene scene;
 
@@ -138,8 +141,8 @@ int main(int argc, char *argv[])
 
 				MaterialOptions mtl_options;
 				mtl_options.uniforms = std::move(u);
-				mtl_options.texture_ids[0] = scene.tex_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
-				mtl_options.texture_ids[1] = scene.tex_manager.getTexture("panel_beams_normal.png");
+				mtl_options.texture_ids[0] = engine.texture_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
+				mtl_options.texture_ids[1] = engine.texture_manager.getTexture("panel_beams_normal.png");
 				mesh.material_options = mtl_options;
 			}
 
@@ -330,7 +333,7 @@ int main(int argc, char *argv[])
 				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 				math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
 
-				scene::renderGeometry(scene, world2view_mat, def_buffers, render_context, sys_uniforms);
+				scene::renderGeometry(engine, scene, world2view_mat, def_buffers, render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);

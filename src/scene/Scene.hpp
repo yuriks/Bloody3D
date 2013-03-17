@@ -5,11 +5,11 @@
 #include "math/vec.hpp"
 #include "math/Quaternion.hpp"
 #include "mesh/GPUMesh.hpp"
-#include "texture/TextureManager.hpp"
 #include "mesh/Material.hpp"
 #include "util/AlignedVector.hpp"
 #include "scene/RenderContext.hpp"
 #include "scene/Transform.hpp"
+#include "Engine.hpp"
 
 namespace scene {
 
@@ -55,7 +55,6 @@ struct ShadingBufferSet {
 };
 
 struct Scene {
-	TextureManager tex_manager;
 	std::vector<Material> material_list;
 	std::vector<GPUMesh> gpu_meshes;
 	std::vector<util::AlignedVector<MeshInstance>> mesh_instances;
@@ -73,6 +72,7 @@ inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
 void bindGBufferTextures(GBufferSet& gbuffer);
 
 void renderGeometry(
+	const Engine& engine,
 	const Scene& scene,
 	const math::mat4& world2view_mat,
 	GBufferSet& buffers,
