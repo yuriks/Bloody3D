@@ -7,9 +7,9 @@
 #include "util/ObjectPool.hpp"
 
 enum TexFlags {
-	TEXF_NONE = 0,
-	TEXF_ALPHA = 1,
-	TEXF_SRGB = 2
+	TEXF_NONE  = 0,
+	TEXF_ALPHA = BIT(0),
+	TEXF_SRGB  = BIT(1)
 };
 
 class TextureManager {

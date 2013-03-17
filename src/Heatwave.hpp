@@ -17,6 +17,8 @@
 #endif
 #define HW_ALIGN_VAR_SSE HW_ALIGN_VAR(16)
 
+#define BIT(x) (1 << (x))
+
 // Standard sized types
 typedef int8_t s8;
 typedef uint8_t u8;
