@@ -28,7 +28,7 @@ void Image::clear()
 	height = ~0u;
 }
 
-void Image::loadPNGFileRGBA8(Image& image, std::string& filename)
+void Image::loadPNGFileRGBA8(Image& image, const std::string& filename)
 {
 	int width, height;
 	unsigned char* data = stbi_load(filename.c_str(), &width, &height, nullptr, 4);

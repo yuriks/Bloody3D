@@ -29,7 +29,7 @@ public:
 	unsigned int getHeight() const;
 	unsigned char* getData() const;
 
-	static void loadPNGFileRGBA8(Image& image, std::string& fname);
+	static void loadPNGFileRGBA8(Image& image, const std::string& fname);
 
 protected:
 	unsigned int width;
