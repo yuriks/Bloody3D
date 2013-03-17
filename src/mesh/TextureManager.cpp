@@ -3,11 +3,11 @@
 #include "image/ImageLoader.hpp"
 #include <fstream>
 
-u16 TextureManager::loadTexture(const char* fname, TexFlags flags) {
+Handle TextureManager::loadTexture(const char* fname, TexFlags flags) {
 	static const std::string texture_path("data/textures/");
 
 	auto lb = fname_map.lower_bound(fname);
-	if (lb != fname_map.end() && !(fname_map.key_comp()(fname, lb->first))) {
+	if (lb != fname_map.end() && !(fname_map.key_comp()(fname, lb->first)) && textures.isValid(lb->second)) {
 		// Already exists
 		return lb->second;
 	} else {
@@ -36,18 +36,13 @@ u16 TextureManager::loadTexture(const char* fname, TexFlags flags) {
 		glTexImage2D(GL_TEXTURE_2D, 0, texture_formats[flags & (TEXF_ALPHA | TEXF_SRGB)], tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		u16 new_id = texture_map.size();
-		fname_map.insert(lb, std::pair<std::string, u16>(fname, new_id));
-		texture_map.push_back(std::move(tex));
+		const Handle new_id = textures.insert(std::move(tex));
+		fname_map.insert(lb, std::make_pair(fname, new_id));
 
 		return new_id;
 	}
 }
 
-const gl::Texture* TextureManager::lookupTexture(u16 tex_id) const {
-	if (tex_id < texture_map.size()) {
-		return &texture_map[tex_id];
-	} else {
-		return nullptr;
-	}
+const gl::Texture* TextureManager::lookupTexture(Handle tex_id) const {
+	return textures[tex_id];
 }

@@ -6,6 +6,7 @@
 #include <GL/gl3w.h>
 #include <memory>
 #include <array>
+#include "util/Handle.hpp"
 
 namespace gl {
 	class BufferObject;
@@ -17,7 +18,7 @@ struct MaterialUniforms {
 
 struct MaterialOptions {
 	std::shared_ptr<MaterialUniforms> uniforms;
-	std::array<u16, 4> texture_ids;
+	std::array<Handle, 4> texture_ids;
 };
 
 struct Material {

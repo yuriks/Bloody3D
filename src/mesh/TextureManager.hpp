@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include "util/ObjectPool.hpp"
 
 enum TexFlags {
 	TEXF_NONE = 0,
@@ -18,10 +19,10 @@ class TextureManager {
 public:
 	TextureManager() {}
 
-	u16 loadTexture(const char* fname, TexFlags flags = TEXF_NONE);
-	const gl::Texture* lookupTexture(u16 tex_id) const;
+	Handle loadTexture(const char* fname, TexFlags flags = TEXF_NONE);
+	const gl::Texture* lookupTexture(Handle tex_id) const;
 
 private:
-	std::map<std::string, u16> fname_map;
-	std::vector<gl::Texture> texture_map;
+	std::map<std::string, Handle> fname_map;
+	ObjectPool<gl::Texture> textures;
 };
