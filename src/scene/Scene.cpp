@@ -67,39 +67,35 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 	glDrawBuffers(1, render_targets);
 }
 
-int Scene::addMesh(GPUMesh&& mesh) {
-	int new_id = gpu_meshes.size();
-	gpu_meshes.push_back(std::move(mesh));
-	mesh_instances.resize(gpu_meshes.size());
-	return new_id;
-}
+Handle Scene::newInstance(Handle mesh_id) {
+	MeshInstance instance;
+	instance.mesh_id = mesh_id;
 
-MeshInstanceHandle Scene::newInstance(int mesh_id) {
-	MeshInstanceHandle handle;
-	handle.mesh_id = mesh_id;
-	handle.instance_id = mesh_instances[mesh_id].size();
-
-	mesh_instances[mesh_id].push_back(MeshInstance());
-	return handle;
+	return mesh_instances.insert(instance);
 }
 
 void renderGeometry(
-	const Engine& engine,
 	const Scene& scene,
 	const math::mat4& world2view_mat,
 	GBufferSet& buffers,
 	RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
 {
-	std::vector<unsigned int> gpumesh_indices(scene.gpu_meshes.size());
-	for (unsigned int i = 0; i < gpumesh_indices.size(); ++i)
-		gpumesh_indices[i] = i;
+	const Engine& engine = *scene.engine;
+	auto& gpu_meshes = engine.gpu_meshes;
+	auto& instances = scene.mesh_instances;
 
-	std::sort(gpumesh_indices.begin(), gpumesh_indices.end(), [&](unsigned int a, unsigned int b) -> bool {
-		Handle mat_id_a = scene.gpu_meshes[a].material_id;
-		Handle mat_id_b = scene.gpu_meshes[b].material_id;
-		if (mat_id_a == mat_id_b) {
-			return a < b;
+	std::vector<Handle> sorted_instances(instances.pool.size());
+	for (unsigned int i = 0; i < sorted_instances.size(); ++i) {
+		sorted_instances[i] = instances.makeHandle(i);
+	}
+
+	// Sort instances first by material, then by instance
+	std::sort(sorted_instances.begin(), sorted_instances.end(), [&](Handle a, Handle b) -> bool {
+		Handle mat_id_a = gpu_meshes[instances[a]->mesh_id]->material_id;
+		Handle mat_id_b = gpu_meshes[instances[b]->mesh_id]->material_id;
+		if (mat_id_a.index == mat_id_b.index) {
+			return a.index < b.index;
 		} else {
 			return mat_id_a.index < mat_id_b.index;
 		}
@@ -107,6 +103,8 @@ void renderGeometry(
 
 	Handle cur_material_id;
 	int mtl_options_size = 0;
+
+	Handle cur_mesh_id;
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
@@ -126,51 +124,47 @@ void renderGeometry(
 	glClearBufferfv(GL_DEPTH, 0, &clear_depth);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
-	for (unsigned int i = 0; i < scene.gpu_meshes.size(); ++i) {
-		const GPUMesh& mesh = scene.gpu_meshes[gpumesh_indices[i]];
+	for (const Handle& instance_h : sorted_instances) {
+		const MeshInstance* instance = instances[instance_h];
+		const GPUMesh* mesh = gpu_meshes[instance->mesh_id];
 
-		if (cur_material_id != mesh.material_id) {
-			// Load material
-			cur_material_id = mesh.material_id;
+		if (cur_mesh_id != instance->mesh_id) {
+			// Load mesh
 
-			const Material* mtl = engine.materials[cur_material_id];
-			mtl->shader_program.use();
-			mtl_options_size = mtl->options_size;
-		}
+			if (cur_material_id != mesh->material_id) {
+				// Load material
+				cur_material_id = mesh->material_id;
 
-		// Load mesh
-		render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
-		glBufferData(GL_UNIFORM_BUFFER, mtl_options_size, mesh.material_options.uniforms.get(), GL_STREAM_DRAW);
-
-		for (int t = 0; t < 4; ++t) {
-			const gl::Texture* tex = engine.texture_manager.textures[mesh.material_options.texture_ids[t]];
-			if (tex != nullptr) {
-				glActiveTexture(GL_TEXTURE0 + t);
-				tex->bind(GL_TEXTURE_2D);
+				const Material* mtl = engine.materials[cur_material_id];
+				mtl->shader_program.use();
+				mtl_options_size = mtl->options_size;
 			}
-		}
 
-		mesh.vao.bind();
-		mesh.ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+			render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
+			glBufferData(GL_UNIFORM_BUFFER, mtl_options_size, mesh->material_options.uniforms.get(), GL_STREAM_DRAW);
 
-		const auto& inst_list = scene.mesh_instances[gpumesh_indices[i]];
-		
-		util::AlignedVector<math::mat4> model2view_mats;
-		model2view_mats.resize(inst_list.size());
-		for (unsigned int j = 0; j < model2view_mats.size(); ++j) {
-			math::mat4 model2world_mat = calcTransformMtx(inst_list[j].t);
-			model2view_mats[j] = world2view_mat * model2world_mat;
+			for (int t = 0; t < 4; ++t) {
+				const gl::Texture* tex = engine.texture_manager.textures[mesh->material_options.texture_ids[t]];
+				if (tex != nullptr) {
+					glActiveTexture(GL_TEXTURE0 + t);
+					tex->bind(GL_TEXTURE_2D);
+				}
+			}
+
+			mesh->vao.bind();
+			mesh->ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
 		}
 
 		// TODO: Instancing
-		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
-		for (unsigned int j = 0; j < model2view_mats.size(); ++j) {
-			SystemUniformBlock sys_uniforms_copy = sys_uniforms;
-			sys_uniforms_copy.view_model_mat = model2view_mats[j];
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms_copy, GL_STREAM_DRAW);
+		math::mat4 model2world_mat = calcTransformMtx(instance->t);
+		math::mat4 model2view_mat = world2view_mat * model2world_mat;
 
-			glDrawElements(GL_TRIANGLES, mesh.indices_count, mesh.indices_type, 0);
-		}
+		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
+		SystemUniformBlock sys_uniforms_copy = sys_uniforms;
+		sys_uniforms_copy.view_model_mat = model2view_mat;
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms_copy, GL_STREAM_DRAW);
+
+		glDrawElements(GL_TRIANGLES, mesh->indices_count, mesh->indices_type, 0);
 	}
 
 	for (int t = 0; t < 4; ++t) {

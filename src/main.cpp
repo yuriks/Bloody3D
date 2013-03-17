@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
 		Engine engine;
 
 		scene::RenderContext render_context(WINDOW_WIDTH, WINDOW_HEIGHT);
-		scene::Scene scene;
+		scene::Scene scene(&engine);
 
-		int mesh_id;
+		Handle mesh_id;
 		{
 			Handle mat_id;
 			{
@@ -139,13 +139,10 @@ int main(int argc, char *argv[])
 				mesh.material_options = mtl_options;
 			}
 
-			mesh_id = scene.addMesh(std::move(mesh));
+			mesh_id = engine.gpu_meshes.insert(std::move(mesh));
 		}
 
-		scene::MeshInstanceHandle insth = scene.newInstance(mesh_id);
-		{
-			scene::MeshInstance& inst = insth.resolve(scene);
-		}
+		Handle insth = scene.newInstance(mesh_id);
 
 		std::vector<scene::DirectionalLight> directional_lights;
 		{
@@ -323,8 +320,8 @@ int main(int argc, char *argv[])
 
 					{
 						// TODO: Experiment with changing to immediate mode style API
-						scene::MeshInstance& inst = insth.resolve(scene);
-						inst.t.rot = rot_amount;
+						scene::MeshInstance* inst = scene.mesh_instances[insth];
+						inst->t.rot = rot_amount;
 					}
 
 					elapsed_game_time += 1./60.;
@@ -334,7 +331,7 @@ int main(int argc, char *argv[])
 				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 				math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
 
-				scene::renderGeometry(engine, scene, world2view_mat, def_buffers, render_context, sys_uniforms);
+				scene::renderGeometry(scene, world2view_mat, def_buffers, render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);

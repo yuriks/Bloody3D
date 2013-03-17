@@ -10,6 +10,7 @@
 #include "scene/RenderContext.hpp"
 #include "scene/Transform.hpp"
 #include "Engine.hpp"
+#include "util/ObjectPool.hpp"
 
 namespace scene {
 
@@ -17,13 +18,7 @@ struct Scene;
 
 struct MeshInstance {
 	Transform t;
-};
-
-struct MeshInstanceHandle {
-	u16 mesh_id;
-	u16 instance_id;
-
-	MeshInstance& resolve(Scene& scene);
+	Handle mesh_id;
 };
 
 struct Light {
@@ -55,22 +50,21 @@ struct ShadingBufferSet {
 };
 
 struct Scene {
-	std::vector<GPUMesh> gpu_meshes;
-	std::vector<util::AlignedVector<MeshInstance>> mesh_instances;
+	const Engine* engine;
+
+	ObjectPool<MeshInstance> mesh_instances;
 	util::AlignedVector<Light> lights;
 
-	int addMesh(GPUMesh&& mesh);
-	MeshInstanceHandle newInstance(int mesh_id);
-};
+	Scene(const Engine* engine)
+		: engine(engine)
+	{}
 
-inline MeshInstance& MeshInstanceHandle::resolve(Scene& scene) {
-	return scene.mesh_instances[mesh_id][instance_id];
-}
+	Handle newInstance(Handle mesh_id);
+};
 
 void bindGBufferTextures(GBufferSet& gbuffer);
 
 void renderGeometry(
-	const Engine& engine,
 	const Scene& scene,
 	const math::mat4& world2view_mat,
 	GBufferSet& buffers,
