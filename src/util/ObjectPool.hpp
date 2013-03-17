@@ -80,6 +80,14 @@ struct ObjectPool {
 		return h.index < roster.size() && roster[h.index].generation == h.generation;
 	}
 
+	/** Creates a handle to the object currently at pool[index]. */
+	Handle makeHandle(size_t index) const {
+		if (index >= pool.size())
+			return Handle();
+		else
+			return Handle(index, roster[pool[index].first].generation);
+	}
+
 private:
 	void expand_roster() {
 		const Handle new_entry(first_free_index, 0);
