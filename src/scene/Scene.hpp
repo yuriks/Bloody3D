@@ -17,8 +17,12 @@ namespace scene {
 struct Scene;
 
 struct MeshInstance {
-	Transform t;
+	Handle transform;
 	Handle mesh_id;
+
+	MeshInstance(Handle transform, Handle mesh)
+		: transform(transform), mesh_id(mesh)
+	{}
 };
 
 struct Camera {
@@ -47,6 +51,7 @@ struct ShadingBufferSet {
 struct Scene {
 	const Engine* engine;
 
+	ObjectPool<Transform> transforms;
 	ObjectPool<MeshInstance> mesh_instances;
 
 	Scene(const Engine* engine)

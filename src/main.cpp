@@ -142,7 +142,8 @@ int main(int argc, char *argv[])
 			mesh_id = engine.gpu_meshes.insert(std::move(mesh));
 		}
 
-		Handle insth = scene.newInstance(mesh_id);
+		Handle wall_t_h = scene.transforms.insert();
+		Handle wall_meshinst_h = scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
 
 		std::vector<scene::DirectionalLight> directional_lights;
 		{
@@ -319,9 +320,8 @@ int main(int argc, char *argv[])
 					last_mouse_pos[1] = cur_mouse_pos[1];
 
 					{
-						// TODO: Experiment with changing to immediate mode style API
-						scene::MeshInstance* inst = scene.mesh_instances[insth];
-						inst->t.rot = rot_amount;
+						scene::Transform* wall_t = scene.transforms[wall_t_h];
+						wall_t->rot = rot_amount;
 					}
 
 					elapsed_game_time += 1./60.;

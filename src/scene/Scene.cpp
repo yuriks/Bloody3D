@@ -67,13 +67,6 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 	glDrawBuffers(1, render_targets);
 }
 
-Handle Scene::newInstance(Handle mesh_id) {
-	MeshInstance instance;
-	instance.mesh_id = mesh_id;
-
-	return mesh_instances.insert(instance);
-}
-
 void renderGeometry(
 	const Scene& scene,
 	const math::mat4& world2view_mat,
@@ -156,7 +149,7 @@ void renderGeometry(
 		}
 
 		// TODO: Instancing
-		math::mat4 model2world_mat = calcTransformMtx(instance->t);
+		math::mat4 model2world_mat = calcTransformMtx(*scene.transforms[instance->transform]);
 		math::mat4 model2view_mat = world2view_mat * model2world_mat;
 
 		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
