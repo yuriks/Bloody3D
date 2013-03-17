@@ -94,10 +94,6 @@ bool init_window()
 	return true;
 }
 
-struct MatUniforms : public MaterialUniforms {
-	float dummy;
-};
-
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -119,7 +115,7 @@ int main(int argc, char *argv[])
 			{
 				MaterialTemplate material_template;
 				material_template.attachShaders("test");
-				material_template.options_size = sizeof(MatUniforms);
+				material_template.options_size = 0;
 
 				mat_id = engine.materials.insert(material_template.compile());
 			}
@@ -136,11 +132,8 @@ int main(int argc, char *argv[])
 			mesh.material_id = mat_id;
 
 			{
-				auto u = std::make_shared<MatUniforms>();
-				u->dummy = 1.f;
-
 				MaterialOptions mtl_options;
-				mtl_options.uniforms = std::move(u);
+				mtl_options.uniforms = nullptr;
 				mtl_options.texture_ids[0] = engine.texture_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
 				mtl_options.texture_ids[1] = engine.texture_manager.getTexture("panel_beams_normal.png");
 				mesh.material_options = mtl_options;
