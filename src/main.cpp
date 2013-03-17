@@ -138,8 +138,8 @@ int main(int argc, char *argv[])
 
 				MaterialOptions mtl_options;
 				mtl_options.uniforms = std::move(u);
-				mtl_options.texture_ids[0] = scene.tex_manager.loadTexture("panel_beams_diffuse.png", TEXF_SRGB);
-				mtl_options.texture_ids[1] = scene.tex_manager.loadTexture("panel_beams_normal.png");
+				mtl_options.texture_ids[0] = scene.tex_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
+				mtl_options.texture_ids[1] = scene.tex_manager.getTexture("panel_beams_normal.png");
 				mesh.material_options = mtl_options;
 			}
 
