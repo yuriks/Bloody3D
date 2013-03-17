@@ -72,6 +72,7 @@
     <ClInclude Include="src\scene\SpotLight.hpp" />
     <ClInclude Include="src\scene\Transform.hpp" />
     <ClInclude Include="src\util\AlignedVector.hpp" />
+    <ClInclude Include="src\util\Handle.hpp" />
     <ClInclude Include="src\util\mmap.hpp" />
     <ClInclude Include="src\util\noncopyable.hpp" />
     <ClInclude Include="src\util\ObjectPool.hpp" />

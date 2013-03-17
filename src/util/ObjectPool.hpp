@@ -5,17 +5,7 @@
 #include <type_traits>
 #include <cassert>
 #include <utility>
-
-struct Handle {
-	size_t index;
-	u32 generation;
-
-	Handle() {}
-
-	Handle(size_t index, u32 generation)
-		: index(index), generation(generation)
-	{}
-};
+#include "Handle.hpp"
 
 /** Manages a pool of objects, providing persistent handles to them. */
 template <typename T>
