@@ -25,7 +25,7 @@ void calculateModel2WorldMatrices(
 {
 	math::mat4* out_i = out_begin;
 	for (auto i = transforms.pool.cbegin(), end = transforms.pool.cend(); i != end; ++i, ++out_i) {
-		*out_i = calcTransformMtx(i->second);
+		*out_i = calcTransformMtx(*i);
 	}
 }
 

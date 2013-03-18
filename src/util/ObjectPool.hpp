@@ -4,7 +4,6 @@
 #include <vector>
 #include <type_traits>
 #include <cassert>
-#include <utility>
 #include "Handle.hpp"
 
 /** Manages a pool of objects, providing persistent handles to them. */
@@ -13,7 +12,8 @@ struct ObjectPool {
 	size_t first_free_index; // in roster
 	
 	std::vector<Handle> roster; // .index is next free index for unused entries
-	std::vector<std::pair<size_t, T>> pool;
+	std::vector<T> pool;
+	std::vector<size_t> pool_indices;
 
 	ObjectPool()
 		: first_free_index(SIZE_MAX)
@@ -31,7 +31,8 @@ struct ObjectPool {
 
 		// Point roster entry to right place and insert object
 		roster[roster_index].index = pool.size();
-		pool.push_back(std::make_pair(roster_index, std::move(object)));
+		pool.push_back(std::move(object));
+		pool_indices.push_back(roster_index);
 
 		return Handle(roster_index, roster[roster_index].generation);
 	}
@@ -43,7 +44,7 @@ struct ObjectPool {
 		const size_t roster_index = h.index;
 		const size_t pool_index = roster[roster_index].index;
 		
-		const size_t moved_roster_index = pool.back().first;
+		const size_t moved_roster_index = pool_indices.back();
 		const size_t moved_pool_index = pool.size() - 1;
 		assert(roster[moved_roster_index].index == moved_pool_index);
 
@@ -51,6 +52,8 @@ struct ObjectPool {
 		roster[moved_roster_index].index = pool_index;
 		pool[pool_index] = std::move(pool[moved_pool_index]);
 		pool.pop_back();
+		pool_indices[pool_index] = pool_indices[moved_pool_index];
+		pool_indices.pop_back();
 
 		// Increment generation of removed roster entry and add it to free list
 		++roster[roster_index].generation;
@@ -61,7 +64,7 @@ struct ObjectPool {
 	T* operator[] (const Handle h) {
 		if (isValid(h)) {
 			assert(roster[h.index].index < pool.size());
-			return &pool[roster[h.index].index].second;
+			return &pool[roster[h.index].index];
 		} else {
 			return nullptr;
 		}
@@ -70,7 +73,7 @@ struct ObjectPool {
 	const T* operator[] (const Handle h) const {
 		if (isValid(h)) {
 			assert(roster[h.index].index < pool.size());
-			return &pool[roster[h.index].index].second;
+			return &pool[roster[h.index].index];
 		} else {
 			return nullptr;
 		}
@@ -85,7 +88,7 @@ struct ObjectPool {
 		if (index >= pool.size())
 			return Handle();
 		else
-			return Handle(index, roster[pool[index].first].generation);
+			return Handle(index, roster[pool_indices[index]].generation);
 	}
 
 	size_t getPoolIndex(const Handle h) const {
