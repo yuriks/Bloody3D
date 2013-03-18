@@ -5,37 +5,47 @@
 
 namespace scene {
 
-void GBufferSet::initialize(int width, int height) {
-	depth_tex.bind(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+struct BufferSpec {
+	gl::Texture* tex;
+	GLenum internal_format;
+	GLenum format;
+	GLenum type;
+	GLenum attachment;
+};
 
-	diffuse_tex.bind(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-
-	normal_tex.bind(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-
+void createBuffers(int width, int height, const BufferSpec* specs, size_t spec_n) {
+	for (size_t i = 0; i < spec_n; ++i) {
+		specs[i].tex->bind(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, specs[i].internal_format, width, height, 0,
+			specs[i].format, specs[i].type, nullptr);
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
 
+void attachBuffers(gl::Framebuffer& fbo, const BufferSpec* specs, size_t spec_n) {
 	fbo.bind(GL_FRAMEBUFFER);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, diffuse_tex, 0);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, normal_tex, 0);
+	for (size_t i = 0; i < spec_n; ++i) {
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, specs[i].attachment, GL_TEXTURE_2D, *specs[i].tex, 0);
+	}
 
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cerr << "Incomplete framebuffer." << std::endl;
+}
+
+void GBufferSet::initialize(int width, int height) {
+	std::array<BufferSpec, 3> buffers = {{
+		// tex         internal_format      format            type                  attachment
+		{&depth_tex,   GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, GL_DEPTH_STENCIL_ATTACHMENT},
+		{&diffuse_tex, GL_SRGB8_ALPHA8,     GL_RGBA,          GL_FLOAT,             GL_COLOR_ATTACHMENT0},
+		{&normal_tex,  GL_RGB10_A2,         GL_RGBA,          GL_FLOAT,             GL_COLOR_ATTACHMENT1}
+	}};
+
+	createBuffers(width, height, buffers.data(), buffers.size());
+	attachBuffers(fbo, buffers.data(), buffers.size());
 
 	static const GLenum render_targets[2] = {
 		GL_COLOR_ATTACHMENT0,
@@ -45,21 +55,14 @@ void GBufferSet::initialize(int width, int height) {
 }
 
 void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex) {
-	accum_tex.bind(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+	std::array<BufferSpec, 2> buffers = {{
+		// tex       internal_format    format   type      attachment
+		{&depth_tex, 0,                 0,       0,        GL_DEPTH_ATTACHMENT},
+		{&accum_tex, GL_R11F_G11F_B10F, GL_RGBA, GL_FLOAT, GL_COLOR_ATTACHMENT0}
+	}};
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	fbo.bind(GL_FRAMEBUFFER);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accum_tex, 0);
-
-	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cerr << "Incomplete framebuffer." << std::endl;
+	createBuffers(width, height, &buffers[1], 1);
+	attachBuffers(fbo, buffers.data(), buffers.size());
 
 	static const GLenum render_targets[1] = {
 		GL_COLOR_ATTACHMENT0
