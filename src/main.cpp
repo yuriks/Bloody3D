@@ -143,7 +143,9 @@ int main(int argc, char *argv[])
 			mesh_id = engine.gpu_meshes.insert(std::move(mesh));
 		}
 
-		Handle wall_t_h = scene.transforms.insert();
+		scene::Transform wall_tt;
+		wall_tt.rot = math::Quaternion(math::up, math::pi);
+		Handle wall_t_h = scene.transforms.insert(wall_tt);
 		Handle wall_meshinst_h = scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
 
 		{
@@ -294,8 +296,6 @@ int main(int argc, char *argv[])
 			double elapsed_real_time = 0.;
 			double last_frame_time;
 
-			math::Quaternion rot_amount(math::up, math::pi);
-
 			int last_mouse_pos[2];
 			glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
 
@@ -308,6 +308,8 @@ int main(int argc, char *argv[])
 				{
 					static const float ROT_SPEED = 0.02f;
 					static const float MOUSE_ROT_SPEED = 0.01f;
+
+					math::Quaternion& rot_amount = scene.transforms[wall_t_h]->rot;
 
 					if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
 					if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
@@ -323,16 +325,12 @@ int main(int argc, char *argv[])
 
 					float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
 					float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
+					//x_mdelta = y_mdelta = 0.0f;
 					rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 					rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 
 					last_mouse_pos[0] = cur_mouse_pos[0];
 					last_mouse_pos[1] = cur_mouse_pos[1];
-
-					{
-						scene::Transform* wall_t = scene.transforms[wall_t_h];
-						wall_t->rot = rot_amount;
-					}
 
 					elapsed_game_time += 1./60.;
 				}
