@@ -22,4 +22,8 @@ struct Handle {
 	bool operator !=(const Handle& o) const {
 		return !(*this == o);
 	}
+
+	bool isNull() const {
+		return index == SIZE_MAX;
+	}
 };
