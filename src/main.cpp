@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 			light.t.pos = math::mvec3(0.0f, 3.0f, 0.0f);
 			light.t.rot = math::Quaternion(math::vec3_x, math::pi / 2.0f);
 			light.exponent = 64;
-			light.color = math::mvec3(32.0f, 0.0f, 0.0f);
+			light.color = math::mvec3(0.0f, 32.0f, 0.0f);
 			spot_lights.push_back(light);
 		}
 
