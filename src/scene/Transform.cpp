@@ -23,10 +23,33 @@ void calculateModel2WorldMatrices(
 	const ObjectPool<Transform>& transforms,
 	math::mat4* out, math::mat4* out_inverse)
 {
-	for (size_t i = 0, end = transforms.pool.size(); i < end; ++i) {
-		out[i] = calcTransformMtx(transforms.pool[i]);
-		out_inverse[i] = calcInvTransformMtx(transforms.pool[i]);
-	}
+	std::vector<bool> done_els(transforms.pool.size(), false);
+	bool done;
+
+	do {
+		done = true;
+
+		for (size_t i = 0, end = transforms.pool.size(); i < end; ++i) {
+			if (done_els[i])
+				continue;
+
+			const Transform& t = transforms.pool[i];
+			if (t.parent.isNull()) {
+				out[i] = calcTransformMtx(t);
+				out_inverse[i] = calcInvTransformMtx(t);
+				done_els[i] = true;
+			} else {
+				size_t parent_i = transforms.getPoolIndex(t.parent);
+				if (done_els[parent_i]) {
+					out[i] = out[parent_i] * calcTransformMtx(t);
+					out_inverse[i] = out_inverse[parent_i] * calcInvTransformMtx(t);
+					done_els[i] = true;
+				} else {
+					done = false;
+				}
+			}
+		}
+	} while (!done);
 }
 
 } // namespace scene

@@ -12,6 +12,8 @@ struct Transform {
 	float scale;
 	math::Quaternion rot;
 
+	Handle parent;
+
 	Transform() : pos(math::vec3_0), scale(1.0f), rot() { }
 };
 

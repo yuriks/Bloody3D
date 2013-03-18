@@ -177,8 +177,9 @@ int main(int argc, char *argv[])
 			scene::SpotLight light;
 			scene::Transform t;
 
-			t.pos = math::mvec3(0.0f, 3.0f, 0.0f);
-			t.rot = math::Quaternion(math::vec3_x, math::pi / 2.0f);
+			t.pos = math::mvec3(0.0f, 0.0f, 3.0f);
+			t.rot = math::Quaternion(math::vec3_y, math::pi);
+			t.parent = wall_t_h;
 			light.exponent = 64;
 			light.color = math::mvec3(0.0f, 32.0f, 0.0f);
 			light.transform = scene.transforms.insert(t);
