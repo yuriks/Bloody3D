@@ -160,6 +160,7 @@ void renderGeometry(
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms_copy, GL_STREAM_DRAW);
 
 		glDrawElements(GL_TRIANGLES, mesh->indices_count, mesh->indices_type, 0);
+		glFlush(); // BUG: Work around for intel bug: glBufferData is ignored
 	}
 
 	for (int t = 0; t < 4; ++t) {
