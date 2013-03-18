@@ -57,8 +57,6 @@ struct Scene {
 	Scene(const Engine* engine)
 		: engine(engine)
 	{}
-
-	Handle newInstance(Handle mesh_id);
 };
 
 void bindGBufferTextures(GBufferSet& gbuffer);
