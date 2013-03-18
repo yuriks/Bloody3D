@@ -21,11 +21,11 @@ math::mat4 calcInvTransformMtx(const Transform& t) {
 
 void calculateModel2WorldMatrices(
 	const ObjectPool<Transform>& transforms,
-	math::mat4* out_begin)
+	math::mat4* out, math::mat4* out_inverse)
 {
-	math::mat4* out_i = out_begin;
-	for (auto i = transforms.pool.cbegin(), end = transforms.pool.cend(); i != end; ++i, ++out_i) {
-		*out_i = calcTransformMtx(*i);
+	for (size_t i = 0, end = transforms.pool.size(); i < end; ++i) {
+		out[i] = calcTransformMtx(transforms.pool[i]);
+		out_inverse[i] = calcInvTransformMtx(transforms.pool[i]);
 	}
 }
 

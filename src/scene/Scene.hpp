@@ -29,7 +29,7 @@ struct MeshInstance {
 };
 
 struct Camera {
-	Transform t;
+	Handle transform;
 	float fov;
 	float clip_near;
 	float clip_far;

@@ -20,6 +20,6 @@ math::mat4 calcInvTransformMtx(const Transform& t);
 
 void calculateModel2WorldMatrices(
 	const ObjectPool<Transform>& transforms,
-	math::mat4* out_begin);
+	math::mat4* out, math::mat4* out_inverse);
 
 } // namespace scene

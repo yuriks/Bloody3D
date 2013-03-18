@@ -187,7 +187,12 @@ int main(int argc, char *argv[])
 		camera.fov = 45.f;
 		camera.clip_near = 0.1f;
 		camera.clip_far = 500.f;
-		camera.t.pos = math::mvec3(0.f, 0.f, -3.5f);
+
+		{
+			scene::Transform t;
+			t.pos = math::mvec3(0.f, 0.f, -3.5f);
+			camera.transform = scene.transforms.insert(t);
+		}
 
 		{
 			MaterialTemplate material_template;
@@ -333,11 +338,13 @@ int main(int argc, char *argv[])
 				}
 
 				std::vector<math::mat4> model2world_mats(scene.transforms.pool.size());
-				scene::calculateModel2WorldMatrices(scene.transforms, model2world_mats.data());
+				std::vector<math::mat4> model2world_inv_mats(scene.transforms.pool.size());
+				scene::calculateModel2WorldMatrices(scene.transforms,
+					model2world_mats.data(), model2world_inv_mats.data());
 
 				scene::SystemUniformBlock sys_uniforms;
 				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
-				math::mat4 world2view_mat = calcInvTransformMtx(camera.t);
+				math::mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
 
 				scene::renderGeometry(scene, world2view_mat, model2world_mats.data(), def_buffers, render_context, sys_uniforms);
 
