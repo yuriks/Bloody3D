@@ -8,11 +8,13 @@ namespace scene {
 void transformDirectionalLights(
 	const std::vector<DirectionalLight>& in_lights,
 	std::vector<GPUDirectionalLight>& out_lights,
-	const math::mat4& world2view_mat)
+	const math::mat4& world2view_mat,
+	const ObjectPool<Transform>& transforms,
+	const math::mat4* model2world_mats)
 {
 	out_lights.resize(in_lights.size());
 	for (size_t i = 0; i < in_lights.size(); ++i) {
-		const math::mat4 model2view_mat = world2view_mat * calcTransformMtx(in_lights[i].t);
+		const math::mat4 model2view_mat = world2view_mat * model2world_mats[transforms.getPoolIndex(in_lights[i].transform)];
 		out_lights[i].direction = -math::mvec3(model2view_mat * math::mvec4(math::vec3_z, 0.0f));
 		out_lights[i].color = in_lights[i].color;
 	}

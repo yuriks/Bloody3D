@@ -12,7 +12,7 @@ struct RenderContext;
 struct SystemUniformBlock;
 
 struct OmniLight {
-	Transform t;
+	Handle transform;
 	math::vec3 color;
 };
 
@@ -24,7 +24,9 @@ struct GPUOmniLight {
 void transformOmniLights(
 	const std::vector<OmniLight>& in_lights,
 	std::vector<GPUOmniLight>& out_lights,
-	const math::mat4& world2view_mat);
+	const math::mat4& world2view_mat,
+	const ObjectPool<Transform>& transforms,
+	const math::mat4* model2world_mats);
 
 void shadeOmniLights(
 	const std::vector<GPUOmniLight>& lights,

@@ -9,6 +9,9 @@
 #include "util/AlignedVector.hpp"
 #include "scene/RenderContext.hpp"
 #include "scene/Transform.hpp"
+#include "scene/DirectionalLight.hpp"
+#include "scene/OmniLight.hpp"
+#include "scene/SpotLight.hpp"
 #include "Engine.hpp"
 #include "util/ObjectPool.hpp"
 
@@ -53,6 +56,10 @@ struct Scene {
 
 	ObjectPool<Transform> transforms;
 	ObjectPool<MeshInstance> mesh_instances;
+
+	ObjectPool<DirectionalLight> lights_dir;
+	ObjectPool<OmniLight> lights_omni;
+	ObjectPool<SpotLight> lights_spot;
 
 	Scene(const Engine* engine)
 		: engine(engine)

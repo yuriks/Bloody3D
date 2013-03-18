@@ -12,7 +12,7 @@ struct RenderContext;
 struct SystemUniformBlock;
 
 struct SpotLight {
-	Transform t;
+	Handle transform;
 	math::vec3 color;
 	float exponent;
 };
@@ -26,7 +26,9 @@ struct GPUSpotLight {
 void transformSpotLights(
 	const std::vector<SpotLight>& in_lights,
 	std::vector<GPUSpotLight>& out_lights,
-	const math::mat4& world2view_mat);
+	const math::mat4& world2view_mat,
+	const ObjectPool<Transform>& transforms,
+	const math::mat4* model2world_mats);
 
 void shadeSpotLights(
 	const std::vector<GPUSpotLight>& lights,

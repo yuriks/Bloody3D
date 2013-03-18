@@ -1,7 +1,9 @@
 #pragma once
 
 #include "math/vec.hpp"
+#include "math/mat.hpp"
 #include "Transform.hpp"
+#include "util/ObjectPool.hpp"
 #include <vector>
 
 struct Material;
@@ -12,7 +14,7 @@ struct RenderContext;
 struct SystemUniformBlock;
 
 struct DirectionalLight {
-	Transform t;
+	Handle transform;
 	math::vec3 color;
 };
 
@@ -24,7 +26,9 @@ struct GPUDirectionalLight {
 void transformDirectionalLights(
 	const std::vector<DirectionalLight>& in_lights,
 	std::vector<GPUDirectionalLight>& out_lights,
-	const math::mat4& world2view_mat);
+	const math::mat4& world2view_mat,
+	const ObjectPool<Transform>& transforms,
+	const math::mat4* model2world_mats);
 
 void shadeDirectionalLights(
 	const std::vector<GPUDirectionalLight>& lights,

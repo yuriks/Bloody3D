@@ -146,37 +146,41 @@ int main(int argc, char *argv[])
 		Handle wall_t_h = scene.transforms.insert();
 		Handle wall_meshinst_h = scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
 
-		std::vector<scene::DirectionalLight> directional_lights;
 		{
 			scene::DirectionalLight light;
+			scene::Transform t;
 
-			light.t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
+			t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
 			light.color = 2.5f * math::vec3_1;
-			directional_lights.push_back(light);
+			light.transform = scene.transforms.insert(t);
+			scene.lights_dir.insert(light);
 
-			light.t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
+			t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
 			light.color = math::mvec3(0.1f, 0.1f, 0.8f);
-			directional_lights.push_back(light);
+			light.transform = scene.transforms.insert(t);
+			scene.lights_dir.insert(light);
 		}
 
-		std::vector<scene::OmniLight> omni_lights;
 		{
 			scene::OmniLight light;
+			scene::Transform t;
 
-			light.t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
+			t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
 			light.color = math::mvec3(32.0f, 0.0f, 0.0f);
-			omni_lights.push_back(light);
+			light.transform = scene.transforms.insert(t);
+			scene.lights_omni.insert(light);
 		}
 
-		std::vector<scene::SpotLight> spot_lights;
 		{
 			scene::SpotLight light;
+			scene::Transform t;
 
-			light.t.pos = math::mvec3(0.0f, 3.0f, 0.0f);
-			light.t.rot = math::Quaternion(math::vec3_x, math::pi / 2.0f);
+			t.pos = math::mvec3(0.0f, 3.0f, 0.0f);
+			t.rot = math::Quaternion(math::vec3_x, math::pi / 2.0f);
 			light.exponent = 64;
 			light.color = math::mvec3(0.0f, 32.0f, 0.0f);
-			spot_lights.push_back(light);
+			light.transform = scene.transforms.insert(t);
+			scene.lights_spot.insert(light);
 		}
 
 		scene::Camera camera;
@@ -346,7 +350,9 @@ int main(int argc, char *argv[])
 
 				{
 					std::vector<scene::GPUDirectionalLight> gpu_dirlights;
-					scene::transformDirectionalLights(directional_lights, gpu_dirlights, world2view_mat);
+					scene::transformDirectionalLights(
+						scene.lights_dir.pool, gpu_dirlights,
+						world2view_mat, scene.transforms, model2world_mats.data());
 					dirlight_vao.bind();
 					dirlight_vbo.bind(GL_ARRAY_BUFFER);
 					scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
@@ -354,7 +360,9 @@ int main(int argc, char *argv[])
 
 				{
 					std::vector<scene::GPUOmniLight> gpu_omnilights;
-					scene::transformOmniLights(omni_lights, gpu_omnilights, world2view_mat);
+					scene::transformOmniLights(
+						scene.lights_omni.pool, gpu_omnilights,
+						world2view_mat, scene.transforms, model2world_mats.data());
 					omnilight_vao.bind();
 					omnilight_vbo.bind(GL_ARRAY_BUFFER);
 					scene::shadeOmniLights(gpu_omnilights, omnilight_material, render_context, sys_uniforms);
@@ -362,7 +370,9 @@ int main(int argc, char *argv[])
 
 				{
 					std::vector<scene::GPUSpotLight> gpu_spotlights;
-					scene::transformSpotLights(spot_lights, gpu_spotlights, world2view_mat);
+					scene::transformSpotLights(
+						scene.lights_spot.pool, gpu_spotlights,
+						world2view_mat, scene.transforms, model2world_mats.data());
 					spotlight_vao.bind();
 					spotlight_vbo.bind(GL_ARRAY_BUFFER);
 					scene::shadeSpotLights(gpu_spotlights, spotlight_material, render_context, sys_uniforms);
