@@ -124,6 +124,7 @@ void renderGeometry(
 
 		if (cur_mesh_id != instance->mesh_id) {
 			// Load mesh
+			cur_mesh_id = instance->mesh_id;
 
 			if (cur_material_id != mesh->material_id) {
 				// Load material
