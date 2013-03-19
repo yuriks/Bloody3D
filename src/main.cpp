@@ -95,21 +95,6 @@ bool init_window()
 	return true;
 }
 
-template <typename L, typename GPUL>
-void shadeLightSet(
-	const std::vector<L>& lights, const LightInfo& light_info,
-	const math::mat4& world2view_mat, const math::mat4* model2world_mats,
-	const Engine& engine, const scene::Scene& scene, const scene::SystemUniformBlock& sys_uniforms)
-{
-	std::vector<GPUL> gpu_dirlights;
-	scene::transformLights(
-		lights, gpu_dirlights,
-		world2view_mat, scene.transforms, model2world_mats);
-	light_info.vao.bind();
-	light_info.vbo.bind(GL_ARRAY_BUFFER);
-	scene::shadeLights(gpu_dirlights, *engine.materials[light_info.material], engine.render_context, sys_uniforms);
-}
-
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -373,15 +358,18 @@ int main(int argc, char *argv[])
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
 
-				shadeLightSet<scene::DirectionalLight, scene::GPUDirectionalLight>(
-					scene.lights_dir.pool, engine.dirlight,
-					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
-				shadeLightSet<scene::OmniLight, scene::GPUOmniLight>(
-					scene.lights_omni.pool, engine.omnilight,
-					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
-				shadeLightSet<scene::SpotLight, scene::GPUSpotLight>(
-					scene.lights_spot.pool, engine.spotlight,
-					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
+				{
+					scene::ShadeLightSetParams p = {
+						&world2view_mat, model2world_mats.data(), &engine, &scene, &sys_uniforms
+					};
+
+					scene::shadeLightSet<scene::DirectionalLight, scene::GPUDirectionalLight>(
+						scene.lights_dir.pool, engine.dirlight, p);
+					scene::shadeLightSet<scene::OmniLight, scene::GPUOmniLight>(
+						scene.lights_omni.pool, engine.omnilight, p);
+					scene::shadeLightSet<scene::SpotLight, scene::GPUSpotLight>(
+						scene.lights_spot.pool, engine.spotlight, p);
+				}
 
 				for (int t = 0; t < 3; ++t) {
 					glActiveTexture(GL_TEXTURE0 + t);
