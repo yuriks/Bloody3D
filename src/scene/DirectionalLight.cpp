@@ -5,7 +5,7 @@
 
 namespace scene {
 
-void transformDirectionalLights(
+void transformLights(
 	const std::vector<DirectionalLight>& in_lights,
 	std::vector<GPUDirectionalLight>& out_lights,
 	const math::mat4& world2view_mat,
@@ -21,10 +21,10 @@ void transformDirectionalLights(
 }
 
 // Shades a collection of directional lights to the shading buffer. Lights are in view-space.
-void shadeDirectionalLights(
+void shadeLights(
 	const std::vector<GPUDirectionalLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context,
+	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
 {
 	glEnable(GL_DEPTH_TEST);

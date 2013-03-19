@@ -5,7 +5,7 @@
 
 namespace scene {
 
-void transformOmniLights(
+void transformLights(
 	const std::vector<OmniLight>& in_lights,
 	std::vector<GPUOmniLight>& out_lights,
 	const math::mat4& world2view_mat,
@@ -21,10 +21,10 @@ void transformOmniLights(
 }
 
 // Shades a collection of omnilights to the shading buffer. Lights are in view-space.
-void shadeOmniLights(
+void shadeLights(
 	const std::vector<GPUOmniLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context,
+	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
 {
 	glEnable(GL_DEPTH_TEST);

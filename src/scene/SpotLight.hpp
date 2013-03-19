@@ -23,17 +23,17 @@ struct GPUSpotLight {
 	math::vec3 color;
 };
 
-void transformSpotLights(
+void transformLights(
 	const std::vector<SpotLight>& in_lights,
 	std::vector<GPUSpotLight>& out_lights,
 	const math::mat4& world2view_mat,
 	const ObjectPool<Transform>& transforms,
 	const math::mat4* model2world_mats);
 
-void shadeSpotLights(
+void shadeLights(
 	const std::vector<GPUSpotLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context,
+	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
 
 } // namespace scene

@@ -95,6 +95,21 @@ bool init_window()
 	return true;
 }
 
+template <typename L, typename GPUL>
+void shadeLightSet(
+	const std::vector<L>& lights, const LightInfo& light_info,
+	const math::mat4& world2view_mat, const math::mat4* model2world_mats,
+	const Engine& engine, const scene::Scene& scene, const scene::SystemUniformBlock& sys_uniforms)
+{
+	std::vector<GPUL> gpu_dirlights;
+	scene::transformLights(
+		lights, gpu_dirlights,
+		world2view_mat, scene.transforms, model2world_mats);
+	light_info.vao.bind();
+	light_info.vbo.bind(GL_ARRAY_BUFFER);
+	scene::shadeLights(gpu_dirlights, *engine.materials[light_info.material], engine.render_context, sys_uniforms);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -106,8 +121,7 @@ int main(int argc, char *argv[])
 
 	{
 		Engine engine;
-
-		scene::RenderContext render_context(WINDOW_WIDTH, WINDOW_HEIGHT);
+		engine.render_context.setScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene::Scene scene(&engine);
 
 		Handle mesh_id;
@@ -201,17 +215,14 @@ int main(int argc, char *argv[])
 			MaterialTemplate material_template;
 			material_template.attachShaders("light_directional");
 			material_template.options_size = 0;
-			Material dirlight_material = material_template.compile();
-
-			gl::VertexArrayObject dirlight_vao;
-			gl::BufferObject dirlight_vbo;
+			engine.dirlight.material = engine.materials.insert(material_template.compile());
 
 			// Setup Directional Light vertex attribs
 			{
 				using scene::GPUDirectionalLight;
-				dirlight_vao.bind();
+				engine.dirlight.vao.bind();
 
-				dirlight_vbo.bind(GL_ARRAY_BUFFER);
+				engine.dirlight.vbo.bind(GL_ARRAY_BUFFER);
 				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, direction));
 				glEnableVertexAttribArray(0);
@@ -225,17 +236,14 @@ int main(int argc, char *argv[])
 			material_template.clear();
 			material_template.attachShaders("light_omni");
 			material_template.options_size = 0;
-			Material omnilight_material = material_template.compile();
-
-			gl::VertexArrayObject omnilight_vao;
-			gl::BufferObject omnilight_vbo;
+			engine.omnilight.material = engine.materials.insert(material_template.compile());
 
 			// Setup Omnilight vertex attribs
 			{
 				using scene::GPUOmniLight;
-				omnilight_vao.bind();
+				engine.omnilight.vao.bind();
 
-				omnilight_vbo.bind(GL_ARRAY_BUFFER);
+				engine.omnilight.vbo.bind(GL_ARRAY_BUFFER);
 				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, pos));
 				glEnableVertexAttribArray(0);
@@ -249,17 +257,14 @@ int main(int argc, char *argv[])
 			material_template.clear();
 			material_template.attachShaders("light_spot");
 			material_template.options_size = 0;
-			Material spotlight_material = material_template.compile();
-
-			gl::VertexArrayObject spotlight_vao;
-			gl::BufferObject spotlight_vbo;
+			engine.spotlight.material = engine.materials.insert(material_template.compile());
 
 			// Setup Spotlight vertex attribs
 			{
 				using scene::GPUSpotLight;
-				spotlight_vao.bind();
+				engine.spotlight.vao.bind();
 
-				spotlight_vbo.bind(GL_ARRAY_BUFFER);
+				engine.spotlight.vbo.bind(GL_ARRAY_BUFFER);
 				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, pos));
 				glEnableVertexAttribArray(0);
@@ -289,9 +294,9 @@ int main(int argc, char *argv[])
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			scene::GBufferSet def_buffers;
-			def_buffers.initialize(render_context.screen_width, render_context.screen_height);
+			def_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height);
 			scene::ShadingBufferSet shading_buffers;
-			shading_buffers.initialize(render_context.screen_width, render_context.screen_height, def_buffers.depth_tex);
+			shading_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height, def_buffers.depth_tex);
 
 			double elapsed_game_time = 0.;
 			double elapsed_real_time = 0.;
@@ -342,10 +347,10 @@ int main(int argc, char *argv[])
 					model2world_mats.data(), model2world_inv_mats.data());
 
 				scene::SystemUniformBlock sys_uniforms;
-				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, engine.render_context.aspect_ratio, camera.clip_near, camera.clip_far);
 				math::mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
 
-				scene::renderGeometry(scene, world2view_mat, model2world_mats.data(), def_buffers, render_context, sys_uniforms);
+				scene::renderGeometry(scene, world2view_mat, model2world_mats.data(), def_buffers, engine.render_context, sys_uniforms);
 
 				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 				bindGBufferTextures(def_buffers);
@@ -354,35 +359,15 @@ int main(int argc, char *argv[])
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_ONE, GL_ONE);
 
-				{
-					std::vector<scene::GPUDirectionalLight> gpu_dirlights;
-					scene::transformDirectionalLights(
-						scene.lights_dir.pool, gpu_dirlights,
-						world2view_mat, scene.transforms, model2world_mats.data());
-					dirlight_vao.bind();
-					dirlight_vbo.bind(GL_ARRAY_BUFFER);
-					scene::shadeDirectionalLights(gpu_dirlights, dirlight_material, render_context, sys_uniforms);
-				}
-
-				{
-					std::vector<scene::GPUOmniLight> gpu_omnilights;
-					scene::transformOmniLights(
-						scene.lights_omni.pool, gpu_omnilights,
-						world2view_mat, scene.transforms, model2world_mats.data());
-					omnilight_vao.bind();
-					omnilight_vbo.bind(GL_ARRAY_BUFFER);
-					scene::shadeOmniLights(gpu_omnilights, omnilight_material, render_context, sys_uniforms);
-				}
-
-				{
-					std::vector<scene::GPUSpotLight> gpu_spotlights;
-					scene::transformSpotLights(
-						scene.lights_spot.pool, gpu_spotlights,
-						world2view_mat, scene.transforms, model2world_mats.data());
-					spotlight_vao.bind();
-					spotlight_vbo.bind(GL_ARRAY_BUFFER);
-					scene::shadeSpotLights(gpu_spotlights, spotlight_material, render_context, sys_uniforms);
-				}
+				shadeLightSet<scene::DirectionalLight, scene::GPUDirectionalLight>(
+					scene.lights_dir.pool, engine.dirlight,
+					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
+				shadeLightSet<scene::OmniLight, scene::GPUOmniLight>(
+					scene.lights_omni.pool, engine.omnilight,
+					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
+				shadeLightSet<scene::SpotLight, scene::GPUSpotLight>(
+					scene.lights_spot.pool, engine.spotlight,
+					world2view_mat, model2world_mats.data(), engine, scene, sys_uniforms);
 
 				for (int t = 0; t < 3; ++t) {
 					glActiveTexture(GL_TEXTURE0 + t);
@@ -391,7 +376,7 @@ int main(int argc, char *argv[])
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 				null_vao.bind();
-				scene::tonemap(shading_buffers, tonemap_material, render_context);
+				scene::tonemap(shading_buffers, tonemap_material, engine.render_context);
 				glBindVertexArray(0);
 
 				glfwSwapBuffers();

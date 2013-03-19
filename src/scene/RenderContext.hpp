@@ -12,7 +12,8 @@ struct SystemUniformBlock {
 };
 
 struct RenderContext {
-	RenderContext(int width, int height);
+	RenderContext();
+	void setScreenSize(int width, int height);
 
 	gl::BufferObject system_ubo;
 	gl::BufferObject material_ubo;

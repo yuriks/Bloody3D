@@ -4,9 +4,22 @@
 #include "util/ObjectPool.hpp"
 #include "mesh/Material.hpp"
 #include "mesh/GPUMesh.hpp"
+#include "scene/RenderContext.hpp"
+
+struct LightInfo {
+	Handle material;
+	gl::VertexArrayObject vao;
+	gl::BufferObject vbo;
+};
 
 struct Engine {
 	TextureManager texture_manager;
 	ObjectPool<Material> materials;
 	ObjectPool<GPUMesh> gpu_meshes;
+
+	scene::RenderContext render_context;
+
+	LightInfo dirlight;
+	LightInfo omnilight;
+	LightInfo spotlight;
 };

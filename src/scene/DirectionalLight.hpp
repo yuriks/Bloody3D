@@ -23,17 +23,17 @@ struct GPUDirectionalLight {
 	math::vec3 color;
 };
 
-void transformDirectionalLights(
+void transformLights(
 	const std::vector<DirectionalLight>& in_lights,
 	std::vector<GPUDirectionalLight>& out_lights,
 	const math::mat4& world2view_mat,
 	const ObjectPool<Transform>& transforms,
 	const math::mat4* model2world_mats);
 
-void shadeDirectionalLights(
+void shadeLights(
 	const std::vector<GPUDirectionalLight>& lights,
 	const Material& light_material,
-	RenderContext& render_context,
+	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
 
 } // namespace scene
