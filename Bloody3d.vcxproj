@@ -15,6 +15,7 @@
     <ClCompile Include="libs\src\stb_image.c" />
     <ClCompile Include="src\editor\AssetProcessing.cpp" />
     <ClCompile Include="src\editor\MeshCooker.cpp" />
+    <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
     <ClCompile Include="src\texture\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />

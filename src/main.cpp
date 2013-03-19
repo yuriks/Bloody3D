@@ -271,31 +271,7 @@ int main(int argc, char *argv[])
 	{
 		Engine engine;
 		engine.render_context.setScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-		{
-			MaterialTemplate material_template;
-			material_template.attachShaders("light_directional");
-			material_template.options_size = 0;
-			engine.dirlight.material = engine.materials.insert(material_template.compile());
-			scene::setupDirLightVao(engine.dirlight);
-
-			material_template.clear();
-			material_template.attachShaders("light_omni");
-			material_template.options_size = 0;
-			engine.omnilight.material = engine.materials.insert(material_template.compile());
-			scene::setupOmniLightVao(engine.omnilight);
-
-			material_template.clear();
-			material_template.attachShaders("light_spot");
-			material_template.options_size = 0;
-			engine.spotlight.material = engine.materials.insert(material_template.compile());
-			scene::setupSpotLightVao(engine.spotlight);
-
-			material_template.clear();
-			material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");
-			material_template.options_size = 0;
-			engine.tonemap_material = engine.materials.insert(material_template.compile());
-		}
+		loadEngineMaterials(engine);
 
 		bool running = true;
 

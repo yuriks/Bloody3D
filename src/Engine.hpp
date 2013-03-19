@@ -26,3 +26,5 @@ struct Engine {
 	LightInfo spotlight;
 	gl::VertexArrayObject null_vao;
 };
+
+void loadEngineMaterials(Engine& engine);
