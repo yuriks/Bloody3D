@@ -160,7 +160,21 @@ int main(int argc, char *argv[])
 		scene::Transform wall_tt;
 		wall_tt.rot = math::Quaternion(math::up, math::pi);
 		Handle wall_t_h = scene.transforms.insert(wall_tt);
-		Handle wall_meshinst_h = scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
+		scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
+
+		{
+			wall_tt.parent = wall_t_h;
+
+			wall_tt.pos = math::mvec3(2.0f, 0.0f, -2.0f);
+			wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * 0.5f);
+			Handle t = scene.transforms.insert(wall_tt);
+			scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
+
+			wall_tt.pos = math::mvec3(-2.0f, 0.0f, -2.0f);
+			wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * -0.5f);
+			t = scene.transforms.insert(wall_tt);
+			scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
+		}
 
 		{
 			scene::DirectionalLight light;
@@ -207,7 +221,7 @@ int main(int argc, char *argv[])
 
 		{
 			scene::Transform t;
-			t.pos = math::mvec3(0.f, 0.f, -3.5f);
+			t.pos = math::mvec3(0.f, 0.f, -5.5f);
 			camera.transform = scene.transforms.insert(t);
 		}
 
