@@ -96,7 +96,7 @@ bool init_window()
 }
 
 void renderCamera(
-	Engine& engine, scene::Scene& scene, scene::Camera& camera,
+	const Engine& engine, const scene::Scene& scene, const scene::Camera& camera,
 	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers,
 	const math::mat4* model2world_mats, const math::mat4* model2world_inv_mats)
 {
@@ -135,7 +135,7 @@ void renderCamera(
 }
 
 void renderScene(
-	Engine& engine, scene::Scene& scene,
+	const Engine& engine, const scene::Scene& scene,
 	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers)
 {
 	using namespace scene;
