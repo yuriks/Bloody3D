@@ -95,6 +95,111 @@ bool init_window()
 	return true;
 }
 
+void setupTestScene(Engine& engine, scene::Scene& scene, Handle* wall_t_h) {
+	Handle mesh_id;
+	{
+		Handle mat_id;
+		{
+			MaterialTemplate material_template;
+			material_template.attachShaders("test");
+			material_template.options_size = 0;
+
+			mat_id = engine.materials.insert(material_template.compile());
+		}
+
+		GPUMesh mesh;
+
+		util::MMapHandle mmap_h = util::mmapFile("data/panel_beams.hwmesh");
+		assert(mmap_h != -1);
+
+		mesh::loadHWMesh(util::mmapGetData(mmap_h), util::fnv_hash("panel_beams"), mesh);
+
+		util::mmapClose(mmap_h);
+
+		mesh.material_id = mat_id;
+
+		{
+			MaterialOptions mtl_options;
+			mtl_options.uniforms = nullptr;
+			mtl_options.texture_ids[0] = engine.texture_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
+			mtl_options.texture_ids[1] = engine.texture_manager.getTexture("panel_beams_normal.png");
+			mesh.material_options = mtl_options;
+		}
+
+		mesh_id = engine.gpu_meshes.insert(std::move(mesh));
+	}
+
+	scene::Transform wall_tt;
+	wall_tt.rot = math::Quaternion(math::up, math::pi);
+	*wall_t_h = scene.transforms.insert(wall_tt);
+	scene.mesh_instances.insert(scene::MeshInstance(*wall_t_h, mesh_id));
+
+	{
+		wall_tt.parent = *wall_t_h;
+
+		wall_tt.pos = math::mvec3(2.0f, 0.0f, -2.0f);
+		wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * 0.5f);
+		Handle t = scene.transforms.insert(wall_tt);
+		scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
+
+		wall_tt.pos = math::mvec3(-2.0f, 0.0f, -2.0f);
+		wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * -0.5f);
+		t = scene.transforms.insert(wall_tt);
+		scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
+	}
+
+	{
+		scene::DirectionalLight light;
+		scene::Transform t;
+
+		t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
+		light.color = 2.5f * math::vec3_1;
+		light.transform = scene.transforms.insert(t);
+		scene.lights_dir.insert(light);
+
+		t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
+		light.color = math::mvec3(0.1f, 0.1f, 0.8f);
+		light.transform = scene.transforms.insert(t);
+		scene.lights_dir.insert(light);
+	}
+
+	{
+		scene::OmniLight light;
+		scene::Transform t;
+
+		t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
+		light.color = math::mvec3(32.0f, 0.0f, 0.0f);
+		light.transform = scene.transforms.insert(t);
+		scene.lights_omni.insert(light);
+	}
+
+	{
+		scene::SpotLight light;
+		scene::Transform t;
+
+		t.pos = math::mvec3(0.0f, 0.0f, 3.0f);
+		t.rot = math::Quaternion(math::vec3_y, math::pi);
+		t.parent = *wall_t_h;
+		light.exponent = 64;
+		light.color = math::mvec3(0.0f, 32.0f, 0.0f);
+		light.transform = scene.transforms.insert(t);
+		scene.lights_spot.insert(light);
+	}
+
+	{
+		scene::Camera camera;
+		camera.fov = 45.f;
+		camera.clip_near = 0.1f;
+		camera.clip_far = 500.f;
+
+		scene::Transform t;
+		t.pos = math::mvec3(0.f, 0.f, -5.5f);
+		camera.transform = scene.transforms.insert(t);
+
+		scene.active_camera = scene.cameras.insert(camera);
+	}
+}
+
 void renderCamera(
 	const Engine& engine, const scene::Scene& scene, const scene::Camera& camera,
 	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers,
@@ -166,110 +271,6 @@ int main(int argc, char *argv[])
 	{
 		Engine engine;
 		engine.render_context.setScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-		scene::Scene scene(&engine);
-
-		Handle mesh_id;
-		{
-			Handle mat_id;
-			{
-				MaterialTemplate material_template;
-				material_template.attachShaders("test");
-				material_template.options_size = 0;
-
-				mat_id = engine.materials.insert(material_template.compile());
-			}
-
-			GPUMesh mesh;
-
-			util::MMapHandle mmap_h = util::mmapFile("data/panel_beams.hwmesh");
-			assert(mmap_h != -1);
-
-			mesh::loadHWMesh(util::mmapGetData(mmap_h), util::fnv_hash("panel_beams"), mesh);
-
-			util::mmapClose(mmap_h);
-
-			mesh.material_id = mat_id;
-
-			{
-				MaterialOptions mtl_options;
-				mtl_options.uniforms = nullptr;
-				mtl_options.texture_ids[0] = engine.texture_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
-				mtl_options.texture_ids[1] = engine.texture_manager.getTexture("panel_beams_normal.png");
-				mesh.material_options = mtl_options;
-			}
-
-			mesh_id = engine.gpu_meshes.insert(std::move(mesh));
-		}
-
-		scene::Transform wall_tt;
-		wall_tt.rot = math::Quaternion(math::up, math::pi);
-		Handle wall_t_h = scene.transforms.insert(wall_tt);
-		scene.mesh_instances.insert(scene::MeshInstance(wall_t_h, mesh_id));
-
-		{
-			wall_tt.parent = wall_t_h;
-
-			wall_tt.pos = math::mvec3(2.0f, 0.0f, -2.0f);
-			wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * 0.5f);
-			Handle t = scene.transforms.insert(wall_tt);
-			scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
-
-			wall_tt.pos = math::mvec3(-2.0f, 0.0f, -2.0f);
-			wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * -0.5f);
-			t = scene.transforms.insert(wall_tt);
-			scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
-		}
-
-		{
-			scene::DirectionalLight light;
-			scene::Transform t;
-
-			t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
-			light.color = 2.5f * math::vec3_1;
-			light.transform = scene.transforms.insert(t);
-			scene.lights_dir.insert(light);
-
-			t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
-			light.color = math::mvec3(0.1f, 0.1f, 0.8f);
-			light.transform = scene.transforms.insert(t);
-			scene.lights_dir.insert(light);
-		}
-
-		{
-			scene::OmniLight light;
-			scene::Transform t;
-
-			t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
-			light.color = math::mvec3(32.0f, 0.0f, 0.0f);
-			light.transform = scene.transforms.insert(t);
-			scene.lights_omni.insert(light);
-		}
-
-		{
-			scene::SpotLight light;
-			scene::Transform t;
-
-			t.pos = math::mvec3(0.0f, 0.0f, 3.0f);
-			t.rot = math::Quaternion(math::vec3_y, math::pi);
-			t.parent = wall_t_h;
-			light.exponent = 64;
-			light.color = math::mvec3(0.0f, 32.0f, 0.0f);
-			light.transform = scene.transforms.insert(t);
-			scene.lights_spot.insert(light);
-		}
-
-		{
-			scene::Camera camera;
-			camera.fov = 45.f;
-			camera.clip_near = 0.1f;
-			camera.clip_far = 500.f;
-
-			scene::Transform t;
-			t.pos = math::mvec3(0.f, 0.f, -5.5f);
-			camera.transform = scene.transforms.insert(t);
-
-			scene.active_camera = scene.cameras.insert(camera);
-		}
 
 		{
 			MaterialTemplate material_template;
@@ -294,77 +295,81 @@ int main(int argc, char *argv[])
 			material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");
 			material_template.options_size = 0;
 			engine.tonemap_material = engine.materials.insert(material_template.compile());
+		}
 
-			bool running = true;
+		bool running = true;
 
-			glEnable(GL_CULL_FACE);
-			//glEnable(GL_DEPTH_CLAMP);
-			glFrontFace(GL_CW);
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_CULL_FACE);
+		//glEnable(GL_DEPTH_CLAMP);
+		glFrontFace(GL_CW);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			scene::GBufferSet def_buffers;
-			def_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height);
-			scene::ShadingBufferSet shading_buffers;
-			shading_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height, def_buffers.depth_tex);
+		scene::GBufferSet def_buffers;
+		def_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height);
+		scene::ShadingBufferSet shading_buffers;
+		shading_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height, def_buffers.depth_tex);
 
-			double elapsed_game_time = 0.;
-			double elapsed_real_time = 0.;
-			double last_frame_time;
+		scene::Scene scene(&engine);
+		Handle wall_t;
+		setupTestScene(engine, scene, &wall_t);
 
-			int last_mouse_pos[2];
-			glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
+		double elapsed_game_time = 0.;
+		double elapsed_real_time = 0.;
+		double last_frame_time;
 
-			while (running)
+		int last_mouse_pos[2];
+		glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
+
+		while (running)
+		{
+			double frame_start = glfwGetTime();
+
+			int i;
+			for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 			{
-				double frame_start = glfwGetTime();
+				static const float ROT_SPEED = 0.02f;
+				static const float MOUSE_ROT_SPEED = 0.01f;
 
-				int i;
-				for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
-				{
-					static const float ROT_SPEED = 0.02f;
-					static const float MOUSE_ROT_SPEED = 0.01f;
+				math::Quaternion& rot_amount = scene.transforms[wall_t]->rot;
 
-					math::Quaternion& rot_amount = scene.transforms[wall_t_h]->rot;
+				if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
+				if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
 
-					if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
-					if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey('W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
+				if (glfwGetKey('S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
 
-					if (glfwGetKey('W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
-					if (glfwGetKey('S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
+				if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
 
-					if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
-					if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
+				int cur_mouse_pos[2];
+				glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
 
-					int cur_mouse_pos[2];
-					glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
+				float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
+				float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
+				//x_mdelta = y_mdelta = 0.0f;
+				rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+				rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 
-					float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
-					float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
-					//x_mdelta = y_mdelta = 0.0f;
-					rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
-					rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+				last_mouse_pos[0] = cur_mouse_pos[0];
+				last_mouse_pos[1] = cur_mouse_pos[1];
 
-					last_mouse_pos[0] = cur_mouse_pos[0];
-					last_mouse_pos[1] = cur_mouse_pos[1];
-
-					elapsed_game_time += 1./60.;
-				}
-
-				renderScene(engine, scene, def_buffers, shading_buffers);
-
-				glfwSwapBuffers();
-
-				double tmp = elapsed_real_time + (glfwGetTime() - frame_start);
-				if (elapsed_game_time > tmp)
-					glfwSleep(elapsed_game_time - tmp - 0.01);
-
-				last_frame_time = glfwGetTime() - frame_start;
-				elapsed_real_time += last_frame_time;
-				if (i == 5)
-					elapsed_game_time = elapsed_real_time;
-
-				running = glfwGetWindowParam(GLFW_OPENED) != 0 && glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS;
+				elapsed_game_time += 1./60.;
 			}
+
+			renderScene(engine, scene, def_buffers, shading_buffers);
+
+			glfwSwapBuffers();
+
+			double tmp = elapsed_real_time + (glfwGetTime() - frame_start);
+			if (elapsed_game_time > tmp)
+				glfwSleep(elapsed_game_time - tmp - 0.01);
+
+			last_frame_time = glfwGetTime() - frame_start;
+			elapsed_real_time += last_frame_time;
+			if (i == 5)
+				elapsed_game_time = elapsed_real_time;
+
+			running = glfwGetWindowParam(GLFW_OPENED) != 0 && glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS;
 		}
 	}
 
