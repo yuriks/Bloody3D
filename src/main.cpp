@@ -234,8 +234,6 @@ int main(int argc, char *argv[])
 			material_template.options_size = 0;
 			Material tonemap_material = material_template.compile();
 
-			gl::VertexArrayObject null_vao;
-
 			bool running = true;
 
 			glEnable(GL_CULL_FACE);
@@ -328,7 +326,7 @@ int main(int argc, char *argv[])
 				}
 
 				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-				null_vao.bind();
+				engine.null_vao.bind();
 				scene::tonemap(shading_buffers, tonemap_material, engine.render_context);
 				glBindVertexArray(0);
 

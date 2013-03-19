@@ -22,4 +22,5 @@ struct Engine {
 	LightInfo dirlight;
 	LightInfo omnilight;
 	LightInfo spotlight;
+	gl::VertexArrayObject null_vao;
 };
