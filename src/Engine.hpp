@@ -19,6 +19,8 @@ struct Engine {
 
 	scene::RenderContext render_context;
 
+	Handle tonemap_material;
+
 	LightInfo dirlight;
 	LightInfo omnilight;
 	LightInfo spotlight;

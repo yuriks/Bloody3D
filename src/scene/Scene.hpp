@@ -56,6 +56,8 @@ struct Scene {
 
 	ObjectPool<Transform> transforms;
 	ObjectPool<MeshInstance> mesh_instances;
+	ObjectPool<Camera> cameras;
+	Handle active_camera;
 
 	ObjectPool<DirectionalLight> lights_dir;
 	ObjectPool<OmniLight> lights_omni;

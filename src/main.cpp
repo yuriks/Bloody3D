@@ -95,6 +95,65 @@ bool init_window()
 	return true;
 }
 
+void renderCamera(
+	Engine& engine, scene::Scene& scene, scene::Camera& camera,
+	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers,
+	const math::mat4* model2world_mats, const math::mat4* model2world_inv_mats)
+{
+	using namespace scene;
+
+	scene::SystemUniformBlock sys_uniforms;
+	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, engine.render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+	math::mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
+
+	scene::renderGeometry(scene, world2view_mat, model2world_mats, def_buffers, engine.render_context, sys_uniforms);
+
+	shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
+	bindGBufferTextures(def_buffers);
+	math::vec4 clear_color = {0, 0, 0, 0};
+	glClearBufferfv(GL_COLOR, 0, clear_color.data);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	{
+		scene::ShadeLightSetParams p = {
+			&world2view_mat, model2world_mats, &engine, &scene, &sys_uniforms
+		};
+
+		scene::shadeLightSet<DirectionalLight, GPUDirectionalLight>(
+			scene.lights_dir.pool, engine.dirlight, p);
+		scene::shadeLightSet<OmniLight, GPUOmniLight>(
+			scene.lights_omni.pool, engine.omnilight, p);
+		scene::shadeLightSet<SpotLight, GPUSpotLight>(
+			scene.lights_spot.pool, engine.spotlight, p);
+	}
+
+	for (int t = 0; t < 3; ++t) {
+		glActiveTexture(GL_TEXTURE0 + t);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}
+
+void renderScene(
+	Engine& engine, scene::Scene& scene,
+	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers)
+{
+	using namespace scene;
+
+	std::vector<math::mat4> model2world_mats(scene.transforms.pool.size());
+	std::vector<math::mat4> model2world_inv_mats(scene.transforms.pool.size());
+	scene::calculateModel2WorldMatrices(scene.transforms,
+		model2world_mats.data(), model2world_inv_mats.data());
+
+	renderCamera(engine, scene, *scene.cameras[scene.active_camera],
+		def_buffers, shading_buffers, model2world_mats.data(), model2world_inv_mats.data());
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	engine.null_vao.bind();
+	scene::tonemap(shading_buffers, *engine.materials[engine.tonemap_material], engine.render_context);
+	glBindVertexArray(0);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -199,15 +258,17 @@ int main(int argc, char *argv[])
 			scene.lights_spot.insert(light);
 		}
 
-		scene::Camera camera;
-		camera.fov = 45.f;
-		camera.clip_near = 0.1f;
-		camera.clip_far = 500.f;
-
 		{
+			scene::Camera camera;
+			camera.fov = 45.f;
+			camera.clip_near = 0.1f;
+			camera.clip_far = 500.f;
+
 			scene::Transform t;
 			t.pos = math::mvec3(0.f, 0.f, -5.5f);
 			camera.transform = scene.transforms.insert(t);
+
+			scene.active_camera = scene.cameras.insert(camera);
 		}
 
 		{
@@ -232,7 +293,7 @@ int main(int argc, char *argv[])
 			material_template.clear();
 			material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");
 			material_template.options_size = 0;
-			Material tonemap_material = material_template.compile();
+			engine.tonemap_material = engine.materials.insert(material_template.compile());
 
 			bool running = true;
 
@@ -289,46 +350,7 @@ int main(int argc, char *argv[])
 					elapsed_game_time += 1./60.;
 				}
 
-				std::vector<math::mat4> model2world_mats(scene.transforms.pool.size());
-				std::vector<math::mat4> model2world_inv_mats(scene.transforms.pool.size());
-				scene::calculateModel2WorldMatrices(scene.transforms,
-					model2world_mats.data(), model2world_inv_mats.data());
-
-				scene::SystemUniformBlock sys_uniforms;
-				sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, engine.render_context.aspect_ratio, camera.clip_near, camera.clip_far);
-				math::mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
-
-				scene::renderGeometry(scene, world2view_mat, model2world_mats.data(), def_buffers, engine.render_context, sys_uniforms);
-
-				shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
-				bindGBufferTextures(def_buffers);
-				math::vec4 clear_color = {0, 0, 0, 0};
-				glClearBufferfv(GL_COLOR, 0, clear_color.data);
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE);
-
-				{
-					scene::ShadeLightSetParams p = {
-						&world2view_mat, model2world_mats.data(), &engine, &scene, &sys_uniforms
-					};
-
-					scene::shadeLightSet<scene::DirectionalLight, scene::GPUDirectionalLight>(
-						scene.lights_dir.pool, engine.dirlight, p);
-					scene::shadeLightSet<scene::OmniLight, scene::GPUOmniLight>(
-						scene.lights_omni.pool, engine.omnilight, p);
-					scene::shadeLightSet<scene::SpotLight, scene::GPUSpotLight>(
-						scene.lights_spot.pool, engine.spotlight, p);
-				}
-
-				for (int t = 0; t < 3; ++t) {
-					glActiveTexture(GL_TEXTURE0 + t);
-					glBindTexture(GL_TEXTURE_2D, 0);
-				}
-
-				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-				engine.null_vao.bind();
-				scene::tonemap(shading_buffers, tonemap_material, engine.render_context);
-				glBindVertexArray(0);
+				renderScene(engine, scene, def_buffers, shading_buffers);
 
 				glfwSwapBuffers();
 
