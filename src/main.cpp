@@ -215,68 +215,19 @@ int main(int argc, char *argv[])
 			material_template.attachShaders("light_directional");
 			material_template.options_size = 0;
 			engine.dirlight.material = engine.materials.insert(material_template.compile());
-
-			// Setup Directional Light vertex attribs
-			{
-				using scene::GPUDirectionalLight;
-				engine.dirlight.vao.bind();
-
-				engine.dirlight.vbo.bind(GL_ARRAY_BUFFER);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, direction));
-				glEnableVertexAttribArray(0);
-				glVertexAttribDivisor(0, 1);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
-					sizeof(GPUDirectionalLight), (void*)offsetof(GPUDirectionalLight, color));
-				glEnableVertexAttribArray(1);
-				glVertexAttribDivisor(1, 1);
-			}
+			scene::setupDirLightVao(engine.dirlight);
 
 			material_template.clear();
 			material_template.attachShaders("light_omni");
 			material_template.options_size = 0;
 			engine.omnilight.material = engine.materials.insert(material_template.compile());
-
-			// Setup Omnilight vertex attribs
-			{
-				using scene::GPUOmniLight;
-				engine.omnilight.vao.bind();
-
-				engine.omnilight.vbo.bind(GL_ARRAY_BUFFER);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, pos));
-				glEnableVertexAttribArray(0);
-				glVertexAttribDivisor(0, 1);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
-					sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, color));
-				glEnableVertexAttribArray(1);
-				glVertexAttribDivisor(1, 1);
-			}
+			scene::setupOmniLightVao(engine.omnilight);
 
 			material_template.clear();
 			material_template.attachShaders("light_spot");
 			material_template.options_size = 0;
 			engine.spotlight.material = engine.materials.insert(material_template.compile());
-
-			// Setup Spotlight vertex attribs
-			{
-				using scene::GPUSpotLight;
-				engine.spotlight.vao.bind();
-
-				engine.spotlight.vbo.bind(GL_ARRAY_BUFFER);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, pos));
-				glEnableVertexAttribArray(0);
-				glVertexAttribDivisor(0, 1);
-				glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,
-					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, dir_exp));
-				glEnableVertexAttribArray(1);
-				glVertexAttribDivisor(1, 1);
-				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,
-					sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, color));
-				glEnableVertexAttribArray(2);
-				glVertexAttribDivisor(2, 1);
-			}
+			scene::setupSpotLightVao(engine.spotlight);
 
 			material_template.clear();
 			material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");

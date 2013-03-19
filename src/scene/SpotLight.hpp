@@ -2,6 +2,7 @@
 
 #include "math/vec.hpp"
 #include "Transform.hpp"
+#include "Engine.hpp"
 #include <vector>
 
 struct Material;
@@ -22,6 +23,8 @@ struct GPUSpotLight {
 	math::vec4 dir_exp; // xyz: Direction, w: Exponent
 	math::vec3 color;
 };
+
+void setupSpotLightVao(LightInfo& info);
 
 void transformLights(
 	const std::vector<SpotLight>& in_lights,

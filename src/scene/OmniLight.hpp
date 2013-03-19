@@ -2,6 +2,7 @@
 
 #include "math/vec.hpp"
 #include "Transform.hpp"
+#include "Engine.hpp"
 #include <vector>
 
 struct Material;
@@ -20,6 +21,8 @@ struct GPUOmniLight {
 	math::vec3 pos;
 	math::vec3 color;
 };
+
+void setupOmniLightVao(LightInfo& info);
 
 void transformLights(
 	const std::vector<OmniLight>& in_lights,

@@ -5,6 +5,20 @@
 
 namespace scene {
 
+void setupOmniLightVao(LightInfo& info) {
+	info.vao.bind();
+
+	info.vbo.bind(GL_ARRAY_BUFFER);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+		sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, pos));
+	glEnableVertexAttribArray(0);
+	glVertexAttribDivisor(0, 1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE,
+		sizeof(GPUOmniLight), (void*)offsetof(GPUOmniLight, color));
+	glEnableVertexAttribArray(1);
+	glVertexAttribDivisor(1, 1);
+}
+
 void transformLights(
 	const std::vector<OmniLight>& in_lights,
 	std::vector<GPUOmniLight>& out_lights,

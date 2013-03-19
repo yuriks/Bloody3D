@@ -4,6 +4,7 @@
 #include "math/mat.hpp"
 #include "Transform.hpp"
 #include "util/ObjectPool.hpp"
+#include "Engine.hpp"
 #include <vector>
 
 struct Material;
@@ -22,6 +23,8 @@ struct GPUDirectionalLight {
 	math::vec3 direction;
 	math::vec3 color;
 };
+
+void setupDirLightVao(LightInfo& info);
 
 void transformLights(
 	const std::vector<DirectionalLight>& in_lights,

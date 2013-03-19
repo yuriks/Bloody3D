@@ -5,6 +5,24 @@
 
 namespace scene {
 
+void setupSpotLightVao(LightInfo& info) {
+	info.vao.bind();
+
+	info.vbo.bind(GL_ARRAY_BUFFER);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+		sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, pos));
+	glEnableVertexAttribArray(0);
+	glVertexAttribDivisor(0, 1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE,
+		sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, dir_exp));
+	glEnableVertexAttribArray(1);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,
+		sizeof(GPUSpotLight), (void*)offsetof(GPUSpotLight, color));
+	glEnableVertexAttribArray(2);
+	glVertexAttribDivisor(2, 1);
+}
+
 void transformLights(
 	const std::vector<SpotLight>& in_lights,
 	std::vector<GPUSpotLight>& out_lights,
