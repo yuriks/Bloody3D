@@ -42,7 +42,7 @@ void calculateModel2WorldMatrices(
 				size_t parent_i = transforms.getPoolIndex(t.parent);
 				if (done_els[parent_i]) {
 					out[i] = out[parent_i] * calcTransformMtx(t);
-					out_inverse[i] = out_inverse[parent_i] * calcInvTransformMtx(t);
+					out_inverse[i] = calcInvTransformMtx(t) * out_inverse[parent_i];
 					done_els[i] = true;
 				} else {
 					done = false;
