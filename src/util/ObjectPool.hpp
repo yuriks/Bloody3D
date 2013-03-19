@@ -11,7 +11,10 @@ template <typename T>
 struct ObjectPool {
 	size_t first_free_index; // in roster
 	
-	std::vector<Handle> roster; // .index is next free index for unused entries
+	// For used entries: .index is index into pool.
+	// For free entries: .index is index of next free entry.
+	std::vector<Handle> roster;
+
 	std::vector<T> pool;
 	std::vector<size_t> pool_indices;
 
@@ -41,9 +44,11 @@ struct ObjectPool {
 		if (!isValid(h))
 			return;
 
+		// Indices for object being removed
 		const size_t roster_index = h.index;
 		const size_t pool_index = roster[roster_index].index;
-		
+
+		// Indices for object being moved into its place
 		const size_t moved_roster_index = pool_indices.back();
 		const size_t moved_pool_index = pool.size() - 1;
 		assert(roster[moved_roster_index].index == moved_pool_index);
@@ -79,6 +84,7 @@ struct ObjectPool {
 		}
 	}
 
+	/** Checks if object referenced by handle is still in the pool. */
 	bool isValid(const Handle h) const {
 		return h.index < roster.size() && roster[h.index].generation == h.generation;
 	}
@@ -91,6 +97,7 @@ struct ObjectPool {
 			return Handle(index, roster[pool_indices[index]].generation);
 	}
 
+	/** Get index into pool for handle. */
 	size_t getPoolIndex(const Handle h) const {
 		if (isValid(h)) {
 			return roster[h.index].index;
