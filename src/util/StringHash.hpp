@@ -56,4 +56,12 @@ inline u32 fnv_hash_runtime(const char *str)
 	return hash;
 }
 
+inline u32 fnv_hash_runtime(const char* begin, const char* end) {
+	u32 hash = 2166136261u;
+	for (; begin != end; ++begin) {
+		hash = (hash ^ *begin) * 16777619u;
+	}
+	return hash;
+}
+
 } // namespace util
