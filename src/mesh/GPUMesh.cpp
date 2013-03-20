@@ -1,6 +1,22 @@
 #include "GPUMesh.hpp"
-
+#include "util/mmap.hpp"
+#include "HWMesh.hpp"
 #include <cassert>
+
+GPUMesh GPUMeshTemplate::compile() {
+	GPUMesh mesh;
+
+	util::MMapHandle mmap_h = util::mmapFile(file.c_str());
+	assert(mmap_h != -1);
+
+	mesh::loadHWMesh(util::mmapGetData(mmap_h), util::fnv_hash_runtime(meshname.c_str()), mesh);
+
+	util::mmapClose(mmap_h);
+
+	mesh.material_id = material;
+
+	return mesh;
+}
 
 using namespace vertex_fmt;
 

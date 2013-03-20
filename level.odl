@@ -1,3 +1,9 @@
+GPUMesh @+panel_beams {
+	file: "data/panel_beams.hwmesh"
+	meshname: "panel_beams"
+	material: @standard_material
+}
+
 MaterialParameters @+panel_beams_mtl {
 	tex0: Texture @+tex_panel_beams_diffuse {
 		file: "panel_beams_diffuse.png"

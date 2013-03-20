@@ -107,20 +107,6 @@ void setupTestScene(Engine& engine, scene::Scene& scene) {
 			mat_id = engine.materials.insert(material_template.compile());
 			scene.named_handles.insert(std::make_pair("standard_material", mat_id));
 		}
-
-		GPUMesh mesh;
-
-		util::MMapHandle mmap_h = util::mmapFile("data/panel_beams.hwmesh");
-		assert(mmap_h != -1);
-
-		mesh::loadHWMesh(util::mmapGetData(mmap_h), util::fnv_hash("panel_beams"), mesh);
-
-		util::mmapClose(mmap_h);
-
-		mesh.material_id = mat_id;
-
-		mesh_id = engine.gpu_meshes.insert(std::move(mesh));
-		scene.named_handles.insert(std::make_pair("panel_beams", mesh_id));
 	}
 }
 

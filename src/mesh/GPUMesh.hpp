@@ -6,6 +6,7 @@
 #include "Material.hpp"
 #include "VertexFormats.hpp"
 #include "util/Handle.hpp"
+#include "util/StringHash.hpp"
 
 struct GPUMesh {
 	GPUMesh() : vertex_format(vertex_fmt::FMT_NONE) {}
@@ -27,4 +28,19 @@ struct GPUMesh {
 	Handle material_id;
 	unsigned int indices_count;
 	GLenum indices_type;
+};
+
+struct GPUMeshTemplate {
+	std::string file;
+	std::string meshname;
+	Handle material;
+
+	GPUMesh compile();
+
+	template <typename T>
+	void reflect(T& f) {
+		f(file,     HASHSTR("file"));
+		f(meshname, HASHSTR("meshname"));
+		f(material, HASHSTR("material"));
+	}
 };
