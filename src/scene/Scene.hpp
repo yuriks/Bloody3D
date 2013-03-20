@@ -22,6 +22,9 @@ struct Scene;
 struct MeshInstance {
 	Handle transform;
 	Handle mesh_id;
+	Handle material_opts;
+
+	MeshInstance() {}
 
 	MeshInstance(Handle transform, Handle mesh)
 		: transform(transform), mesh_id(mesh)
@@ -31,6 +34,7 @@ struct MeshInstance {
 	void reflect(T& f) {
 		f(transform, "transform");
 		f(mesh_id, "mesh_id");
+		f(material_opts, "material_params");
 	}
 };
 
@@ -70,6 +74,7 @@ struct Scene {
 
 	ObjectPool<Transform> transforms;
 	ObjectPool<MeshInstance> mesh_instances;
+	ObjectPool<MaterialOptions> material_options;
 	ObjectPool<Camera> cameras;
 	Handle active_camera;
 

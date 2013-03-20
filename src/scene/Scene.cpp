@@ -102,6 +102,7 @@ void renderGeometry(
 	int mtl_options_size = 0;
 
 	Handle cur_mesh_id;
+	Handle cur_material_params_id;
 
 	render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(SystemUniformBlock), &sys_uniforms, GL_STREAM_DRAW);
@@ -138,19 +139,25 @@ void renderGeometry(
 				mtl_options_size = mtl->options_size;
 			}
 
+			mesh->vao.bind();
+			mesh->ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+		}
+
+		if (cur_material_params_id != instance->material_opts) {
+			cur_material_params_id = instance->material_opts;
+			const MaterialOptions* params = scene.material_options[cur_material_params_id];
+
 			render_context.material_ubo.bind(GL_UNIFORM_BUFFER);
-			glBufferData(GL_UNIFORM_BUFFER, mtl_options_size, mesh->material_options.uniforms.get(), GL_STREAM_DRAW);
+			glBufferData(GL_UNIFORM_BUFFER, mtl_options_size, params->uniforms.get(), GL_STREAM_DRAW);
 
 			for (int t = 0; t < 4; ++t) {
-				const Texture* tex = engine.textures[mesh->material_options.texture_ids[t]];
+				const Texture* tex = engine.textures[params->texture_ids[t]];
 				if (tex != nullptr) {
 					glActiveTexture(GL_TEXTURE0 + t);
 					tex->gl_tex.bind(GL_TEXTURE_2D);
 				}
 			}
-
-			mesh->vao.bind();
-			mesh->ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+			glFlush();
 		}
 
 		// TODO: Instancing

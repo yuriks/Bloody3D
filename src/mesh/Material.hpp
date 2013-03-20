@@ -20,6 +20,14 @@ struct MaterialUniforms {
 struct MaterialOptions {
 	std::shared_ptr<MaterialUniforms> uniforms;
 	std::array<Handle, 4> texture_ids;
+
+	template <typename T>
+	void reflect(T& f) {
+		f(texture_ids[0], "tex0");
+		f(texture_ids[1], "tex1");
+		f(texture_ids[2], "tex2");
+		f(texture_ids[3], "tex3");
+	}
 };
 
 struct Material {
