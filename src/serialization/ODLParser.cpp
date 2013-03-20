@@ -2,9 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-
-#include "Engine.hpp"
-#include "scene/Scene.hpp"
 #include "memory/LinearAllocator.hpp"
 
 namespace serialization {
