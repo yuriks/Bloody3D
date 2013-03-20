@@ -34,7 +34,7 @@ struct AstNumber {
 	Type type;
 
 	union {
-		u32 int_value;
+		s32 int_value;
 		float float_value;
 	};
 };
