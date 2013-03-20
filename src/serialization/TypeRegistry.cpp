@@ -9,6 +9,7 @@
 namespace serialization {
 
 #define DECLARE_TYPE(type, str) {util::fnv_hash(str), str, &objectDeserializator<type>},
+#define DECLARE_TYPE_COMPILED(type, str) {util::fnv_hash(str), str, &compiledObjectReader<type, type##Template>},
 
 TypeEntry type_registry[] = {
 	DECLARE_TYPE(::scene::Transform, "Transform")
@@ -18,6 +19,7 @@ TypeEntry type_registry[] = {
 	DECLARE_TYPE(::scene::Camera, "Camera")
 	DECLARE_TYPE(::scene::MeshInstance, "MeshInstance")
 	DECLARE_TYPE(::MaterialOptions, "MaterialParameters")
+	DECLARE_TYPE_COMPILED(::Texture, "Texture")
 };
 TypeEntry* type_registry_end = std::end(type_registry);
 

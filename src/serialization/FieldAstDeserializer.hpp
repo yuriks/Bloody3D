@@ -47,4 +47,12 @@ Handle objectDeserializator(FieldAstDeserializer& reflector) {
 	return pool.insert(std::move(obj));
 }
 
+template <typename T, typename TemplateT>
+Handle compiledObjectReader(FieldAstDeserializer& reflector) {
+	TemplateT templ;
+	templ.reflect(reflector);
+	ObjectPool<T>& pool = reflectGetPool(*reflector.scene_reader->scene, static_cast<T*>(nullptr));
+	return pool.insert(templ.compile());
+}
+
 }

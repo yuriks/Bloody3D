@@ -73,7 +73,7 @@ struct ShadingBufferSet {
 };
 
 struct Scene {
-	const Engine* engine;
+	Engine* engine;
 	std::unordered_map<std::string, Handle> named_handles;
 
 	ObjectPool<Transform> transforms;
@@ -86,7 +86,7 @@ struct Scene {
 	ObjectPool<OmniLight> lights_omni;
 	ObjectPool<SpotLight> lights_spot;
 
-	Scene(const Engine* engine)
+	Scene(Engine* engine)
 		: engine(engine)
 	{}
 };

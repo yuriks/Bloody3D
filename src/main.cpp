@@ -119,19 +119,6 @@ void setupTestScene(Engine& engine, scene::Scene& scene) {
 
 		mesh.material_id = mat_id;
 
-		{
-			TextureTemplate tex_template;
-			tex_template.file = "panel_beams_diffuse.png";
-			tex_template.flags = TEXF_SRGB;
-			scene.named_handles.insert(
-				std::make_pair("tex_panel_beams_diffuse", engine.textures.insert(tex_template.compile())));
-
-			tex_template.file = "panel_beams_normal.png";
-			tex_template.flags = TEXF_NONE;
-			scene.named_handles.insert(
-				std::make_pair("tex_panel_beams_normal", engine.textures.insert(tex_template.compile())));
-		}
-
 		mesh_id = engine.gpu_meshes.insert(std::move(mesh));
 		scene.named_handles.insert(std::make_pair("panel_beams", mesh_id));
 	}

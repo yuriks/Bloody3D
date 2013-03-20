@@ -1,6 +1,11 @@
 MaterialParameters @+panel_beams_mtl {
-	tex0: @tex_panel_beams_diffuse
-	tex1: @tex_panel_beams_normal
+	tex0: Texture @+tex_panel_beams_diffuse {
+		file: "panel_beams_diffuse.png"
+		flags: [srgb]
+	}
+	tex1: Texture @+tex_panel_beams_normal {
+		file: "panel_beams_normal.png"
+	}
 }
 
 MeshInstance {

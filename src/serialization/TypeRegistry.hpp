@@ -32,6 +32,7 @@ DECLARE_POOL(::scene::SpotLight, scene.lights_spot)
 DECLARE_POOL(::scene::Camera, scene.cameras)
 DECLARE_POOL(::scene::MeshInstance, scene.mesh_instances)
 DECLARE_POOL(::MaterialOptions, scene.material_options)
+DECLARE_POOL(::Texture, scene.engine->textures)
 
 #undef DECLARE_POOL
 
