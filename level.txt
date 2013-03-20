@@ -1,0 +1,92 @@
+Material @+standard_material {
+	shaders: [
+		("test.vert" vertex)
+		("test.frag" fragment)
+	]
+}
+
+GPUMesh @+panel_beams {
+	file: "data/panel_beams.hwmesh"
+	meshname: "panel_beams"
+	material: @standard_material
+}
+
+MaterialOptions @+panel_beams_mtl {
+	tex0: Texture {
+		file: "panel_beams_diffuse.png"
+		flags: [srgb]
+	}
+	tex1: Texture {
+		file: "panel_beams_normal.png"
+	}
+}
+
+MeshInstance @+parent_mesh {
+	transform: Transform {
+		pos: (0 0 0)
+		rot: (0 1 0 0)
+	}
+	mesh_id: @panel_beams
+	material: @panel_beams_mtl
+}
+
+MeshInstance {
+	transform: Transform {
+		pos: (2 0 -2)
+		rot: (0 0.707106769 0 0.707106769)
+		parent: @parent_mesh
+	}
+	mesh_id: @panel_beams
+	material: @panel_beams_mtl
+}
+
+MeshInstance {
+	transform: Transform {
+		pos: (-2 0 -2)
+		rot: (0 -0.707106769 0 0.707106769)
+		parent: @parent_mesh
+	}
+	mesh_id: @panel_beams
+	material: @panel_beams_mtl
+}
+
+DirectionalLight {
+	transform: Transform {
+		rot: (0.486518949 -0.243259475 0 0.839121103)
+	}
+	color: (2.5 2.5 2.5)
+}
+
+DirectionalLight {
+	transform: Transform {
+		rot: (-0.707106769 0 0 0.707106769)
+	}
+	color: (0.1 0.1 0.8)
+}
+
+OmniLight {
+	transform: Transform {
+		pos: (3 3 0)
+	}
+	color: (32 0 0)
+}
+
+SpotLight {
+	transform: Transform {
+		pos: (0 0 3)
+		rot: (0 1 0 0)
+		parent: @parent_mesh
+	}
+	color: (0 32 0)
+	exponent: 64
+}
+
+Camera {
+	transform: Transform {
+		pos: (0 0 -5.5)
+	}
+	fov: 45
+	clip_near: 0.1
+	clip_far: 500
+	active: 1
+}

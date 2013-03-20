@@ -17,6 +17,8 @@
     <ClCompile Include="src\editor\MeshCooker.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\gl\Shader.cpp" />
+    <ClCompile Include="src\serialization\InputBuffer.cpp" />
+    <ClCompile Include="src\serialization\ODLParser.cpp" />
     <ClCompile Include="src\texture\ImageLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\MatrixTransform.cpp" />
@@ -54,6 +56,7 @@
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Heatwave.hpp" />
     <ClInclude Include="src\memory\LinearAllocator.hpp" />
+    <ClInclude Include="src\serialization\InputBuffer.hpp" />
     <ClInclude Include="src\texture\ImageLoader.hpp" />
     <ClInclude Include="src\math\mat.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
