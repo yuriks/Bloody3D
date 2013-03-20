@@ -109,12 +109,16 @@ void skipWs(InputBuffer& in) {
 	do {
 		while (in.cur_i < in.end_i) {
 			char c = in.buffer[in.cur_i];
-			if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r'))
-				break;
+			if (!(c == ' ' || c == '\t' || c == '\n' || c == '\r')) {
+				in.refill();
+				return;
+			}
+
+			if (c == '\n') ++in.cur_line;
 			++in.cur_i;
 		}
 		in.refill();
-	} while (in.cur_i == in.end_i);
+	} while (in.cur_i != in.end_i);
 }
 
 bool parseRange(InputBuffer& in, char l_min, char l_max) {
@@ -232,7 +236,9 @@ bool parseFieldName(InputBuffer& in, ParseAst& ast, AstFieldName& node) {
 
 bool parseInstance(InputBuffer& in, ParseAst& ast, AstInstance& node) {
 	TRY(parseTypeName(in, ast, node.type_name));
-	parseHandleName(in, ast, node.handle_name);
+	if (!parseHandleName(in, ast, node.handle_name)) {
+		node.handle_name.begin = node.handle_name.end = nullptr;
+	}
 	REQUIRE(parseLiteral(in, '{'), "Expected {.");
 	skipWs(in);
 	parseSequence(in, ast, node.fields, parseField);
@@ -337,7 +343,7 @@ bool parseTuple(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr) {
 
 bool parseNumber(InputBuffer& in, ParseAst& ast, AstNumber& node) {
 	char c = in.buffer[in.cur_i];
-	if (c != '-' && c < '0' && c > '9') return false;
+	if (c != '-' && (c < '0' || c > '9')) return false;
 
 	const char* str_begin = &in.buffer[in.cur_i];
 	node.type = AstNumber::INT;
