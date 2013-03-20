@@ -57,6 +57,8 @@
     <ClInclude Include="src\Heatwave.hpp" />
     <ClInclude Include="src\memory\LinearAllocator.hpp" />
     <ClInclude Include="src\serialization\InputBuffer.hpp" />
+    <ClInclude Include="src\serialization\ODLAst.hpp" />
+    <ClInclude Include="src\serialization\ODLParse.hpp" />
     <ClInclude Include="src\texture\ImageLoader.hpp" />
     <ClInclude Include="src\math\mat.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
