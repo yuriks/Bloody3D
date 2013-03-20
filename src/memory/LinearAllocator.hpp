@@ -24,17 +24,22 @@ public:
 	}
 
 	template <typename T>
-	T* allocate() {
-		static_assert(std::is_pod<T>::value, "T must be a POD");
+	T* allocate(size_t count) {
+		static_assert(std::is_trivial<T>::value, "T must be trivial");
 
 		size_t remaining = memory_end - memory_cur;
 
 		void* void_cur = static_cast<void*>(memory_cur);
-		void* p = std::align(std::alignment_of<T>::value, sizeof(T), void_cur, remaining);
+		void* p = std::align(std::alignment_of<T>::value, count * sizeof(T), void_cur, remaining);
 		memory_cur = static_cast<u8*>(void_cur);
 
 		assert(p);
 		return static_cast<T*>(p);
+	}
+
+	template <typename T>
+	T* allocate() {
+		return allocate<T>(1);
 	}
 
 	void rewind() {
