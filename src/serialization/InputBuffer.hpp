@@ -12,12 +12,14 @@ struct InputBuffer {
 	size_t cur_i;
 	size_t end_i;
 
+	int cur_line;
+
 	bool in_quote;
 	bool eof;
 	bool error;
 
 	InputBuffer(std::ifstream* f)
-		: f(f), cur_i(0), end_i(0),
+		: f(f), cur_i(0), end_i(0), cur_line(1),
 		in_quote(false), eof(false), error(false)
 	{}
 

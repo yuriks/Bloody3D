@@ -83,17 +83,27 @@ struct ParseAst {
 	std::array<u8, 8*1024> alloc_buf;
 	memory::LinearAllocator alloc;
 
-	bool failed;
+	const char* fail_message;
+	int fail_line;
+	char fail_char;
 	AstInstance* instances;
 
 	ParseAst()
 		: alloc(alloc_buf.data(), alloc_buf.size()),
-		failed(false)
+		fail_message(nullptr)
 	{}
+
+	void fail(InputBuffer& in, const char* msg) {
+		if (fail_message == nullptr) {
+			fail_message = msg;
+			fail_line = in.cur_line;
+			fail_char = in.buffer[in.cur_i];
+		}
+	}
 };
 
 #define TRY(x) if (!(x)) return false
-#define REQUIRE(x) if (!(x)) { ast.failed = true; return false; }
+#define REQUIRE(x, msg) if (!(x)) { ast.fail(in, msg); return false; }
 
 void skipWs(InputBuffer& in) {
 	do {
@@ -194,7 +204,7 @@ bool parseHandleName(InputBuffer& in, ParseAst& ast, AstHandleName& node) {
 		node.create = parseLiteral(in, '+');
 
 		const char* str_begin = &in.buffer[in.cur_i];
-		REQUIRE(parseRange(in, 'a', 'z'));
+		REQUIRE(parseRange(in, 'a', 'z'), "Expected a-z.");
 		while (parseRange(in, 'a', 'z') || parseRange(in, '0', '9') || parseLiteral(in, '_'));
 		const char* str_end = &in.buffer[in.cur_i];
 
@@ -208,7 +218,7 @@ bool parseHandleName(InputBuffer& in, ParseAst& ast, AstHandleName& node) {
 
 bool parseFieldName(InputBuffer& in, ParseAst& ast, AstFieldName& node) {
 	const char* str_begin = &in.buffer[in.cur_i];
-	REQUIRE(parseRange(in, 'a', 'z'));
+	TRY(parseRange(in, 'a', 'z'));
 	while (parseRange(in, 'a', 'z') || parseRange(in, '0', '9') || parseLiteral(in, '_'));
 	const char* str_end = &in.buffer[in.cur_i];
 
@@ -223,10 +233,10 @@ bool parseFieldName(InputBuffer& in, ParseAst& ast, AstFieldName& node) {
 bool parseInstance(InputBuffer& in, ParseAst& ast, AstInstance& node) {
 	TRY(parseTypeName(in, ast, node.type_name));
 	parseHandleName(in, ast, node.handle_name);
-	REQUIRE(parseLiteral(in, '{'));
+	REQUIRE(parseLiteral(in, '{'), "Expected {.");
 	skipWs(in);
 	parseSequence(in, ast, node.fields, parseField);
-	REQUIRE(parseLiteral(in, '}'));
+	REQUIRE(parseLiteral(in, '}'), "Expected }.");
 	skipWs(in);
 
 	return true;
@@ -234,9 +244,9 @@ bool parseInstance(InputBuffer& in, ParseAst& ast, AstInstance& node) {
 
 bool parseField(InputBuffer& in, ParseAst& ast, AstField& node) {
 	TRY(parseFieldName(in, ast, node.name));
-	REQUIRE(parseLiteral(in, ':'));
+	REQUIRE(parseLiteral(in, ':'), "Expected :.");
 	skipWs(in);
-	REQUIRE(parseExpression(in, ast, node.expression));
+	REQUIRE(parseExpression(in, ast, node.expression), "Expected expression.");
 
 	return true;
 }
@@ -309,7 +319,7 @@ bool parseList(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr) {
 	TRY(parseLiteral(in, '['));
 	skipWs(in);
 	parseSequence(in, ast, node_ptr, parseExpression);
-	REQUIRE(parseLiteral(in, ']'));
+	REQUIRE(parseLiteral(in, ']'), "Expected ].");
 	skipWs(in);
 
 	return true;
@@ -319,7 +329,7 @@ bool parseTuple(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr) {
 	TRY(parseLiteral(in, '('));
 	skipWs(in);
 	parseSequence(in, ast, node_ptr, parseExpression);
-	REQUIRE(parseLiteral(in, ')'));
+	REQUIRE(parseLiteral(in, ')'), "Expected ).");
 	skipWs(in);
 
 	return true;
@@ -334,20 +344,20 @@ bool parseNumber(InputBuffer& in, ParseAst& ast, AstNumber& node) {
 
 	parseLiteral(in, '-');
 	if (!(parseLiteral(in, '0'))) {
-		REQUIRE(parseRange(in, '1', '9'));
+		REQUIRE(parseRange(in, '1', '9'), "Expected 1-9.");
 		while (parseRange(in, '0', '9'));
 	}
 
 	if (parseLiteral(in, '.')) {
 		node.type = AstNumber::FLOAT;
-		REQUIRE(parseRange(in, '0', '9'));
+		REQUIRE(parseRange(in, '0', '9'), "Expected 0-9.");
 		while (parseRange(in, '0', '9'));
 	}
 
 	if (parseLiteral(in, 'e') || parseLiteral(in, 'E')) {
 		node.type = AstNumber::FLOAT;
 		parseLiteral(in, '+') || parseLiteral(in, '-');
-		REQUIRE(parseRange(in, '0', '9'));
+		REQUIRE(parseRange(in, '0', '9'), "Expected 0-9.");
 		while (parseRange(in, '0', '9'));
 	}
 
@@ -372,4 +382,8 @@ void testParse() {
 	serialization::ParseAst ast;
 
 	serialization::parseRoot(in, ast);
+
+	if (ast.fail_message) {
+		std::cerr << "Parsing failed:\n" << ast.fail_line << ": " << ast.fail_message << " Got '" << ast.fail_char << "'.\n";
+	}
 }
