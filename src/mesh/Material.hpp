@@ -8,6 +8,7 @@
 #include <array>
 #include <string>
 #include "util/Handle.hpp"
+#include "util/StringHash.hpp"
 
 namespace gl {
 	class BufferObject;
@@ -23,10 +24,10 @@ struct MaterialOptions {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(texture_ids[0], "tex0");
-		f(texture_ids[1], "tex1");
-		f(texture_ids[2], "tex2");
-		f(texture_ids[3], "tex3");
+		f(texture_ids[0], HASHSTR("tex0"));
+		f(texture_ids[1], HASHSTR("tex1"));
+		f(texture_ids[2], HASHSTR("tex2"));
+		f(texture_ids[3], HASHSTR("tex3"));
 	}
 };
 

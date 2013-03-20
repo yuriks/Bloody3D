@@ -14,6 +14,7 @@
 #include "scene/SpotLight.hpp"
 #include "Engine.hpp"
 #include "util/ObjectPool.hpp"
+#include "util/StringHash.hpp"
 #include <unordered_map>
 #include <string>
 
@@ -34,9 +35,9 @@ struct MeshInstance {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(transform, "transform");
-		f(mesh_id, "mesh_id");
-		f(material_opts, "material_params");
+		f(transform,     HASHSTR("transform"));
+		f(mesh_id,       HASHSTR("mesh_id"));
+		f(material_opts, HASHSTR("material_params"));
 	}
 };
 
@@ -48,10 +49,10 @@ struct Camera {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(transform, "transform");
-		f(fov, "fov");
-		f(clip_near, "clip_near");
-		f(clip_far, "clip_far");
+		f(transform, HASHSTR("transform"));
+		f(fov,       HASHSTR("fov"));
+		f(clip_near, HASHSTR("clip_near"));
+		f(clip_far,  HASHSTR("clip_far"));
 	}
 };
 

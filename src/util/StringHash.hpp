@@ -64,4 +64,6 @@ inline u32 fnv_hash_runtime(const char* begin, const char* end) {
 	return hash * 16777619u;
 }
 
+#define HASHSTR(str) str, ::util::fnv_hash(str)
+
 } // namespace util

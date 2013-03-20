@@ -3,6 +3,7 @@
 #include "math/vec.hpp"
 #include "Transform.hpp"
 #include "Engine.hpp"
+#include "util/StringHash.hpp"
 #include <vector>
 
 struct Material;
@@ -19,9 +20,9 @@ struct SpotLight {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(transform, "transform");
-		f(color, "color");
-		f(exponent, "exponent");
+		f(transform, HASHSTR("transform"));
+		f(color,     HASHSTR("color"));
+		f(exponent,  HASHSTR("exponent"));
 	}
 };
 

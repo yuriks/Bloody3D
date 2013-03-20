@@ -23,10 +23,9 @@ static float numberAsFloat(const AstNumber& number) {
 	}
 }
 
-const AstField* FieldAstDeserializer::searchField(const char* str) {
+const AstField* searchField(const AstField* fields, const char* str, u32 hash) {
 	const AstField* field = fields;
 
-	u32 hash = util::fnv_hash_runtime(str);
 	while (field != nullptr) {
 		const AstFieldName& name = field->name;
 		if (name.hash == hash && strEqual(name.begin, name.end, str)) {
@@ -37,8 +36,8 @@ const AstField* FieldAstDeserializer::searchField(const char* str) {
 	return nullptr;
 }
 
-void FieldAstDeserializer::operator ()(float& v, const char* name) {
-	const AstField* field = searchField(name);
+void FieldAstDeserializer::operator ()(float& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
 
@@ -48,8 +47,8 @@ void FieldAstDeserializer::operator ()(float& v, const char* name) {
 }
 
 template <unsigned int N>
-void FieldAstDeserializer::operator ()(math::vec<N>& v, const char* name) {
-	const AstField* field = searchField(name);
+void FieldAstDeserializer::operator ()(math::vec<N>& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
 
@@ -66,10 +65,10 @@ void FieldAstDeserializer::operator ()(math::vec<N>& v, const char* name) {
 	assert(e == nullptr);
 }
 
-template void FieldAstDeserializer::operator ()<3>(math::vec<3>& v, const char* name);
+template void FieldAstDeserializer::operator ()<3>(math::vec<3>& v, const char* name, u32 name_hash);
 
-void FieldAstDeserializer::operator ()(math::Quaternion& v, const char* name) {
-	const AstField* field = searchField(name);
+void FieldAstDeserializer::operator ()(math::Quaternion& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
 
@@ -86,8 +85,8 @@ void FieldAstDeserializer::operator ()(math::Quaternion& v, const char* name) {
 	assert(e == nullptr);
 }
 
-void FieldAstDeserializer::operator ()(Handle& v, const char* name) {
-	const AstField* field = searchField(name);
+void FieldAstDeserializer::operator ()(Handle& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
 

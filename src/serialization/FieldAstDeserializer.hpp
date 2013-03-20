@@ -16,12 +16,10 @@ struct FieldAstDeserializer {
 	const AstField* fields;
 	SceneAstDeserializer* scene_reader;
 
-	const AstField* searchField(const char* str);
-
-	void operator ()(float& v, const char* name);
-	template <unsigned int N> void operator ()(math::vec<N>& v, const char* name);
-	void operator ()(math::Quaternion& v, const char* name);
-	void operator ()(Handle& v, const char* name);
+	void operator ()(float& v, const char* name, u32 name_hash);
+	template <unsigned int N> void operator ()(math::vec<N>& v, const char* name, u32 name_hash);
+	void operator ()(math::Quaternion& v, const char* name, u32 name_hash);
+	void operator ()(Handle& v, const char* name, u32 name_hash);
 };
 
 template <typename T>

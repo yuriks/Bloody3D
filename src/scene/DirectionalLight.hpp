@@ -5,6 +5,7 @@
 #include "Transform.hpp"
 #include "util/ObjectPool.hpp"
 #include "Engine.hpp"
+#include "util/StringHash.hpp"
 #include <vector>
 
 struct Material;
@@ -20,8 +21,8 @@ struct DirectionalLight {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(transform, "transform");
-		f(color, "color");
+		f(transform, HASHSTR("transform"));
+		f(color,     HASHSTR("color"));
 	}
 };
 

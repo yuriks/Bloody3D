@@ -4,6 +4,7 @@
 #include "math/Quaternion.hpp"
 #include "math/mat.hpp"
 #include "util/ObjectPool.hpp"
+#include "util/StringHash.hpp"
 
 namespace scene {
 
@@ -18,10 +19,10 @@ struct Transform {
 
 	template <typename T>
 	void reflect(T& f) {
-		f(pos, "pos");
-		f(scale, "scale");
-		f(rot, "rot");
-		f(parent, "parent");
+		f(pos,    HASHSTR("pos"));
+		f(scale,  HASHSTR("scale"));
+		f(rot,    HASHSTR("rot"));
+		f(parent, HASHSTR("parent"));
 	}
 };
 
