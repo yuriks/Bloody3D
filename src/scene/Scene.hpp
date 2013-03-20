@@ -26,6 +26,12 @@ struct MeshInstance {
 	MeshInstance(Handle transform, Handle mesh)
 		: transform(transform), mesh_id(mesh)
 	{}
+
+	template <typename T>
+	void reflect(T& f) {
+		f(transform, "transform");
+		f(mesh_id, "mesh_id");
+	}
 };
 
 struct Camera {
@@ -33,6 +39,14 @@ struct Camera {
 	float fov;
 	float clip_near;
 	float clip_far;
+
+	template <typename T>
+	void reflect(T& f) {
+		f(transform, "transform");
+		f(fov, "fov");
+		f(clip_near, "clip_near");
+		f(clip_far, "clip_far");
+	}
 };
 
 struct GBufferSet {

@@ -16,6 +16,13 @@ struct SpotLight {
 	Handle transform;
 	math::vec3 color;
 	float exponent;
+
+	template <typename T>
+	void reflect(T& f) {
+		f(transform, "transform");
+		f(color, "color");
+		f(exponent, "exponent");
+	}
 };
 
 struct GPUSpotLight {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "util/StringHash.hpp"
 
 namespace serialization {
 
@@ -131,6 +132,7 @@ bool parseFieldName(InputBuffer& in, ParseAst& ast, AstFieldName& node) {
 
 	node.begin = ast.alloc.allocate<char>(str_end - str_begin);
 	node.end = std::copy(str_begin, str_end, node.begin);
+	node.hash = util::fnv_hash_runtime(node.begin, node.end);
 
 	skipWs(in);
 
@@ -282,17 +284,4 @@ bool parseNumber(InputBuffer& in, ParseAst& ast, AstNumber& node) {
 	return true;
 }
 
-}
-
-void testParse() {
-	std::ifstream f("level.txt");
-	serialization::InputBuffer in(&f);
-
-	serialization::ParseAst ast;
-
-	serialization::parseRoot(in, ast);
-
-	if (ast.fail_message) {
-		std::cerr << "Parsing failed:\n" << ast.fail_line << ": " << ast.fail_message << " Got '" << ast.fail_char << "'.\n";
-	}
 }

@@ -15,6 +15,14 @@ struct Transform {
 	Handle parent;
 
 	Transform() : pos(math::vec3_0), scale(1.0f), rot() { }
+
+	template <typename T>
+	void reflect(T& f) {
+		f(pos, "pos");
+		f(scale, "scale");
+		f(rot, "rot");
+		f(parent, "parent");
+	}
 };
 
 math::mat4 calcTransformMtx(const Transform& t);

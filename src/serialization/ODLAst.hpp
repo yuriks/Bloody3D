@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Heatwave.hpp"
+
 namespace serialization {
 
 struct AstTypeName {
@@ -16,6 +18,7 @@ struct AstHandleName {
 struct AstFieldName {
 	char* begin;
 	char* end;
+	u32 hash;
 };
 
 struct AstString {

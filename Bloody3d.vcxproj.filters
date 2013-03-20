@@ -90,6 +90,15 @@
     <ClCompile Include="src\serialization\ODLParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\serialization\SceneReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\serialization\TypeRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\serialization\FieldAstDeserializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl\BufferObject.hpp">
@@ -231,6 +240,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\serialization\ODLParse.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serialization\SceneReader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serialization\TypeRegistry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\serialization\FieldAstDeserializer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

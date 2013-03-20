@@ -17,6 +17,12 @@ struct SystemUniformBlock;
 struct DirectionalLight {
 	Handle transform;
 	math::vec3 color;
+
+	template <typename T>
+	void reflect(T& f) {
+		f(transform, "transform");
+		f(color, "color");
+	}
 };
 
 struct GPUDirectionalLight {
