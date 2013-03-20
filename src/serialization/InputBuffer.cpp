@@ -37,6 +37,12 @@ void InputBuffer::refill() {
 		end_i = i;
 	}
 
+	if (eof || error) {
+		assert(end_i < buffer.size());
+		buffer[end_i] = '\0';
+		return;
+	}
+
 	// Fill rest of buffer with read data
 	while (true) {
 		f->read(&buffer[end_i], buffer.size() - end_i);
