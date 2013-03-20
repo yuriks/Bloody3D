@@ -26,5 +26,13 @@ extern TypeEntry* type_registry_end;
 	}
 
 DECLARE_POOL(::scene::Transform, scene.transforms)
+DECLARE_POOL(::scene::DirectionalLight, scene.lights_dir)
+DECLARE_POOL(::scene::OmniLight, scene.lights_omni)
+DECLARE_POOL(::scene::SpotLight, scene.lights_spot)
+DECLARE_POOL(::scene::Camera, scene.cameras)
+DECLARE_POOL(::scene::MeshInstance, scene.mesh_instances)
+DECLARE_POOL(::MaterialOptions, scene.material_options)
+
+#undef DECLARE_POOL
 
 }

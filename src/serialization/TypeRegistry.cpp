@@ -12,7 +12,15 @@ namespace serialization {
 
 TypeEntry type_registry[] = {
 	DECLARE_TYPE(::scene::Transform, "Transform")
+	DECLARE_TYPE(::scene::DirectionalLight, "DirectionalLight")
+	DECLARE_TYPE(::scene::OmniLight, "OmniLight")
+	DECLARE_TYPE(::scene::SpotLight, "SpotLight")
+	DECLARE_TYPE(::scene::Camera, "Camera")
+	DECLARE_TYPE(::scene::MeshInstance, "MeshInstance")
+	DECLARE_TYPE(::MaterialOptions, "MaterialParameters")
 };
 TypeEntry* type_registry_end = std::end(type_registry);
+
+#undef DECLARE_TYPE
 
 }

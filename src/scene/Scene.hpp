@@ -14,6 +14,8 @@
 #include "scene/SpotLight.hpp"
 #include "Engine.hpp"
 #include "util/ObjectPool.hpp"
+#include <unordered_map>
+#include <string>
 
 namespace scene {
 
@@ -71,6 +73,7 @@ struct ShadingBufferSet {
 
 struct Scene {
 	const Engine* engine;
+	std::unordered_map<std::string, Handle> named_handles;
 
 	ObjectPool<Transform> transforms;
 	ObjectPool<MeshInstance> mesh_instances;

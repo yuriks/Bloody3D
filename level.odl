@@ -1,33 +1,15 @@
-Material @+standard_material {
-	shaders: [
-		("test.vert" vertex)
-		("test.frag" fragment)
-	]
+MaterialParameters @+panel_beams_mtl {
+	tex0: @tex_panel_beams_diffuse
+	tex1: @tex_panel_beams_normal
 }
 
-GPUMesh @+panel_beams {
-	file: "data/panel_beams.hwmesh"
-	meshname: "panel_beams"
-	material: @standard_material
-}
-
-MaterialOptions @+panel_beams_mtl {
-	tex0: Texture {
-		file: "panel_beams_diffuse.png"
-		flags: [srgb]
-	}
-	tex1: Texture {
-		file: "panel_beams_normal.png"
-	}
-}
-
-MeshInstance @+parent_mesh {
-	transform: Transform {
+MeshInstance {
+	transform: Transform @+parent_mesh {
 		pos: (0 0 0)
 		rot: (0 1 0 0)
 	}
 	mesh_id: @panel_beams
-	material: @panel_beams_mtl
+	material_params: @panel_beams_mtl
 }
 
 MeshInstance {
@@ -37,7 +19,7 @@ MeshInstance {
 		parent: @parent_mesh
 	}
 	mesh_id: @panel_beams
-	material: @panel_beams_mtl
+	material_params: @panel_beams_mtl
 }
 
 MeshInstance {
@@ -47,7 +29,7 @@ MeshInstance {
 		parent: @parent_mesh
 	}
 	mesh_id: @panel_beams
-	material: @panel_beams_mtl
+	material_params: @panel_beams_mtl
 }
 
 DirectionalLight {

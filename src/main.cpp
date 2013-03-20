@@ -95,7 +95,7 @@ bool init_window()
 	return true;
 }
 
-void setupTestScene(Engine& engine, scene::Scene& scene, Handle* wall_t_h) {
+void setupTestScene(Engine& engine, scene::Scene& scene) {
 	Handle mesh_id;
 	{
 		Handle mat_id;
@@ -105,6 +105,7 @@ void setupTestScene(Engine& engine, scene::Scene& scene, Handle* wall_t_h) {
 			material_template.options_size = 0;
 
 			mat_id = engine.materials.insert(material_template.compile());
+			scene.named_handles.insert(std::make_pair("standard_material", mat_id));
 		}
 
 		GPUMesh mesh;
@@ -119,92 +120,20 @@ void setupTestScene(Engine& engine, scene::Scene& scene, Handle* wall_t_h) {
 		mesh.material_id = mat_id;
 
 		{
-			MaterialOptions mtl_options;
-			mtl_options.uniforms = nullptr;
-
 			TextureTemplate tex_template;
 			tex_template.file = "panel_beams_diffuse.png";
 			tex_template.flags = TEXF_SRGB;
-			mtl_options.texture_ids[0] = engine.textures.insert(tex_template.compile());
+			scene.named_handles.insert(
+				std::make_pair("tex_panel_beams_diffuse", engine.textures.insert(tex_template.compile())));
 
 			tex_template.file = "panel_beams_normal.png";
 			tex_template.flags = TEXF_NONE;
-			mtl_options.texture_ids[1] = engine.textures.insert(tex_template.compile());
-
-			mesh.material_options = mtl_options;
+			scene.named_handles.insert(
+				std::make_pair("tex_panel_beams_normal", engine.textures.insert(tex_template.compile())));
 		}
 
 		mesh_id = engine.gpu_meshes.insert(std::move(mesh));
-	}
-
-	scene::Transform wall_tt;
-	wall_tt.rot = math::Quaternion(math::up, math::pi);
-	*wall_t_h = scene.transforms.insert(wall_tt);
-	scene.mesh_instances.insert(scene::MeshInstance(*wall_t_h, mesh_id));
-
-	{
-		wall_tt.parent = *wall_t_h;
-
-		wall_tt.pos = math::mvec3(2.0f, 0.0f, -2.0f);
-		wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * 0.5f);
-		Handle t = scene.transforms.insert(wall_tt);
-		scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
-
-		wall_tt.pos = math::mvec3(-2.0f, 0.0f, -2.0f);
-		wall_tt.rot = math::Quaternion(math::vec3_y, math::pi * -0.5f);
-		t = scene.transforms.insert(wall_tt);
-		scene.mesh_instances.insert(scene::MeshInstance(t, mesh_id));
-	}
-
-	{
-		scene::DirectionalLight light;
-		scene::Transform t;
-
-		t.rot = math::shortestArc(math::vec3_z, math::normalized(math::mvec3(-0.5f, -1.f, 0.5f)));
-		light.color = 2.5f * math::vec3_1;
-		light.transform = scene.transforms.insert(t);
-		scene.lights_dir.insert(light);
-
-		t.rot = math::shortestArc(math::vec3_z, math::vec3_y);
-		light.color = math::mvec3(0.1f, 0.1f, 0.8f);
-		light.transform = scene.transforms.insert(t);
-		scene.lights_dir.insert(light);
-	}
-
-	{
-		scene::OmniLight light;
-		scene::Transform t;
-
-		t.pos = math::mvec3(3.0f, 3.0f, 0.0f);
-		light.color = math::mvec3(32.0f, 0.0f, 0.0f);
-		light.transform = scene.transforms.insert(t);
-		scene.lights_omni.insert(light);
-	}
-
-	{
-		scene::SpotLight light;
-		scene::Transform t;
-
-		t.pos = math::mvec3(0.0f, 0.0f, 3.0f);
-		t.rot = math::Quaternion(math::vec3_y, math::pi);
-		t.parent = *wall_t_h;
-		light.exponent = 64;
-		light.color = math::mvec3(0.0f, 32.0f, 0.0f);
-		light.transform = scene.transforms.insert(t);
-		scene.lights_spot.insert(light);
-	}
-
-	{
-		scene::Camera camera;
-		camera.fov = 45.f;
-		camera.clip_near = 0.1f;
-		camera.clip_far = 500.f;
-
-		scene::Transform t;
-		t.pos = math::mvec3(0.f, 0.f, -5.5f);
-		camera.transform = scene.transforms.insert(t);
-
-		scene.active_camera = scene.cameras.insert(camera);
+		scene.named_handles.insert(std::make_pair("panel_beams", mesh_id));
 	}
 }
 
@@ -267,6 +196,8 @@ void renderScene(
 	glBindVertexArray(0);
 }
 
+void testParse(scene::Scene& scene);
+
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
@@ -294,8 +225,11 @@ int main(int argc, char *argv[])
 		shading_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height, def_buffers.depth_tex);
 
 		scene::Scene scene(&engine);
-		Handle wall_t;
-		setupTestScene(engine, scene, &wall_t);
+		setupTestScene(engine, scene);
+		testParse(scene);
+
+		Handle wall_t = scene.named_handles.at("parent_mesh");
+		scene.active_camera = scene.cameras.makeHandle(0);
 
 		double elapsed_game_time = 0.;
 		double elapsed_real_time = 0.;

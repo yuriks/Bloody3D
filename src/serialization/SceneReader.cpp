@@ -39,6 +39,9 @@ Handle SceneAstDeserializer::deserializeObject(const AstInstance& instance) {
 
 	if (instance.handle_name.begin != nullptr) {
 		std::string handle_name(instance.handle_name.begin, instance.handle_name.end);
+		if (instance.handle_name.create) {
+			scene->named_handles.insert(std::make_pair(handle_name, handle));
+		}
 		handle_map.insert(std::make_pair(std::move(handle_name), handle));
 	}
 	return handle;
@@ -55,7 +58,7 @@ void SceneAstDeserializer::deserializeScene(const ParseAst& ast) {
 }
 
 void testParse(scene::Scene& scene) {
-	std::ifstream f("level_test.txt");
+	std::ifstream f("level.odl");
 	serialization::InputBuffer in(&f);
 
 	serialization::ParseAst ast;
@@ -67,6 +70,7 @@ void testParse(scene::Scene& scene) {
 	} else {
 		serialization::SceneAstDeserializer scene_reader;
 		scene_reader.scene = &scene;
+		scene_reader.handle_map = scene.named_handles;
 		scene_reader.deserializeScene(ast);
 	}
 }
