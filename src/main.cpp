@@ -13,7 +13,7 @@
 #include "mesh/VertexFormats.hpp"
 #include "mesh/GPUMesh.hpp"
 #include "mesh/ObjLoader.hpp"
-#include "texture/TextureManager.hpp"
+#include "texture/Texture.hpp"
 #include "mesh/HWMesh.hpp"
 #include "scene/Scene.hpp"
 #include "scene/RenderContext.hpp"
@@ -121,8 +121,16 @@ void setupTestScene(Engine& engine, scene::Scene& scene, Handle* wall_t_h) {
 		{
 			MaterialOptions mtl_options;
 			mtl_options.uniforms = nullptr;
-			mtl_options.texture_ids[0] = engine.texture_manager.getTexture("panel_beams_diffuse.png", TEXF_SRGB);
-			mtl_options.texture_ids[1] = engine.texture_manager.getTexture("panel_beams_normal.png");
+
+			TextureTemplate tex_template;
+			tex_template.file = "panel_beams_diffuse.png";
+			tex_template.flags = TEXF_SRGB;
+			mtl_options.texture_ids[0] = engine.textures.insert(tex_template.compile());
+
+			tex_template.file = "panel_beams_normal.png";
+			tex_template.flags = TEXF_NONE;
+			mtl_options.texture_ids[1] = engine.textures.insert(tex_template.compile());
+
 			mesh.material_options = mtl_options;
 		}
 

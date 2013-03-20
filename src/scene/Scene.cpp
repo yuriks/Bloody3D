@@ -142,10 +142,10 @@ void renderGeometry(
 			glBufferData(GL_UNIFORM_BUFFER, mtl_options_size, mesh->material_options.uniforms.get(), GL_STREAM_DRAW);
 
 			for (int t = 0; t < 4; ++t) {
-				const gl::Texture* tex = engine.texture_manager.textures[mesh->material_options.texture_ids[t]];
+				const Texture* tex = engine.textures[mesh->material_options.texture_ids[t]];
 				if (tex != nullptr) {
 					glActiveTexture(GL_TEXTURE0 + t);
-					tex->bind(GL_TEXTURE_2D);
+					tex->gl_tex.bind(GL_TEXTURE_2D);
 				}
 			}
 

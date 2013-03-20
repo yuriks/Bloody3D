@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture/TextureManager.hpp"
+#include "texture/Texture.hpp"
 #include "util/ObjectPool.hpp"
 #include "mesh/Material.hpp"
 #include "mesh/GPUMesh.hpp"
@@ -13,7 +13,7 @@ struct LightInfo {
 };
 
 struct Engine {
-	TextureManager texture_manager;
+	ObjectPool<Texture> textures;
 	ObjectPool<Material> materials;
 	ObjectPool<GPUMesh> gpu_meshes;
 
