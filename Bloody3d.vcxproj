@@ -53,6 +53,7 @@
     <ClInclude Include="src\gl\Texture.hpp" />
     <ClInclude Include="src\gl\VertexArrayObject.hpp" />
     <ClInclude Include="src\Heatwave.hpp" />
+    <ClInclude Include="src\memory\LinearAllocator.hpp" />
     <ClInclude Include="src\texture\ImageLoader.hpp" />
     <ClInclude Include="src\math\mat.hpp" />
     <ClInclude Include="src\math\MatrixTransform.hpp" />
