@@ -23,6 +23,23 @@ static float numberAsFloat(const AstNumber& number) {
 	}
 }
 
+template <typename T>
+AstFlagSetter<T> AstFlagSetter<T>::flag(T value, const char* name, u32 name_hash) {
+	const AstSequence* seq = seq_head;
+	while (seq != nullptr) {
+		assert(seq->type == AstExpression::FIELD_NAME);
+		const AstFieldName& fname = *seq->field_name;
+		if (fname.hash == name_hash && strEqual(fname.begin, fname.end, name)) {
+			*target |= value;
+		}
+		seq = seq->next;
+	}
+
+	return *this;
+}
+
+template AstFlagSetter<u8> AstFlagSetter<u8>::flag(u8 value, const char* name, u32 name_hash);
+
 const AstField* searchField(const AstField* fields, const char* str, u32 hash) {
 	const AstField* field = fields;
 
@@ -35,6 +52,19 @@ const AstField* searchField(const AstField* fields, const char* str, u32 hash) {
 	}
 	return nullptr;
 }
+
+template <typename T>
+AstFlagSetter<T> FieldAstDeserializer::flags(T& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
+	if (field == nullptr)
+		return AstFlagSetter<T>(nullptr, nullptr);
+
+	const AstExpression& sequence = field->expression;
+	assert(sequence.type == AstExpression::LIST);
+	return AstFlagSetter<T>(sequence.sequence, &v);
+}
+
+template AstFlagSetter<u8> FieldAstDeserializer::flags<u8>(u8& v, const char* name, u32 name_hash);
 
 void FieldAstDeserializer::operator ()(float& v, const char* name, u32 name_hash) {
 	const AstField* field = searchField(fields, name, name_hash);
@@ -103,6 +133,16 @@ void FieldAstDeserializer::operator ()(Handle& v, const char* name, u32 name_has
 	} else {
 		assert(false);
 	}
+}
+
+void FieldAstDeserializer::operator ()(std::string& v, const char* name, u32 name_hash) {
+	const AstField* field = searchField(fields, name, name_hash);
+	if (field == nullptr)
+		return;
+
+	const AstExpression& str = field->expression;
+	assert(str.type == AstExpression::STRING);
+	v.assign(str.string->begin, str.string->end);
 }
 
 }
