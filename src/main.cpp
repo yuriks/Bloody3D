@@ -311,6 +311,11 @@ int main(int argc, char *argv[])
 			int i;
 			for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 			{
+				int cur_mouse_pos[2];
+				glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
+				float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
+				float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
+
 				static const float ROT_SPEED = 0.02f;
 				static const float MOUSE_ROT_SPEED = 0.01f;
 
@@ -325,12 +330,6 @@ int main(int argc, char *argv[])
 				if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
 				if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
 
-				int cur_mouse_pos[2];
-				glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
-
-				float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
-				float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
-				//x_mdelta = y_mdelta = 0.0f;
 				rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 				rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 
