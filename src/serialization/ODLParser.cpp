@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "memory/LinearAllocator.hpp"
 
 namespace serialization {
@@ -41,8 +42,7 @@ struct AstNumber {
 };
 
 struct AstInstance;
-struct AstList;
-struct AstTuple;
+struct AstSequence;
 
 struct AstExpression {
 	enum Type {
@@ -55,19 +55,14 @@ struct AstExpression {
 		AstInstance* instance;
 		AstHandleName* handle_name;
 		AstString* string;
-		AstList* list;
-		AstTuple* tuple;
+		AstSequence* sequence;
 		AstNumber* number;
 		AstFieldName* field_name;
 	};
 };
 
-struct AstList : AstExpression {
-	AstList* next;
-};
-
-struct AstTuple : AstExpression {
-	AstTuple* next;
+struct AstSequence : AstExpression {
+	AstSequence* next;
 };
 
 struct AstField {
@@ -168,8 +163,8 @@ bool parseField(InputBuffer& in, ParseAst& ast, AstField& node);
 bool parseExpression(InputBuffer& in, ParseAst& ast, AstExpression& node);
 
 bool parseString(InputBuffer& in, ParseAst& ast, AstString& node);
-bool parseList(InputBuffer& in, ParseAst& ast, AstList*& node_ptr);
-bool parseTuple(InputBuffer& in, ParseAst& ast, AstTuple*& node_ptr);
+bool parseList(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr);
+bool parseTuple(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr);
 bool parseNumber(InputBuffer& in, ParseAst& ast, AstNumber& node);
 
 void parseRoot(InputBuffer& in, ParseAst& ast) {
@@ -251,8 +246,7 @@ bool parseExpression(InputBuffer& in, ParseAst& ast, AstExpression& node) {
 		AstInstance node_instance;
 		AstHandleName node_handle_name;
 		AstString node_string;
-		AstList* node_list;
-		AstTuple* node_tuple;
+		AstSequence* node_sequence;
 		AstNumber node_number;
 		AstFieldName node_field_name;
 	};
@@ -263,18 +257,17 @@ bool parseExpression(InputBuffer& in, ParseAst& ast, AstExpression& node) {
 			node.f = ast.alloc.allocate<Ast##cls>(); \
 			*node.f = node_##f; \
 		} else
-#define PARSECASE_SEQ(e, cls, f) \
-		if (parse##cls(in, ast, node_##f)) { \
+#define PARSECASE_SEQ(e, cls) \
+		if (parse##cls(in, ast, node_sequence)) { \
 			node.type = AstExpression::e; \
-			node.f = ast.alloc.allocate<Ast##cls>(); \
-			node.f = node_##f; \
+			node.sequence = node_sequence; \
 		} else
 
 	PARSECASE(INSTANCE, Instance, instance)
 	PARSECASE(HANDLE_NAME, HandleName, handle_name)
 	PARSECASE(STRING, String, string)
-	PARSECASE_SEQ(LIST, List, list)
-	PARSECASE_SEQ(TUPLE, Tuple, tuple)
+	PARSECASE_SEQ(LIST, List)
+	PARSECASE_SEQ(TUPLE, Tuple)
 	PARSECASE(NUMBER, Number, number)
 	PARSECASE(FIELD_NAME, FieldName, field_name) {
 		return false;
@@ -312,7 +305,7 @@ bool parseString(InputBuffer& in, ParseAst& ast, AstString& node) {
 	return true;
 }
 
-bool parseList(InputBuffer& in, ParseAst& ast, AstList*& node_ptr) {
+bool parseList(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr) {
 	TRY(parseLiteral(in, '['));
 	skipWs(in);
 	parseSequence(in, ast, node_ptr, parseExpression);
@@ -322,7 +315,7 @@ bool parseList(InputBuffer& in, ParseAst& ast, AstList*& node_ptr) {
 	return true;
 }
 
-bool parseTuple(InputBuffer& in, ParseAst& ast, AstTuple*& node_ptr) {
+bool parseTuple(InputBuffer& in, ParseAst& ast, AstSequence*& node_ptr) {
 	TRY(parseLiteral(in, '('));
 	skipWs(in);
 	parseSequence(in, ast, node_ptr, parseExpression);
