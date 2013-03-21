@@ -14,6 +14,22 @@ MaterialParameters @+panel_beams_mtl {
 	}
 }
 
+GPUMesh @+monkey {
+	file: "data/monkey.hwmesh"
+	meshname: "monkey"
+	material: @standard_material
+}
+
+MaterialParameters @+monkey_mtl {
+	tex0: Texture @+tex_monkey_diffuse {
+		file: "monkey_diffuse.png"
+		flags: [srgb]
+	}
+	tex1: Texture @+tex_monkey_normal {
+		file: "monkey_normal.png"
+	}
+}
+
 MeshInstance {
 	transform: Transform @+parent_mesh {
 		pos: (0 0 0)
@@ -21,6 +37,16 @@ MeshInstance {
 	}
 	mesh_id: @panel_beams
 	material_params: @panel_beams_mtl
+}
+
+MeshInstance {
+	transform: Transform {
+		pos: (0 0 1)
+		rot: (0 0 0 1)
+		parent: @parent_mesh
+	}
+	mesh_id: @monkey
+	material_params: @monkey_mtl
 }
 
 MeshInstance {
