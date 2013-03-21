@@ -69,6 +69,36 @@ MeshInstance {
 	material_params: @panel_beams_mtl
 }
 
+MeshInstance {
+	transform: Transform {
+		pos: (0 0 -4)
+		rot: (0 1 0 0)
+		parent: @parent_mesh
+	}
+	mesh_id: @panel_beams
+	material_params: @panel_beams_mtl
+}
+
+MeshInstance {
+	transform: Transform {
+		pos: (0 2 -2)
+		rot: (-0.707106769 0 0 0.707106769)
+		parent: @parent_mesh
+	}
+	mesh_id: @panel_beams
+	material_params: @panel_beams_mtl
+}
+
+MeshInstance {
+	transform: Transform {
+		pos: (0 -2 -2)
+		rot: (0.707106769 0 0 0.707106769)
+		parent: @parent_mesh
+	}
+	mesh_id: @panel_beams
+	material_params: @panel_beams_mtl
+}
+
 DirectionalLight {
 	transform: Transform {
 		rot: (0.486518949 -0.243259475 0 0.839121103)
