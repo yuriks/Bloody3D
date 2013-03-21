@@ -57,7 +57,8 @@ Mesh load_obj(std::istream& f)
 		{
 			float u, v;
 			ss >> u >> v;
-			uv_db.push_back(floatPair(u, v));
+			// OpenGL textures are "upside down"
+			uv_db.push_back(floatPair(u, 1.0f - v));
 		}
 		else if (command == "vn")
 		{
