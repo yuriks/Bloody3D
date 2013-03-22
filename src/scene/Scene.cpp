@@ -87,14 +87,20 @@ void renderGeometry(
 		sorted_instances[i] = instances.makeHandle(i);
 	}
 
-	// Sort instances first by material, then by instance
+	// Sort instances by material, material_params, instance
 	std::sort(sorted_instances.begin(), sorted_instances.end(), [&](Handle a, Handle b) -> bool {
-		Handle mat_id_a = gpu_meshes[instances[a]->mesh_id]->material_id;
-		Handle mat_id_b = gpu_meshes[instances[b]->mesh_id]->material_id;
-		if (mat_id_a.index == mat_id_b.index) {
-			return a.index < b.index;
+		size_t mat_id_a = gpu_meshes[instances[a]->mesh_id]->material_id.index;
+		size_t mat_id_b = gpu_meshes[instances[b]->mesh_id]->material_id.index;
+		if (mat_id_a == mat_id_b) {
+			size_t matpar_id_a = instances[a]->material_opts.index;
+			size_t matpar_id_b = instances[b]->material_opts.index;
+			if (matpar_id_a == matpar_id_b) {
+				return a.index < b.index;
+			} else {
+				return matpar_id_a < matpar_id_b;
+			}
 		} else {
-			return mat_id_a.index < mat_id_b.index;
+			return mat_id_a < mat_id_b;
 		}
 	});
 
