@@ -28,14 +28,17 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <thread>
 
 #include <GL/gl3w.h>
 
-//#define GLFW_GL3_H
-#include <GL/glfw.h>
+#define GLFW_INCLUDE_GLCOREARB
+#include <GLFW/glfw3.h>
 
 static const int WINDOW_WIDTH = 800;
 static const int WINDOW_HEIGHT = 600;
+
+static GLFWwindow* glfw_window = nullptr;
 
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
@@ -47,7 +50,7 @@ void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum sever
 
 bool init_window()
 {
-	if (glfwInit() != GL_TRUE)
+	if (!glfwInit())
 	{
 		char tmp;
 		std::cerr << "Failed to initialize GLFW." << std::endl;
@@ -55,12 +58,15 @@ bool init_window()
 		return false;
 	}
 
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
-	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	if (glfwOpenWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 8, 8, 8, 0, 0, 0, GLFW_WINDOW) != GL_TRUE)
+	glfwDefaultWindowHints();
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfw_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Bloody3D", nullptr, nullptr);
+	if (glfw_window == nullptr)
 	{
 		char tmp;
 		std::cerr << "Failed to open window." << std::endl;
@@ -68,6 +74,7 @@ bool init_window()
 		return false;
 	}
 
+	glfwMakeContextCurrent(glfw_window);
 	glfwSwapInterval(1);
 
 	if (gl3wInit() != 0) {
@@ -90,7 +97,7 @@ bool init_window()
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	glfwDisable(GLFW_MOUSE_CURSOR);
+	glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	return true;
 }
@@ -208,8 +215,8 @@ int main(int argc, char *argv[])
 		double elapsed_real_time = 0.;
 		double last_frame_time;
 
-		int last_mouse_pos[2];
-		glfwGetMousePos(&last_mouse_pos[0], &last_mouse_pos[1]);
+		double last_mouse_pos[2];
+		glfwGetCursorPos(glfw_window, &last_mouse_pos[0], &last_mouse_pos[1]);
 
 		while (running)
 		{
@@ -218,8 +225,8 @@ int main(int argc, char *argv[])
 			int i;
 			for (i = 0; elapsed_game_time < elapsed_real_time && i < 5; ++i)
 			{
-				int cur_mouse_pos[2];
-				glfwGetMousePos(&cur_mouse_pos[0], &cur_mouse_pos[1]);
+				double cur_mouse_pos[2];
+				glfwGetCursorPos(glfw_window, &cur_mouse_pos[0], &cur_mouse_pos[1]);
 				float x_mdelta = float(cur_mouse_pos[0] - last_mouse_pos[0]);
 				float y_mdelta = float(cur_mouse_pos[1] - last_mouse_pos[1]);
 
@@ -228,14 +235,14 @@ int main(int argc, char *argv[])
 
 				math::Quaternion& rot_amount = scene.transforms[wall_t]->rot;
 
-				if (glfwGetKey('A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
-				if (glfwGetKey('D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
 
-				if (glfwGetKey('W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
-				if (glfwGetKey('S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
 
-				if (glfwGetKey('Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
-				if (glfwGetKey('E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
 
 				rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 				rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
@@ -248,21 +255,25 @@ int main(int argc, char *argv[])
 
 			renderScene(engine, scene, def_buffers, shading_buffers);
 
-			glfwSwapBuffers();
+			glfwSwapBuffers(glfw_window);
+			glfwPollEvents();
 
 			double tmp = elapsed_real_time + (glfwGetTime() - frame_start);
-			if (elapsed_game_time > tmp)
-				glfwSleep(elapsed_game_time - tmp - 0.01);
+			if (elapsed_game_time > tmp) {
+				const std::chrono::duration<double> sleep_duration(elapsed_game_time - tmp - 0.01);
+				std::this_thread::sleep_for(std::chrono::duration_cast<std::chrono::microseconds>(sleep_duration));
+			}
 
 			last_frame_time = glfwGetTime() - frame_start;
 			elapsed_real_time += last_frame_time;
 			if (i == 5)
 				elapsed_game_time = elapsed_real_time;
 
-			running = glfwGetWindowParam(GLFW_OPENED) != 0 && glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS;
+			running = glfwWindowShouldClose(glfw_window) == 0 && glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) != GLFW_PRESS;
 		}
 	}
 
+	glfwDestroyWindow(glfw_window);
 	glfwTerminate();
 
 	return 0;

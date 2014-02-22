@@ -41,9 +41,10 @@
     <ClCompile Include="src\util\mmap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libs\include\GLFW\glfw3.h" />
+    <ClInclude Include="libs\include\GLFW\glfw3native.h" />
     <ClInclude Include="libs\include\GL\gl3w.h" />
     <ClInclude Include="libs\include\GL\glcorearb.h" />
-    <ClInclude Include="libs\include\GL\glfw.h" />
     <ClInclude Include="libs\include\stb_image.h" />
     <ClInclude Include="src\editor\AssetProcessing.hpp" />
     <ClInclude Include="src\editor\MeshCooker.hpp" />
@@ -93,7 +94,7 @@
     <ClInclude Include="src\util\StringHash.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="libs\msvc110\GLFW.lib" />
+    <Library Include="libs\lib-msvc120\glfw3.lib" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EFE3B300-8AA5-4DD9-A433-B9AB8675ECD3}</ProjectGuid>
