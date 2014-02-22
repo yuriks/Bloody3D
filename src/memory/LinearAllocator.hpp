@@ -27,13 +27,16 @@ public:
 	T* allocate(size_t count) {
 		static_assert(std::is_trivial<T>::value, "T must be trivial");
 
+		const size_t allocation_size = count * sizeof(T);
+
+		// Modified by std::align
 		size_t remaining = memory_end - memory_cur;
-
 		void* void_cur = static_cast<void*>(memory_cur);
-		void* p = std::align(std::alignment_of<T>::value, count * sizeof(T), void_cur, remaining);
-		memory_cur = static_cast<u8*>(void_cur);
 
+		void* p = std::align(std::alignment_of<T>::value, allocation_size, void_cur, remaining);
 		assert(p);
+
+		memory_cur = static_cast<u8*>(void_cur) +allocation_size;
 		return static_cast<T*>(p);
 	}
 

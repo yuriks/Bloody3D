@@ -53,7 +53,7 @@ bool cook_mesh(int& argc, char **& argv) {
 
 	while (argc > 0) {
 		if (argc < 3) {
-			std::cerr << "[CookMesh] Missing mesh parameters: in_file mesh_name format" << std::cerr;
+			std::cerr << "[CookMesh] Missing mesh parameters: in_file mesh_name format" << std::endl;
 			return false;
 		}
 

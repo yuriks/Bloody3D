@@ -25,6 +25,7 @@ Handle reflectionObjectDispatch(std::string& str, FieldAstDeserializer& reflecto
 			return entry.name_hash == str_hash && std::strcmp(entry.name, str_cstr) == 0;
 		});
 
+	assert(type_entry != type_registry_end);
 	assert(type_entry != nullptr);
 	return type_entry->astDeserializator(reflector);
 }

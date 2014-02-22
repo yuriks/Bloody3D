@@ -49,6 +49,10 @@ struct Material {
 struct MaterialTemplate {
 	size_t options_size;
 
+	MaterialTemplate()
+		: options_size(0)
+	{}
+
 	void attachShader(const std::string& fname, GLenum type);
 
 	void attachShaders(const std::string& vert, const std::string& frag) {
