@@ -17,7 +17,7 @@ vec3 brdf(vec3 normal, vec3 light_dir, vec3 view_dir) {
 	vec3 spec_color = 0.02f * vec3(1, 1, 1);
 	float spec_m = 1000;
 	vec3 h = normalize(light_dir + view_dir);
-	vec3 specular_term = (spec_m + 8)/(8*C_PI) * pow(dot(normal, h), spec_m) * spec_color;
+	vec3 specular_term = (spec_m + 8)/(8*C_PI) * pow(max(dot(normal, h), 0), spec_m) * spec_color;
 
 	return diffuse_term + specular_term;
 }
