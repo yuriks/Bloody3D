@@ -42,6 +42,11 @@ static GLFWwindow* glfw_window = nullptr;
 
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
+	if (source != GL_DEBUG_SOURCE_APPLICATION_ARB) {
+		// Republish messages so that apitrace picks them up.
+		glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, type, id, severity, length, message);
+		return;
+	}
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity != GL_DEBUG_SEVERITY_LOW_ARB)
 		std::cerr << message << std::endl;
 	if ((type != GL_DEBUG_TYPE_PERFORMANCE_ARB && type != GL_DEBUG_TYPE_OTHER_ARB) || severity == GL_DEBUG_SEVERITY_HIGH_ARB)
