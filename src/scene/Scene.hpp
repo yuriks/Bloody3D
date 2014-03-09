@@ -76,7 +76,7 @@ struct Scene {
 	std::unordered_map<std::string, Handle> named_handles;
 
 	ObjectPool<Transform> transforms;
-	ObjectPool<MeshInstance> mesh_instances ;
+	ObjectPool<MeshInstance> mesh_instances;
 	ObjectPool<MaterialOptions> material_options;
 	ObjectPool<Camera> cameras;
 	Handle active_camera;
