@@ -3,8 +3,6 @@
 #include "math/MatrixTransform.hpp"
 #include "math/misc.hpp"
 
-namespace scene {
-
 struct BufferSpec {
 	gl::Texture* tex;
 	GLenum internal_format;
@@ -73,8 +71,8 @@ void ShadingBufferSet::initialize(int width, int height, gl::Texture& depth_tex)
 
 void renderGeometry(
 	const Scene& scene,
-	const math::mat4& world2view_mat,
-	const math::mat4* model2world_mats,
+	const mat4& world2view_mat,
+	const mat4* model2world_mats,
 	GBufferSet& buffers,
 	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms)
@@ -121,8 +119,8 @@ void renderGeometry(
 
 	glDisable(GL_BLEND);
 
-	math::vec4 clear_albedo = {0, 0, 0, 0};
-	math::vec4 clear_normal = {0.5f, 0.5f, 0, 0};
+	vec4 clear_albedo = {0, 0, 0, 0};
+	vec4 clear_normal = {0.5f, 0.5f, 0, 0};
 	float clear_depth = 1.f;
 	glClearBufferfv(GL_COLOR, 0, clear_albedo.data);
 	glClearBufferfv(GL_COLOR, 1, clear_normal.data);
@@ -168,8 +166,8 @@ void renderGeometry(
 		}
 
 		// TODO: Instancing
-		math::mat4 model2world_mat = model2world_mats[scene.transforms.getPoolIndex(instance->transform)];
-		math::mat4 model2view_mat = world2view_mat * model2world_mat;
+		mat4 model2world_mat = model2world_mats[scene.transforms.getPoolIndex(instance->transform)];
+		mat4 model2view_mat = world2view_mat * model2world_mat;
 
 		render_context.system_ubo.bind(GL_UNIFORM_BUFFER);
 		SystemUniformBlock sys_uniforms_copy = sys_uniforms;
@@ -196,5 +194,3 @@ void bindGBufferTextures(GBufferSet& gbuffer) {
 	glActiveTexture(GL_TEXTURE2);
 	gbuffer.normal_tex.bind(GL_TEXTURE_2D);
 }
-
-} // namespace scene

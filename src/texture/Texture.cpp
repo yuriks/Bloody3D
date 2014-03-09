@@ -4,8 +4,8 @@
 #include <fstream>
 
 static gl::Texture loadTexture(const std::string& fname, TexFlags flags) {
-	image::Image img;
-	image::Image::loadPNGFileRGBA8(img, fname);
+	Image img;
+	Image::loadPNGFileRGBA8(img, fname);
 
 	gl::Texture tex;
 	tex.bind(GL_TEXTURE_2D);
@@ -34,8 +34,8 @@ static gl::Texture loadTexture(const std::string& fname, TexFlags flags) {
 Texture TextureTemplate::compile() {
 	static const std::string texture_path("data/textures/");
 
-	image::Image img;
-	image::Image::loadPNGFileRGBA8(img, texture_path + file);
+	Image img;
+	Image::loadPNGFileRGBA8(img, texture_path + file);
 
 	gl::Texture tex;
 	tex.bind(GL_TEXTURE_2D);

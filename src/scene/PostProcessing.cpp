@@ -1,11 +1,9 @@
 #include "scene/PostProcessing.hpp"
 
-namespace scene {
-
 void tonemap(const ShadingBufferSet& shading_buffers, const Material& material, const RenderContext& render_context) {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-	math::vec4 clear_color = {0, 0, 0, 0};
+	vec4 clear_color = {0, 0, 0, 0};
 	glClearBufferfv(GL_COLOR, 0, clear_color.data);
 
 	material.shader_program.use();
@@ -20,5 +18,3 @@ void tonemap(const ShadingBufferSet& shading_buffers, const Material& material, 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-} // namespace scene

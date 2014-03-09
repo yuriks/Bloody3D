@@ -6,12 +6,12 @@
 GPUMesh GPUMeshTemplate::compile() {
 	GPUMesh mesh;
 
-	util::MMapHandle mmap_h = util::mmapFile(file.c_str());
+	MMapHandle mmap_h = mmapFile(file.c_str());
 	assert(mmap_h != -1);
 
-	mesh::loadHWMesh(util::mmapGetData(mmap_h), util::fnv_hash_runtime(meshname.c_str()), mesh);
+	loadHWMesh(mmapGetData(mmap_h), fnv_hash_runtime(meshname.c_str()), mesh);
 
-	util::mmapClose(mmap_h);
+	mmapClose(mmap_h);
 
 	mesh.material_id = material;
 

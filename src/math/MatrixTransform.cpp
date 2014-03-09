@@ -3,10 +3,6 @@
 #include "misc.hpp"
 #include <cmath>
 
-namespace math {
-
-namespace mat_transform {
-
 mat3 rotate(const vec3& axis, float angle)
 {
 	// Taken from Graphics Gems I (Section IX.6)
@@ -61,7 +57,7 @@ mat4 frustrum_proj(float half_width, float half_height, float z_near, float z_fa
 
 mat4 perspective_proj(float vfov, float aspect, float z_near, float z_far)
 {
-	float height = z_far * std::tanf(vfov * (math::pi / 180.f));
+	float height = z_far * std::tanf(vfov * (pi / 180.f));
 
 	return frustrum_proj(height * aspect, height, z_near, z_far);
 }
@@ -78,9 +74,5 @@ mat4 look_at(const vec3& up, const vec3& camera, const vec3& target)
 		z_axis
 	}};
 
-	return pad<4>(m) * mat_transform::translate(-camera);
+	return pad<4>(m) * translate(-camera);
 }
-
-} // namespace mat_transform
-
-} // namespace math

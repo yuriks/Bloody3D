@@ -2,7 +2,6 @@
 
 #include "Heatwave.hpp"
 
-namespace util {
 
 // Implements a compile-time FNV-1a string hash
 // Thanks to http://altdevblogaday.com/2011/10/27/quasi-compile-time-string-hashing/
@@ -64,6 +63,4 @@ inline u32 fnv_hash_runtime(const char* begin, const char* end) {
 	return hash * 16777619u;
 }
 
-#define HASHSTR(str) str, ::util::fnv_hash(str)
-
-} // namespace util
+#define HASHSTR(str) str, ::fnv_hash(str)

@@ -5,8 +5,6 @@
 #include <cassert>
 #include <iostream>
 
-namespace serialization {
-
 static bool checkWhitespace(InputBuffer& buf, size_t start) {
 	// Check for whitespace in buffer
 	for (size_t i = start; i < buf.end_i; ++i) {
@@ -70,6 +68,4 @@ void InputBuffer::refill() {
 			break;
 		}
 	}
-}
-
 }

@@ -102,7 +102,7 @@ bool init_window()
 	return true;
 }
 
-void setupTestScene(Engine& engine, scene::Scene& scene) {
+void setupTestScene(Engine& engine, Scene& scene) {
 	Handle mesh_id;
 	{
 		Handle mat_id;
@@ -118,35 +118,33 @@ void setupTestScene(Engine& engine, scene::Scene& scene) {
 }
 
 void renderCamera(
-	const Engine& engine, const scene::Scene& scene, const scene::Camera& camera,
-	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers,
-	const math::mat4* model2world_mats, const math::mat4* model2world_inv_mats)
+	const Engine& engine, const Scene& scene, const Camera& camera,
+	GBufferSet& def_buffers, ShadingBufferSet& shading_buffers,
+	const mat4* model2world_mats, const mat4* model2world_inv_mats)
 {
-	using namespace scene;
+	SystemUniformBlock sys_uniforms;
+	sys_uniforms.projection_mat = perspective_proj(camera.fov, engine.render_context.aspect_ratio, camera.clip_near, camera.clip_far);
+	mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
 
-	scene::SystemUniformBlock sys_uniforms;
-	sys_uniforms.projection_mat = math::mat_transform::perspective_proj(camera.fov, engine.render_context.aspect_ratio, camera.clip_near, camera.clip_far);
-	math::mat4 world2view_mat = model2world_inv_mats[scene.transforms.getPoolIndex(camera.transform)];
-
-	scene::renderGeometry(scene, world2view_mat, model2world_mats, def_buffers, engine.render_context, sys_uniforms);
+	renderGeometry(scene, world2view_mat, model2world_mats, def_buffers, engine.render_context, sys_uniforms);
 
 	shading_buffers.fbo.bind(GL_DRAW_FRAMEBUFFER);
 	bindGBufferTextures(def_buffers);
-	math::vec4 clear_color = {0, 0, 0, 0};
+	vec4 clear_color = {0, 0, 0, 0};
 	glClearBufferfv(GL_COLOR, 0, clear_color.data);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
 	{
-		scene::ShadeLightSetParams p = {
+		ShadeLightSetParams p = {
 			&world2view_mat, model2world_mats, &engine, &scene, &sys_uniforms
 		};
 
-		scene::shadeLightSet<DirectionalLight, GPUDirectionalLight>(
+		shadeLightSet<DirectionalLight, GPUDirectionalLight>(
 			scene.lights_dir.pool, engine.dirlight, p);
-		scene::shadeLightSet<OmniLight, GPUOmniLight>(
+		shadeLightSet<OmniLight, GPUOmniLight>(
 			scene.lights_omni.pool, engine.omnilight, p);
-		scene::shadeLightSet<SpotLight, GPUSpotLight>(
+		shadeLightSet<SpotLight, GPUSpotLight>(
 			scene.lights_spot.pool, engine.spotlight, p);
 	}
 
@@ -157,14 +155,12 @@ void renderCamera(
 }
 
 void renderScene(
-	const Engine& engine, const scene::Scene& scene,
-	scene::GBufferSet& def_buffers, scene::ShadingBufferSet& shading_buffers)
+	const Engine& engine, const Scene& scene,
+	GBufferSet& def_buffers, ShadingBufferSet& shading_buffers)
 {
-	using namespace scene;
-
-	std::vector<math::mat4> model2world_mats(scene.transforms.pool.size());
-	std::vector<math::mat4> model2world_inv_mats(scene.transforms.pool.size());
-	scene::calculateModel2WorldMatrices(scene.transforms,
+	std::vector<mat4> model2world_mats(scene.transforms.pool.size());
+	std::vector<mat4> model2world_inv_mats(scene.transforms.pool.size());
+	calculateModel2WorldMatrices(scene.transforms,
 		model2world_mats.data(), model2world_inv_mats.data());
 
 	renderCamera(engine, scene, *scene.cameras[scene.active_camera],
@@ -172,11 +168,11 @@ void renderScene(
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	engine.null_vao.bind();
-	scene::tonemap(shading_buffers, *engine.materials[engine.tonemap_material], engine.render_context);
+	tonemap(shading_buffers, *engine.materials[engine.tonemap_material], engine.render_context);
 	glBindVertexArray(0);
 }
 
-void testParse(scene::Scene& scene);
+void testParse(Scene& scene);
 
 int main(int argc, char *argv[])
 {
@@ -199,12 +195,12 @@ int main(int argc, char *argv[])
 		glFrontFace(GL_CW);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-		scene::GBufferSet def_buffers;
+		GBufferSet def_buffers;
 		def_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height);
-		scene::ShadingBufferSet shading_buffers;
+		ShadingBufferSet shading_buffers;
 		shading_buffers.initialize(engine.render_context.screen_width, engine.render_context.screen_height, def_buffers.depth_tex);
 
-		scene::Scene scene(&engine);
+		Scene scene(&engine);
 		setupTestScene(engine, scene);
 		testParse(scene);
 
@@ -233,19 +229,19 @@ int main(int argc, char *argv[])
 				static const float ROT_SPEED = 0.02f;
 				static const float MOUSE_ROT_SPEED = 0.01f;
 
-				math::Quaternion& rot_amount = scene.transforms[wall_t]->rot;
+				Quaternion& rot_amount = scene.transforms[wall_t]->rot;
 
-				if (glfwGetKey(glfw_window, 'A')) rot_amount = math::Quaternion(math::up, ROT_SPEED) * rot_amount;
-				if (glfwGetKey(glfw_window, 'D')) rot_amount = math::Quaternion(math::up, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'A')) rot_amount = Quaternion(up, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'D')) rot_amount = Quaternion(up, -ROT_SPEED) * rot_amount;
 
-				if (glfwGetKey(glfw_window, 'W')) rot_amount = math::Quaternion(math::right, ROT_SPEED) * rot_amount;
-				if (glfwGetKey(glfw_window, 'S')) rot_amount = math::Quaternion(math::right, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'W')) rot_amount = Quaternion(right, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'S')) rot_amount = Quaternion(right, -ROT_SPEED) * rot_amount;
 
-				if (glfwGetKey(glfw_window, 'Q')) rot_amount = math::Quaternion(math::forward, ROT_SPEED) * rot_amount;
-				if (glfwGetKey(glfw_window, 'E')) rot_amount = math::Quaternion(math::forward, -ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'Q')) rot_amount = Quaternion(forward, ROT_SPEED) * rot_amount;
+				if (glfwGetKey(glfw_window, 'E')) rot_amount = Quaternion(forward, -ROT_SPEED) * rot_amount;
 
-				rot_amount = math::Quaternion(math::up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
-				rot_amount = math::Quaternion(math::right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+				rot_amount = Quaternion(up, -x_mdelta * MOUSE_ROT_SPEED) * rot_amount;
+				rot_amount = Quaternion(right, -y_mdelta * MOUSE_ROT_SPEED) * rot_amount;
 
 				last_mouse_pos[0] = cur_mouse_pos[0];
 				last_mouse_pos[1] = cur_mouse_pos[1];

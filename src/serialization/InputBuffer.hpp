@@ -3,8 +3,6 @@
 #include <array>
 #include <fstream>
 
-namespace serialization {
-
 struct InputBuffer {
 	std::ifstream* f;
 
@@ -25,5 +23,3 @@ struct InputBuffer {
 
 	void refill();
 };
-
-}

@@ -8,7 +8,7 @@
 
 struct SubMesh
 {
-	util::AlignedVector<vertex_fmt::Pos3f_Norm3f_Tex2f> vertices;
+	AlignedVector<vertex_fmt::Pos3f_Norm3f_Tex2f> vertices;
 	std::vector<unsigned short> indices;
 	std::string name;
 	std::string material;

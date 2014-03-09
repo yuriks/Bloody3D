@@ -2,8 +2,6 @@
 
 #include "Heatwave.hpp"
 
-namespace serialization {
-
 struct AstTypeName {
 	char* begin;
 	char* end;
@@ -76,5 +74,3 @@ struct AstInstance {
 
 	AstInstance* next;
 };
-
-}

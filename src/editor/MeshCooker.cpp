@@ -47,8 +47,8 @@ bool cook_mesh(int& argc, char **& argv) {
 	const char *out_fname = argv[0];
 	argc -= 1; argv += 1;
 
-	std::vector<mesh::HWMeshIndex> index;
-	std::vector<mesh::HWMeshData> mesh_data;
+	std::vector<HWMeshIndex> index;
+	std::vector<HWMeshData> mesh_data;
 	std::vector<const char*> input_filenames;
 
 	while (argc > 0) {
@@ -60,8 +60,8 @@ bool cook_mesh(int& argc, char **& argv) {
 		input_filenames.push_back(argv[0]);
 
 		{
-			mesh::HWMeshIndex i;
-			i.name_hash = util::fnv_hash_runtime(argv[1]);
+			HWMeshIndex i;
+			i.name_hash = fnv_hash_runtime(argv[1]);
 			i.file_offset = ~0u;
 
 			index.push_back(i);
@@ -74,7 +74,7 @@ bool cook_mesh(int& argc, char **& argv) {
 				return false;
 			}
 
-			mesh::HWMeshData d;
+			HWMeshData d;
 			d.vertex_format = fmt;
 			d.reserved = 0;
 
@@ -90,15 +90,15 @@ bool cook_mesh(int& argc, char **& argv) {
 		return false;
 	}
 
-	mesh::HWMeshHeader header;
+	HWMeshHeader header;
 	std::copy_n("HWMESH", 6, header.magic);
 	header.version = 0;
 	header.num_meshes = input_filenames.size();
 
-	out_file.write(reinterpret_cast<char*>(&header), sizeof(mesh::HWMeshHeader));
+	out_file.write(reinterpret_cast<char*>(&header), sizeof(HWMeshHeader));
 
 	std::streamoff index_offset = out_file.tellp();
-	out_file.write(reinterpret_cast<char*>(index.data()), sizeof(mesh::HWMeshIndex) * index.size());
+	out_file.write(reinterpret_cast<char*>(index.data()), sizeof(HWMeshIndex) * index.size());
 
 	for (unsigned int i = 0; i < input_filenames.size(); ++i) {
 		std::ifstream objf(input_filenames[i]);
@@ -139,7 +139,7 @@ bool cook_mesh(int& argc, char **& argv) {
 
 		index[i].file_offset = static_cast<u32>(out_file.tellp());
 
-		out_file.write(reinterpret_cast<char*>(&mesh_data[i]), sizeof(mesh::HWMeshData));
+		out_file.write(reinterpret_cast<char*>(&mesh_data[i]), sizeof(HWMeshData));
 
 		static const unsigned char alignment_padding[15] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 		{
@@ -150,7 +150,7 @@ bool cook_mesh(int& argc, char **& argv) {
 		}
 
 		if (mesh_data[i].vertex_format == vertex_fmt::FMT_POS3F) {
-			util::AlignedVector<vertex_fmt::Pos3f> v_data;
+			AlignedVector<vertex_fmt::Pos3f> v_data;
 			v_data.resize(max_index);
 
 			auto cur_output = std::begin(v_data);
@@ -168,7 +168,7 @@ bool cook_mesh(int& argc, char **& argv) {
 			assert(v_data.size() * sizeof(vertex_fmt::Pos3f) == mesh_data[i].vertex_data_size);
 			out_file.write(reinterpret_cast<char*>(v_data.data()), v_data.size() * sizeof(vertex_fmt::Pos3f));
 		} else if (mesh_data[i].vertex_format == vertex_fmt::FMT_POS3F_NORM3F_TEX2F) {
-			util::AlignedVector<vertex_fmt::Pos3f_Norm3f_Tex2f> v_data;
+			AlignedVector<vertex_fmt::Pos3f_Norm3f_Tex2f> v_data;
 			v_data.resize(max_index);
 
 			auto cur_output = std::begin(v_data);
@@ -220,7 +220,7 @@ bool cook_mesh(int& argc, char **& argv) {
 
 	// Update index with mesh offsets.
 	out_file.seekp(index_offset);
-	out_file.write(reinterpret_cast<char*>(index.data()), sizeof(mesh::HWMeshIndex) * index.size());
+	out_file.write(reinterpret_cast<char*>(index.data()), sizeof(HWMeshIndex) * index.size());
 
 	return true;
 }

@@ -5,8 +5,6 @@
 #include "math/Quaternion.hpp"
 #include "SceneReader.hpp"
 
-namespace serialization {
-
 static bool strEqual(const char* a_begin, const char* a_end, const char* b) {
 	for (; a_begin != a_end && *b != '\0'; ++a_begin, ++b) {
 		if (*a_begin != *b)
@@ -77,7 +75,7 @@ void FieldAstDeserializer::operator ()(float& v, const char* name, u32 name_hash
 }
 
 template <unsigned int N>
-void FieldAstDeserializer::operator ()(math::vec<N>& v, const char* name, u32 name_hash) {
+void FieldAstDeserializer::operator ()(vec<N>& v, const char* name, u32 name_hash) {
 	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
@@ -95,9 +93,9 @@ void FieldAstDeserializer::operator ()(math::vec<N>& v, const char* name, u32 na
 	assert(e == nullptr);
 }
 
-template void FieldAstDeserializer::operator ()<3>(math::vec<3>& v, const char* name, u32 name_hash);
+template void FieldAstDeserializer::operator ()<3>(vec<3>& v, const char* name, u32 name_hash);
 
-void FieldAstDeserializer::operator ()(math::Quaternion& v, const char* name, u32 name_hash) {
+void FieldAstDeserializer::operator ()(Quaternion& v, const char* name, u32 name_hash) {
 	const AstField* field = searchField(fields, name, name_hash);
 	if (field == nullptr)
 		return;
@@ -143,6 +141,4 @@ void FieldAstDeserializer::operator ()(std::string& v, const char* name, u32 nam
 	const AstExpression& str = field->expression;
 	assert(str.type == AstExpression::STRING);
 	v.assign(str.string->begin, str.string->end);
-}
-
 }

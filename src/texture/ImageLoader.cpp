@@ -7,8 +7,6 @@
 #include "stb_image.h"
 #include <csetjmp>
 
-namespace image {
-
 void Image::initialize(unsigned char* data_, unsigned int width_, unsigned int height_)
 {
 	assert(width_ != ~0u);
@@ -62,6 +60,4 @@ void preMultiplyAlpha(Image& image)
 		data[i+1] = data[i+1] * alpha / 255;
 		data[i+2] = data[i+2] * alpha / 255;
 	}
-}
-
 }

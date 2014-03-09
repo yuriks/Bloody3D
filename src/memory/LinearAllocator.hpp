@@ -5,8 +5,6 @@
 #include <memory>
 #include <type_traits>
 
-namespace memory {
-
 class LinearAllocator {
 public:
 	LinearAllocator(u8* memory_area, size_t max_size) :
@@ -54,5 +52,3 @@ private:
 	u8* memory_cur;
 	u8* memory_end;
 };
-
-}

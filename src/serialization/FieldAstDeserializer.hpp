@@ -2,16 +2,12 @@
 
 #include "math/vec.hpp"
 #include "util/Handle.hpp"
+#include "SceneReader.hpp"
 
-namespace math {
-	struct Quaternion;
-}
-
-namespace serialization {
+struct Quaternion;
 
 struct AstField;
 struct AstSequence;
-struct SceneAstDeserializer;
 
 template <typename T>
 struct AstFlagSetter {
@@ -33,8 +29,8 @@ struct FieldAstDeserializer {
 	AstFlagSetter<T> flags(T& v, const char* name, u32 name_hash);
 
 	void operator ()(float& v, const char* name, u32 name_hash);
-	template <unsigned int N> void operator ()(math::vec<N>& v, const char* name, u32 name_hash);
-	void operator ()(math::Quaternion& v, const char* name, u32 name_hash);
+	template <unsigned int N> void operator ()(vec<N>& v, const char* name, u32 name_hash);
+	void operator ()(Quaternion& v, const char* name, u32 name_hash);
 	void operator ()(Handle& v, const char* name, u32 name_hash);
 	void operator ()(std::string& v, const char* name, u32 name_hash);
 };
@@ -53,6 +49,4 @@ Handle compiledObjectReader(FieldAstDeserializer& reflector) {
 	templ.reflect(reflector);
 	ObjectPool<T>& pool = reflectGetPool(*reflector.scene_reader->scene, static_cast<T*>(nullptr));
 	return pool.insert(templ.compile());
-}
-
 }

@@ -3,8 +3,6 @@
 #include "Scene.hpp"
 #include "GL/gl3w.h"
 
-namespace scene {
-
 void setupSpotLightVao(LightInfo& info) {
 	info.vao.bind();
 
@@ -26,15 +24,15 @@ void setupSpotLightVao(LightInfo& info) {
 void transformLights(
 	const std::vector<SpotLight>& in_lights,
 	std::vector<GPUSpotLight>& out_lights,
-	const math::mat4& world2view_mat,
+	const mat4& world2view_mat,
 	const ObjectPool<Transform>& transforms,
-	const math::mat4* model2world_mats)
+	const mat4* model2world_mats)
 {
 	out_lights.resize(in_lights.size());
 	for (size_t i = 0; i < in_lights.size(); ++i) {
-		const math::mat4 model2view_mat = world2view_mat * model2world_mats[transforms.getPoolIndex(in_lights[i].transform)];
-		out_lights[i].pos = math::mvec3(model2view_mat * math::mvec4(math::vec3_0, 1.0f));
-		out_lights[i].dir_exp = model2view_mat * math::mvec4(math::vec3_z, 0.0f);
+		const mat4 model2view_mat = world2view_mat * model2world_mats[transforms.getPoolIndex(in_lights[i].transform)];
+		out_lights[i].pos = mvec3(model2view_mat * mvec4(vec3_0, 1.0f));
+		out_lights[i].dir_exp = model2view_mat * mvec4(vec3_z, 0.0f);
 		out_lights[i].dir_exp[3] = in_lights[i].exponent;
 		out_lights[i].color = in_lights[i].color;
 	}
@@ -59,5 +57,3 @@ void shadeLights(
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, lights.size());
 	glBindVertexArray(0);
 }
-
-} // namespace scene

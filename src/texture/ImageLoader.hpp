@@ -6,8 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-namespace image {
-
 class PngException : public std::runtime_error
 {
 public:
@@ -75,8 +73,6 @@ inline unsigned int Image::getHeight() const
 inline unsigned char* Image::getData() const
 {
 	return data;
-}
-
 }
 
 #endif // BLOODY3D_IMAGE_IMAGELOADER_HPP

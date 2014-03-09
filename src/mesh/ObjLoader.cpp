@@ -8,9 +8,6 @@
 #include <map>
 #include <deque>
 
-using math::vec2;
-using math::vec3;
-using math::mvec3;
 using std::get;
 
 Mesh load_obj(std::istream& f)
@@ -21,8 +18,8 @@ Mesh load_obj(std::istream& f)
 	Mesh mesh;
 	SubMesh* current_submesh = nullptr;
 
-	util::AlignedVector<vec3> pos_db;
-	util::AlignedVector<vec3> norm_db;
+	AlignedVector<vec3> pos_db;
+	AlignedVector<vec3> norm_db;
 	std::vector<floatPair> uv_db;
 	std::map<Triangle, unsigned short> vertex_cache;
 

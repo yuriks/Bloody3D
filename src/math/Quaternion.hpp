@@ -5,8 +5,6 @@
 
 #include <cmath>
 
-namespace math {
-
 struct Quaternion {
 	vec3 v;
 	float w;
@@ -54,5 +52,3 @@ inline Quaternion normalized(const Quaternion& q) {
 
 mat3 matrixFromQuaternion(const Quaternion& q);
 Quaternion shortestArc(const vec3& a, const vec3& b);
-
-} // namespace math

@@ -14,11 +14,9 @@
 #include "FieldAstDeserializer.hpp"
 #include <unordered_map>
 
-namespace serialization {
-
 Handle reflectionObjectDispatch(std::string& str, FieldAstDeserializer& reflector) {
 	const char* str_cstr = str.c_str();
-	u32 str_hash = util::fnv_hash_runtime(str_cstr);
+	u32 str_hash = fnv_hash_runtime(str_cstr);
 
 	TypeEntry* type_entry = std::find_if(type_registry, type_registry_end,
 		[str_cstr, str_hash](const TypeEntry& entry) {
@@ -56,20 +54,18 @@ void SceneAstDeserializer::deserializeScene(const ParseAst& ast) {
 	}
 }
 
-}
-
-void testParse(scene::Scene& scene) {
+void testParse(Scene& scene) {
 	std::ifstream f("level.odl");
-	serialization::InputBuffer in(&f);
+	InputBuffer in(&f);
 
-	serialization::ParseAst ast;
+	ParseAst ast;
 
-	serialization::parseRoot(in, ast);
+	parseRoot(in, ast);
 
 	if (ast.fail_message) {
 		std::cerr << "Parsing failed:\n" << ast.fail_line << ": " << ast.fail_message << " Got '" << ast.fail_char << "'.\n";
 	} else {
-		serialization::SceneAstDeserializer scene_reader;
+		SceneAstDeserializer scene_reader;
 		scene_reader.scene = &scene;
 		scene_reader.handle_map = scene.named_handles;
 		scene_reader.deserializeScene(ast);

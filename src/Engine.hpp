@@ -17,7 +17,7 @@ struct Engine {
 	ObjectPool<Material> materials;
 	ObjectPool<GPUMesh> gpu_meshes;
 
-	scene::RenderContext render_context;
+	RenderContext render_context;
 
 	Handle tonemap_material;
 

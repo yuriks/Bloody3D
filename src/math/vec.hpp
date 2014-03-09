@@ -4,8 +4,6 @@
 #include <cmath>
 #include <ostream>
 
-namespace math {
-
 template<unsigned int N, typename T = float>
 struct vec {
 	T data[N == 3 ? 4 : N];
@@ -189,5 +187,3 @@ std::ostream& operator <<(std::ostream& s, const vec<N,T> v) {
 	}
 	return s << v[N-1] << '>';
 }
-
-} // namespace math

@@ -4,8 +4,6 @@
 #include <algorithm>
 #include <cassert>
 
-namespace util {
-
 namespace {
 
 struct MMapInfo {
@@ -81,5 +79,3 @@ void mmapClose(MMapHandle handle) {
 
 	info.active = false;
 }
-
-} // namespace util

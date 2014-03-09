@@ -5,8 +5,6 @@
 
 struct GPUMesh;
 
-namespace mesh {
-
 struct HWMeshHeader {
 	// Header magic
 	char magic[6]; // = "HWMESH"
@@ -45,5 +43,3 @@ struct HWMeshData {
 static_assert(sizeof(HWMeshData) == 76, "Struct size changed! (Breaks I/O compatibility.)");
 
 void loadHWMesh(const void* file_data_ptr, u32 name_hash, GPUMesh& gpu_mesh);
-
-} // namespace mesh

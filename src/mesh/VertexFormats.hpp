@@ -5,12 +5,12 @@
 namespace vertex_fmt {
 
 struct Pos3f {
-	math::vec3 pos;
+	vec3 pos;
 };
 
 struct Pos3f_Norm3f_Tex2f {
-	math::vec3 pos;
-	math::vec3 norm;
+	vec3 pos;
+	vec3 norm;
 	float tex_coord[2];
 };
 

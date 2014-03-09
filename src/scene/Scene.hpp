@@ -18,8 +18,6 @@
 #include <unordered_map>
 #include <string>
 
-namespace scene {
-
 struct Scene;
 
 struct MeshInstance {
@@ -95,10 +93,8 @@ void bindGBufferTextures(GBufferSet& gbuffer);
 
 void renderGeometry(
 	const Scene& scene,
-	const math::mat4& world2view_mat,
-	const math::mat4* model2world_mats,
+	const mat4& world2view_mat,
+	const mat4* model2world_mats,
 	GBufferSet& buffers,
 	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
-
-} // namespace scene

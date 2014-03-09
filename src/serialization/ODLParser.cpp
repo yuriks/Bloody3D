@@ -4,8 +4,6 @@
 #include <string>
 #include "util/StringHash.hpp"
 
-namespace serialization {
-
 #define TRY(x) if (!(x)) return false
 #define REQUIRE(x, msg) if (!(x)) { ast.fail(in, msg); return false; }
 
@@ -132,7 +130,7 @@ bool parseFieldName(InputBuffer& in, ParseAst& ast, AstFieldName& node) {
 
 	node.begin = ast.alloc.allocate<char>(str_end - str_begin);
 	node.end = std::copy(str_begin, str_end, node.begin);
-	node.hash = util::fnv_hash_runtime(node.begin, node.end);
+	node.hash = fnv_hash_runtime(node.begin, node.end);
 
 	skipWs(in);
 
@@ -282,6 +280,4 @@ bool parseNumber(InputBuffer& in, ParseAst& ast, AstNumber& node) {
 	skipWs(in);
 
 	return true;
-}
-
 }

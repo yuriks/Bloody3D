@@ -4,11 +4,9 @@
 #include "gl/BufferObject.hpp"
 #include "math/mat.hpp"
 
-namespace scene {
-
 struct SystemUniformBlock {
-	math::mat4 projection_mat;
-	math::mat4 view_model_mat;
+	mat4 projection_mat;
+	mat4 view_model_mat;
 };
 
 struct RenderContext {
@@ -22,5 +20,3 @@ struct RenderContext {
 	int screen_height;
 	float aspect_ratio;
 };
-
-} // namespace scene

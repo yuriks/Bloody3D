@@ -1,7 +1,5 @@
 #include "Quaternion.hpp"
 
-namespace math {
-
 mat3 matrixFromQuaternion(const Quaternion& q) {
 	const float x = q.v[0];
 	const float y = q.v[1];
@@ -23,5 +21,3 @@ Quaternion shortestArc(const vec3& a, const vec3& b) {
 	// From http://stackoverflow.com/a/1171995
 	return normalized(Quaternion(cross(a, b), 1 + dot(a, b), 0));
 }
-
-} // namespace math

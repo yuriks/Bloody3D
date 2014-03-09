@@ -5,8 +5,6 @@
 #include <cstring>
 #include <cassert>
 
-namespace util {
-
 // WARNING: You should only use this with POD (or similarly trivial) objects. No constructors or destructors called.
 
 template <typename T, size_t Align = 16>
@@ -161,5 +159,3 @@ template <typename T, size_t Align>
 void swap(AlignedVector<T, Align>& a, AlignedVector<T, Align>& b) {
 	a.swap(b);
 }
-
-} // namespace util

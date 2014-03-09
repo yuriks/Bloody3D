@@ -4,8 +4,6 @@
 #include <cmath>
 #include "vec.hpp"
 
-namespace math {
-
 template<unsigned int R, unsigned int C = R, typename T = float>
 struct mat {
 	// Rows
@@ -221,5 +219,3 @@ std::ostream& operator <<(std::ostream& s, const mat<R,C,T>& m) {
 
 	return s;
 }
-
-} // namespace math

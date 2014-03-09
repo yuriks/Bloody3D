@@ -9,19 +9,19 @@ void loadEngineMaterials(Engine& engine) {
 	material_template.attachShaders("light_directional");
 	material_template.options_size = 0;
 	engine.dirlight.material = engine.materials.insert(material_template.compile());
-	scene::setupDirLightVao(engine.dirlight);
+	setupDirLightVao(engine.dirlight);
 
 	material_template.clear();
 	material_template.attachShaders("light_omni");
 	material_template.options_size = 0;
 	engine.omnilight.material = engine.materials.insert(material_template.compile());
-	scene::setupOmniLightVao(engine.omnilight);
+	setupOmniLightVao(engine.omnilight);
 
 	material_template.clear();
 	material_template.attachShaders("light_spot");
 	material_template.options_size = 0;
 	engine.spotlight.material = engine.materials.insert(material_template.compile());
-	scene::setupSpotLightVao(engine.spotlight);
+	setupSpotLightVao(engine.spotlight);
 
 	material_template.clear();
 	material_template.attachShaders("fullscreen_triangle.vert", "tonemap.frag");

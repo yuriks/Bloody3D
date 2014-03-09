@@ -8,14 +8,12 @@
 
 struct Material;
 
-namespace scene {
-
 struct RenderContext;
 struct SystemUniformBlock;
 
 struct SpotLight {
 	Handle transform;
-	math::vec3 color;
+	vec3 color;
 	float exponent;
 
 	template <typename T>
@@ -27,9 +25,9 @@ struct SpotLight {
 };
 
 struct GPUSpotLight {
-	math::vec3 pos;
-	math::vec4 dir_exp; // xyz: Direction, w: Exponent
-	math::vec3 color;
+	vec3 pos;
+	vec4 dir_exp; // xyz: Direction, w: Exponent
+	vec3 color;
 };
 
 void setupSpotLightVao(LightInfo& info);
@@ -37,14 +35,12 @@ void setupSpotLightVao(LightInfo& info);
 void transformLights(
 	const std::vector<SpotLight>& in_lights,
 	std::vector<GPUSpotLight>& out_lights,
-	const math::mat4& world2view_mat,
+	const mat4& world2view_mat,
 	const ObjectPool<Transform>& transforms,
-	const math::mat4* model2world_mats);
+	const mat4* model2world_mats);
 
 void shadeLights(
 	const std::vector<GPUSpotLight>& lights,
 	const Material& light_material,
 	const RenderContext& render_context,
 	const SystemUniformBlock& sys_uniforms);
-
-} // namespace scene

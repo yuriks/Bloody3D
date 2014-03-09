@@ -4,11 +4,9 @@
 #include "memory/LinearAllocator.hpp"
 #include "ODLAst.hpp"
 
-namespace serialization {
-
 struct ParseAst {
 	std::array<u8, 8*1024> alloc_buf;
-	memory::LinearAllocator alloc;
+	LinearAllocator alloc;
 
 	const char* fail_message;
 	int fail_line;
@@ -30,5 +28,3 @@ struct ParseAst {
 };
 
 void parseRoot(InputBuffer& in, ParseAst& ast);
-
-}
