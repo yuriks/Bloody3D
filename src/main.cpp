@@ -24,6 +24,8 @@
 #include "editor/AssetProcessing.hpp"
 #include "util/mmap.hpp"
 #include "util/StringHash.hpp"
+#include "serialization/reflection.hpp"
+#include "objects.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -108,18 +110,12 @@ bool init_window()
 }
 
 void setupTestScene(Engine& engine, Scene& scene) {
-	Handle mesh_id;
-	{
-		Handle mat_id;
-		{
-			MaterialTemplate material_template;
-			material_template.attachShaders("test");
-			material_template.options_size = 0;
+	MaterialTemplate material_template;
+	material_template.attachShaders("test");
+	material_template.options_size = 0;
 
-			mat_id = engine.materials.insert(material_template.compile());
-			scene.named_handles.insert(std::make_pair("standard_material", mat_id));
-		}
-	}
+	Handle mat_id = engine.materials.insert(material_template.compile());
+	scene.named_handles.insert(std::make_pair("standard_material", mat_id));
 }
 
 void renderCamera(
@@ -181,6 +177,8 @@ void testParse(Scene& scene);
 
 int main(int argc, char *argv[])
 {
+	register_types();
+
 	if (argc > 1 && std::strcmp(argv[1], "-a") == 0) {
 		return editor::asset_processing(argc - 2, argv + 2);
 	}

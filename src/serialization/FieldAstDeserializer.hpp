@@ -3,6 +3,7 @@
 #include "math/vec.hpp"
 #include "util/Handle.hpp"
 #include "SceneReader.hpp"
+#include "objects.hpp"
 
 struct Quaternion;
 
@@ -39,14 +40,16 @@ template <typename T>
 Handle objectDeserializator(FieldAstDeserializer& reflector) {
 	T obj;
 	obj.reflect(reflector);
-	ObjectPool<T>& pool = reflectGetPool(*reflector.scene_reader->scene, static_cast<T*>(nullptr));
-	return pool.insert(std::move(obj));
+	ObjectPool<T>* pool = getTypeConfig<T>().pool;
+	assert(pool != nullptr);
+	return pool->insert(std::move(obj));
 }
 
 template <typename T, typename TemplateT>
 Handle compiledObjectReader(FieldAstDeserializer& reflector) {
 	TemplateT templ;
 	templ.reflect(reflector);
-	ObjectPool<T>& pool = reflectGetPool(*reflector.scene_reader->scene, static_cast<T*>(nullptr));
-	return pool.insert(templ.compile());
+	ObjectPool<T>* pool = getTypeConfig<T>().pool;
+	assert(pool != nullptr);
+	return pool->insert(templ.compile());
 }

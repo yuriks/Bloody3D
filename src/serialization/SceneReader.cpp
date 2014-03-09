@@ -10,22 +10,18 @@
 #include "math/vec.hpp"
 #include "math/Quaternion.hpp"
 #include "util/StringHash.hpp"
-#include "TypeRegistry.hpp"
 #include "FieldAstDeserializer.hpp"
 #include <unordered_map>
+#include "objects.hpp"
 
 Handle reflectionObjectDispatch(std::string& str, FieldAstDeserializer& reflector) {
 	const char* str_cstr = str.c_str();
 	u32 str_hash = fnv_hash_runtime(str_cstr);
 
-	TypeEntry* type_entry = std::find_if(type_registry, type_registry_end,
-		[str_cstr, str_hash](const TypeEntry& entry) {
-			return entry.name_hash == str_hash && std::strcmp(entry.name, str_cstr) == 0;
-		});
+	const TypeEntry* type_entry = type_database.getType(str_hash);
 
-	assert(type_entry != type_registry_end);
 	assert(type_entry != nullptr);
-	return type_entry->astDeserializator(reflector);
+	return type_entry->ast_deserializator(reflector);
 }
 
 Handle SceneAstDeserializer::deserializeObject(const AstInstance& instance) {
@@ -66,6 +62,17 @@ void testParse(Scene& scene) {
 		std::cerr << "Parsing failed:\n" << ast.fail_line << ": " << ast.fail_message << " Got '" << ast.fail_char << "'.\n";
 	} else {
 		SceneAstDeserializer scene_reader;
+
+		SerializationPool<Transform> tmp0(&scene.transforms);
+		SerializationPool<DirectionalLight> tmp1(&scene.lights_dir);
+		SerializationPool<OmniLight> tmp2(&scene.lights_omni);
+		SerializationPool<SpotLight> tmp3(&scene.lights_spot);
+		SerializationPool<Camera> tmp4(&scene.cameras);
+		SerializationPool<MeshInstance> tmp5(&scene.mesh_instances);
+		SerializationPool<MaterialOptions> tmp6(&scene.material_options);
+		SerializationPool<Texture> tmp7(&scene.engine->textures);
+		SerializationPool<GPUMesh> tmp8(&scene.engine->gpu_meshes);
+
 		scene_reader.scene = &scene;
 		scene_reader.handle_map = scene.named_handles;
 		scene_reader.deserializeScene(ast);

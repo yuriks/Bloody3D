@@ -2,6 +2,7 @@
 
 #include "Heatwave.hpp"
 
+typedef u32 StrHash;
 
 // Implements a compile-time FNV-1a string hash
 // Thanks to http://altdevblogaday.com/2011/10/27/quasi-compile-time-string-hashing/

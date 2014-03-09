@@ -5,6 +5,7 @@
 #include "mesh/Material.hpp"
 #include "mesh/GPUMesh.hpp"
 #include "scene/RenderContext.hpp"
+#include "objects.hpp"
 
 struct LightInfo {
 	Handle material;
