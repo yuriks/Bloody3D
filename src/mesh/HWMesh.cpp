@@ -19,13 +19,14 @@ void loadHWMesh(const void* file_data_ptr, u32 name_hash, GPUMesh& gpu_mesh) {
 
 	auto mesh_header = reinterpret_cast<const HWMeshHeader*>(file_data);
 	assert(std::strcmp(mesh_header->magic, "HWMESH") == 0);
-	assert(mesh_header->version == 0);
+	assert(mesh_header->version == HWMeshHeader::HWMESH_VERSION);
 
 	auto mesh_index = reinterpret_cast<const HWMeshIndex*>(file_data + sizeof(HWMeshHeader));
-	auto entry = std::find_if(mesh_index, mesh_index + mesh_header->num_meshes, [&](const HWMeshIndex& i) { return i.name_hash == name_hash; });
+	auto entry = std::find_if(mesh_index, mesh_index + mesh_header->num_meshes, [name_hash](const HWMeshIndex& i) { return i.name_hash == name_hash; });
 	assert(entry != mesh_index + mesh_header->num_meshes);
 
 	auto mesh_data = reinterpret_cast<const HWMeshData*>(file_data + entry->file_offset);
+	assert(mesh_data->num_submeshes <= HWMeshData::MAX_SUBMESHES);
 	assert(mesh_data->vertex_format == vertex_fmt::FMT_POS3F_NORM3F_TEX2F);
 	assert(mesh_data->num_submeshes == 1); // for now
 	gpu_mesh.indices_count = mesh_data->submesh_indices_size[0];

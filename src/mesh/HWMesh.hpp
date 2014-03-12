@@ -6,10 +6,12 @@
 struct GPUMesh;
 
 struct HWMeshHeader {
+	static const int HWMESH_VERSION = 0;
+
 	// Header magic
 	char magic[6]; // = "HWMESH"
 	// Version number,
-	u16 version; // = 0
+	u16 version; // = HWMESH_VERSION
 
 	u16 num_meshes;
 };
@@ -22,14 +24,16 @@ struct HWMeshIndex {
 static_assert(sizeof(HWMeshIndex) == 8, "Struct size changed! (Breaks I/O compatibility.)");
 
 struct HWMeshData {
+	static const int MAX_SUBMESHES = 16;
+
 	u8 index_type; // 1 = UNSIGNED_BYTE, 2 = UNSIGNED_SHORT
 	u8 vertex_format; // See VertexFormat enum in VertexFormats.hpp
-	u8 num_submeshes; // max 16
+	u8 num_submeshes; // max MAX_SUBMESHES
 
 	u8 reserved;
 
-	u16 submesh_indices_offset[16];
-	u16 submesh_indices_size[16];
+	u16 submesh_indices_offset[MAX_SUBMESHES];
+	u16 submesh_indices_size[MAX_SUBMESHES];
 
 	u32 vertex_data_size; // in bytes
 	u32 index_data_size; // in bytes
