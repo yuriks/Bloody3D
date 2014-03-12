@@ -18,7 +18,7 @@ void loadHWMesh(const void* file_data_ptr, u32 name_hash, GPUMesh& gpu_mesh) {
 	auto file_data = static_cast<const char*>(file_data_ptr);
 
 	auto mesh_header = reinterpret_cast<const HWMeshHeader*>(file_data);
-	assert(std::strcmp(mesh_header->magic, "HWMESH") == 0);
+	assert(std::memcmp(mesh_header->magic, "HWMESH", 6) == 0);
 	assert(mesh_header->version == HWMeshHeader::HWMESH_VERSION);
 
 	auto mesh_index = reinterpret_cast<const HWMeshIndex*>(file_data + sizeof(HWMeshHeader));
